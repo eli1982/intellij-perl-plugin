@@ -32,7 +32,7 @@ public class ImportedPackage {
     public String toString() {
         return "ImportPackage{" +
                 "importPackage='" + importPackage + '\'' +
-                ", containingPackage=" + containingPackage +
+                ", containingPackage=" + containingPackage.getPackageName() +
                 '}';
     }
 }

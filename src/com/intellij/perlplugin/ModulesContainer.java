@@ -57,10 +57,10 @@ public class ModulesContainer {
     }
 
     public static void addSub(Sub sub) {
-        if (!subs.containsKey(sub.getSubName())) {
-            subs.put(sub.getSubName(), new HashSet<Sub>());
+        if (!subs.containsKey(sub.getName())) {
+            subs.put(sub.getName(), new HashSet<Sub>());
         }
-        HashSet<Sub> subSet = subs.get(sub.getSubName());
+        HashSet<Sub> subSet = subs.get(sub.getName());
         subSet.add(sub);
     }
 

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  * Created by eli on 27-11-14.
  */
 public class Utils {
-    public static boolean debug = false;
+    public static boolean debug = true;
 
     public static void alert(String str){
         throw  new RuntimeException(str);

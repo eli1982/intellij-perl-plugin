@@ -98,7 +98,7 @@ public class Package {
                 "   startPositionInFile='" + startPositionInFile + '\'' + ",\n" +
                 "   endPositionInFile='" + endPositionInFile + '\'' + ",\n" +
                 "   packageName='" + packageName + '\'' + ",\n" +
-                "   parentPackage='" +  ((parentPackage != null) ? parentPackage.getPackageName() : "'null'") + '\'' + ",\n" +
+                "   parentPackage='" +  ((parentPackage != null) ? parentPackage.getPackageName() : "''") + '\'' + ",\n" +
                 "   importedPackages=" + importedPackages + "\n" +
                 "   subs=" + subs + "\n" +
                 '}';

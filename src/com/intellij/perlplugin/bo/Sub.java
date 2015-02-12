@@ -19,11 +19,11 @@ public class Sub {
         ModulesContainer.addSub(this);
     }
 
-    public String getSubName() {
+    public String getName() {
         return subName;
     }
 
-    public void setSubName(String subName) {
+    public void setName(String subName) {
         this.subName = subName;
     }
 
@@ -51,7 +51,7 @@ public class Sub {
     public String toString() {
         return "Sub{" + "\n" +
                 "   subName='" + subName + '\'' + ",\n" +
-                "   packageObj='" + packageObj + '\'' + ",\n" +
+                "   packageObj='" + packageObj.getPackageName() + '\'' + ",\n" +
                 "   positionInFile='" + positionInFile + '\'' + ",\n" +
                 "   arguments=" + arguments + "\n" +
                 '}';
@@ -59,7 +59,7 @@ public class Sub {
 
     public String toString2() {
         StringBuffer sb = new StringBuffer();
-        sb.append(getSubName());
+        sb.append(getName());
         sb.append("(");
         for (int i = 0; i < getArguments().size(); i++) {
             Argument argument = getArguments().get(i);

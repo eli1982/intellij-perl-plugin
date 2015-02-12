@@ -63,7 +63,7 @@ public class PerlCompletionContributor extends CompletionContributor {
 
                 //get all subs of package if we are on a package's pointer
                 PsiElement psiElement = parameters.getPosition().getPrevSibling();
-                if(psiElement.getNode().getElementType().equals(PerlTypes.POINTER) &&  psiElement .getText().equals("->")){
+                if(psiElement != null && psiElement.getNode().getElementType().equals(PerlTypes.POINTER) &&  psiElement.getText().equals("->")){
                     if(psiElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.PACKAGE)) {
                         String packageName = psiElement.getPrevSibling().getText();
                         ArrayList<Package> packageList = ModulesContainer.getPackageList(packageName);
