@@ -9,14 +9,14 @@ usage:
 3.select a file from the project
 4.press CTRL+SHIFT+G to run the analysis ( this is done to prevent intellij sdk from disabling the plugin if it failes to load - which might happen a lot in this stage of development)
 
-what can it do so far:
+What can it do so far:
 ----------------------
 -autocomplete packages subroutines with CTRL+SPACE
 -support inhertence - so you will see subroutines of parent packages as well
 -highlights subs and packages
 -adds a row symbol for packages in the gutter ( the blue Class symbol)
 
-there's a lot to do (here's some of the things)
+There's a lot to do (here's some of the things)
 -----------------------------------------------
 -detect imports
 -support ctrl click imports (multiple sources) - references
