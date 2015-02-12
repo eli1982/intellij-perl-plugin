@@ -1,0 +1,62 @@
+<idea-plugin version="2">
+    <id>com.yourcompany.unique.plugin.id</id>
+    <name>Perl Plugin</name>
+    <version>1.0</version>
+    <vendor email="eli.abramovitch@booking.com" url="http://www.booking.com">Booking.com</vendor>
+
+    <description><![CDATA[
+      A Plugin that adds support for perl<br>
+      <em>Beta</em>
+    ]]></description>
+
+    <change-notes><![CDATA[
+    ]]>
+    </change-notes>
+
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="131"/>
+
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileTypeFactory implementation="com.intellij.perlplugin.extensions.PerlFileTypeFactory"/>
+        <lang.parserDefinition language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlParserDefinition"/>
+        <lang.syntaxHighlighterFactory key="Simple" implementationClass="com.intellij.perlplugin.extensions.PerlSyntaxHighlighterFactory"/>
+        <codeInsight.lineMarkerProvider language="Perl" implementationClass="com.intellij.perlplugin.extensions.PropertyLineMarkerProvider"/>
+        <completion.contributor language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlCompletionContributor"/>
+        <psi.referenceContributor implementation="com.intellij.perlplugin.extensions.PropertyReferenceContributor"/>
+        <lang.commenter language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlCommenter"/>
+    </extensions>
+
+    <application-components>
+        <component>
+            <implementation-class>com.intellij.perlplugin.AppComponent</implementation-class>
+        </component>
+    </application-components>
+
+    <project-components>
+
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+        <action id="active" class="com.intellij.perlplugin.UpdateSourcesAction" text="Update Sources">
+            <add-to-group group-id="FileMenu" anchor="first"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift G"/>
+        </action>
+        <action id="some action" class="com.intellij.perlplugin.AutoCompleteAction" text="action">
+            <add-to-group group-id="CodeInsightEditorActions" anchor="first"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift D"/>
+        </action>
+    </actions>
+
+    <module-components>
+        <component>
+            <implementation-class>com.intellij.perlplugin.MainModuleComponent</implementation-class>
+        </component>
+    </module-components>
+</idea-plugin>

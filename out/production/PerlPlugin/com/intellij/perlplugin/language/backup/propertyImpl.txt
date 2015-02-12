@@ -1,0 +1,47 @@
+// This is a generated file. Not intended for manual editing.
+package com.intellij.perlplugin.psi.impl;
+
+import com.intellij.perlplugin.psi.PerlPsiImplUtil;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import org.jetbrains.annotations.NotNull;
+
+public class PerlPropertyImpl extends ASTWrapperPsiElement implements PerlProperty {
+
+    public PerlPropertyImpl(ASTNode node) {
+        super(node);
+    }
+
+    public void accept(@NotNull PsiElementVisitor visitor) {
+        if (visitor instanceof PerlVisitor) ((PerlVisitor) visitor).visitProperty(this);
+        else super.accept(visitor);
+    }
+
+    public String getKey() {
+        return PerlPsiImplUtil.getKey(this);
+    }
+
+    public String getValue() {
+        return PerlPsiImplUtil.getValue(this);
+    }
+
+    public String getName() {
+        return PerlPsiImplUtil.getName(this);
+    }
+
+    public PsiElement setName(String newName) {
+        return PerlPsiImplUtil.setName(this, newName);
+    }
+
+    public PsiElement getNameIdentifier() {
+        return PerlPsiImplUtil.getNameIdentifier(this);
+    }
+
+    public ItemPresentation getPresentation() {
+        return PerlPsiImplUtil.getPresentation(this);
+    }
+
+}
