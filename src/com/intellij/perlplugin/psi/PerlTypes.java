@@ -9,7 +9,6 @@ import com.intellij.perlplugin.psi.impl.*;
 public interface PerlTypes {
 
   IElementType PROPERTY = new PerlElementType("PROPERTY");
-  IElementType COMMENT = new PerlTokenType("COMMENT");
   IElementType CRLF = new PerlTokenType("CRLF");
   IElementType KEY = new PerlTokenType("KEY");
   IElementType OPERATOR = new PerlTokenType("OPERATOR");

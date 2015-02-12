@@ -35,13 +35,13 @@ public class PerlParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // property|COMMENT|CRLF
+  // property|COMMENTS|CRLF
   static boolean item_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item_")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = property(b, l + 1);
-    if (!r) r = consumeToken(b, COMMENT);
+    if (!r) r = consumeToken(b, ENDOFLINECOMMENT);
     if (!r) r = consumeToken(b, CRLF);
     exit_section_(b, m, null, r);
     return r;

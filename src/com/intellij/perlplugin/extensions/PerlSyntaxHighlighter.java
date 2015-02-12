@@ -23,7 +23,7 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey BRACES = createTextAttributesKey("BRACES", DefaultLanguageHighlighterColors.OPERATION_SIGN);
     public static final TextAttributesKey KEY = createTextAttributesKey("KEY", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey VALUE = createTextAttributesKey("VALUE", DefaultLanguageHighlighterColors.STRING);
-    public static final TextAttributesKey COMMENT = createTextAttributesKey("COMMENT", getTextAttribute(Color.GRAY,true));
+    public static final TextAttributesKey COMMENTS = createTextAttributesKey("COMMENTS", DefaultLanguageHighlighterColors.LINE_COMMENT);
     public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("BAD_CHARACTER",getTextAttribute(Color.RED,true));
 
     public static final TextAttributesKey PACKAGE = createTextAttributesKey("PACKAGE", DefaultLanguageHighlighterColors.KEYWORD);
@@ -35,7 +35,7 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] KEY_KEYS = new TextAttributesKey[]{KEY};
     private static final TextAttributesKey[] PACKAGE_KEYS = new TextAttributesKey[]{PACKAGE};
     private static final TextAttributesKey[] VALUE_KEYS = new TextAttributesKey[]{VALUE};
-    private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
+    private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENTS};
     private static final TextAttributesKey[] SUBROUTINE_KEYS = new TextAttributesKey[]{SUBROUTINE};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
@@ -60,7 +60,7 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
             return PACKAGE_KEYS;
         } else if (tokenType.equals(PerlTypes.VALUE)) {
             return VALUE_KEYS;
-        } else if (tokenType.equals(PerlTypes.COMMENT)) {
+        } else if (tokenType.equals(PerlTypes.ENDOFLINECOMMENT)) {
             return COMMENT_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;

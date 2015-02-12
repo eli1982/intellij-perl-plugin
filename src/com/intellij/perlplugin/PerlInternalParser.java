@@ -163,7 +163,7 @@ public class PerlInternalParser {
         if (Utils.debug) {
             Utils.print("time:" + result);
         }
-        if(result>0.5) {
+        if(false && result>0.5) {
             ModulesContainer.addProblematicFiles(filePath + "(" + result + ")");
             ModulesContainer.totalDelays += result;
         }

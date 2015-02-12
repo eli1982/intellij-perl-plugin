@@ -1,6 +1,7 @@
 package com.intellij.perlplugin.extensions;
 
 import com.intellij.perlplugin.ModulesContainer;
+import com.intellij.perlplugin.Utils;
 import com.intellij.perlplugin.bo.Package;
 import com.intellij.perlplugin.psi.PerlTypes;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
@@ -49,6 +50,12 @@ public class PropertyLineMarkerProvider extends RelatedItemLineMarkerProvider {
                                     setTooltipText("Navigate to package");
                     result.add(builder.createLineMarkerInfo(element));
             }
+        }else if(element.getNode().getElementType().equals(PerlTypes.SUBROUTINE)){
+            boolean isConstructor = Utils.applyRegex("sub\\s+new",element.getNode().getText()).find();
+            NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create((isConstructor)?AllIcons.Nodes.ClassInitializer:AllIcons.Nodes.Method).
+                    setTargets(element).
+                    setTooltipText((isConstructor)?"Constructor":"");
+            result.add(builder.createLineMarkerInfo(element));
         }
     }
 }
