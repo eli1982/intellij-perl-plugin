@@ -1,15 +1,15 @@
 package com.intellij.perlplugin.psi;
 
-import com.intellij.perlplugin.ModulesContainer;
-import com.intellij.perlplugin.bo.Package;
-import com.intellij.perlplugin.language.PerlFile;
-import com.intellij.perlplugin.psi.impl.PerlElementFactory;
-import com.intellij.perlplugin.psi.impl.PerlProperty;
-import com.intellij.perlplugin.language.PerlIcons;
-import com.intellij.perlplugin.psi.impl.PerlPropertyImpl;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
+import com.intellij.perlplugin.ModulesContainer;
+import com.intellij.perlplugin.bo.Package;
+import com.intellij.perlplugin.language.PerlFile;
+import com.intellij.perlplugin.language.PerlIcons;
+import com.intellij.perlplugin.psi.impl.PerlElementFactory;
+import com.intellij.perlplugin.psi.impl.PerlProperty;
+import com.intellij.perlplugin.psi.impl.PerlPropertyImpl;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -87,7 +87,7 @@ public class PerlPsiImplUtil {
 
     public static List<PerlProperty> findProperties(Project project, PsiElement key) {
         List<PerlProperty> result = null;
-        ArrayList<Package> packageList = ModulesContainer.getPackageList(key.getText().replace(";",""));
+        ArrayList<Package> packageList = ModulesContainer.getPackageList(key.getText().replace(";", ""));
         for (int i = 0; i < packageList.size(); i++) {
             Package packageObj = packageList.get(i);
             PerlFile perlFile = (PerlFile) PsiManager.getInstance(project).findFile(key.getContainingFile().getVirtualFile());

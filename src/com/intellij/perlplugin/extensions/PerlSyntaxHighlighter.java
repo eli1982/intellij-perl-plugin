@@ -1,12 +1,12 @@
 package com.intellij.perlplugin.extensions;
 
-import com.intellij.perlplugin.language.PerlLexerAdapter;
-import com.intellij.perlplugin.psi.PerlTypes;
 import com.intellij.lexer.Lexer;
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
+import com.intellij.perlplugin.language.PerlLexerAdapter;
+import com.intellij.perlplugin.psi.PerlTypes;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
+
+;
 
 /**
  * Created by eli on 9-2-15.
@@ -24,11 +26,13 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey KEY = createTextAttributesKey("KEY", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey VALUE = createTextAttributesKey("VALUE", DefaultLanguageHighlighterColors.STRING);
     public static final TextAttributesKey COMMENTS = createTextAttributesKey("COMMENTS", DefaultLanguageHighlighterColors.LINE_COMMENT);
-    public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("BAD_CHARACTER",getTextAttribute(Color.RED,true));
+    public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("BAD_CHARACTER", getTextAttribute(Color.RED, true));
+    public static final TextAttributesKey MARKUP = createTextAttributesKey("MARKUP", DefaultLanguageHighlighterColors.MARKUP_ATTRIBUTE);
 
     public static final TextAttributesKey PACKAGE = createTextAttributesKey("PACKAGE", DefaultLanguageHighlighterColors.KEYWORD);
-    public static final TextAttributesKey SUBROUTINE = createTextAttributesKey("SUBROUTINE",DefaultLanguageHighlighterColors.KEYWORD);
+    public static final TextAttributesKey SUBROUTINE = createTextAttributesKey("SUBROUTINE", DefaultLanguageHighlighterColors.KEYWORD);
 
+    private static final TextAttributesKey[] MARKUP_KEYS = new TextAttributesKey[]{MARKUP};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] BRACES_KEYS = new TextAttributesKey[]{BRACES};
     private static final TextAttributesKey[] OPERATOR_KEYS = new TextAttributesKey[]{OPERATOR};
@@ -38,6 +42,10 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENTS};
     private static final TextAttributesKey[] SUBROUTINE_KEYS = new TextAttributesKey[]{SUBROUTINE};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
+
+    private static TextAttributes getTextAttribute(Color color, boolean bold) {
+        return new TextAttributes(color, null, null, null, (bold) ? Font.BOLD : null);
+    }
 
     @NotNull
     @Override
@@ -50,9 +58,9 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
         if (tokenType.equals(PerlTypes.SUBROUTINE)) {
             return SUBROUTINE_KEYS;
-        }else if (tokenType.equals(PerlTypes.BRACES)) {
+        } else if (tokenType.equals(PerlTypes.BRACES)) {
             return BRACES_KEYS;
-        }else if (tokenType.equals(PerlTypes.OPERATOR)) {
+        } else if (tokenType.equals(PerlTypes.OPERATOR)) {
             return OPERATOR_KEYS;
         } else if (tokenType.equals(PerlTypes.KEY)) {
             return KEY_KEYS;
@@ -62,14 +70,12 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
             return VALUE_KEYS;
         } else if (tokenType.equals(PerlTypes.ENDOFLINECOMMENT)) {
             return COMMENT_KEYS;
+        } else if (tokenType.equals(PerlTypes.MARKUP)) {
+            return MARKUP_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;
         } else {
             return EMPTY_KEYS;
         }
-    }
-
-    private static TextAttributes getTextAttribute(Color color, boolean bold){
-        return new TextAttributes(color, null, null, null, (bold)?Font.BOLD:null);
     }
 }

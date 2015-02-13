@@ -62,17 +62,17 @@ public class Package {
         return subs;
     }
 
-    public ArrayList<Sub> getAllSubs(){
+    public void setSubs(ArrayList<Sub> subs) {
+        this.subs = subs;
+    }
+
+    public ArrayList<Sub> getAllSubs() {
         ArrayList<Sub> result = new ArrayList<Sub>();
         result.addAll(getSubs());
-        if(getParentPackage() != null) {
+        if (getParentPackage() != null) {
             result.addAll(getParentPackage().getAllSubs());
         }
         return result;
-    }
-
-    public void setSubs(ArrayList<Sub> subs) {
-        this.subs = subs;
     }
 
     public int getStartPositionInFile() {
@@ -98,7 +98,7 @@ public class Package {
                 "   startPositionInFile='" + startPositionInFile + '\'' + ",\n" +
                 "   endPositionInFile='" + endPositionInFile + '\'' + ",\n" +
                 "   packageName='" + packageName + '\'' + ",\n" +
-                "   parentPackage='" +  ((parentPackage != null) ? parentPackage.getPackageName() : "''") + '\'' + ",\n" +
+                "   parentPackage='" + ((parentPackage != null) ? parentPackage.getPackageName() : "''") + '\'' + ",\n" +
                 "   importedPackages=" + importedPackages + "\n" +
                 "   subs=" + subs + "\n" +
                 '}';

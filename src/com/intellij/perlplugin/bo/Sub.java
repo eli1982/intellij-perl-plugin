@@ -70,9 +70,9 @@ public class Sub {
         }
 
 
-        if(getArguments().size() ==0 ){
+        if (getArguments().size() == 0) {
             sb.append(")");
-        }else{
+        } else {
             sb.append(" )");
         }
 

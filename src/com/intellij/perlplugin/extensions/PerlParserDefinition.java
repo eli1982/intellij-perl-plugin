@@ -1,13 +1,16 @@
 package com.intellij.perlplugin.extensions;
 
-import com.intellij.perlplugin.language.*;
-import com.intellij.perlplugin.psi.PerlTypes;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.lang.PsiParser;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.project.Project;
+import com.intellij.perlplugin.language.PerlFile;
+import com.intellij.perlplugin.language.PerlLanguage;
+import com.intellij.perlplugin.language.PerlLexerAdapter;
+import com.intellij.perlplugin.language.PerlParser;
+import com.intellij.perlplugin.psi.PerlTypes;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;

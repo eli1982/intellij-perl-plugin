@@ -11,12 +11,14 @@ import java.util.regex.Pattern;
 public class Utils {
     public static boolean debug = true;
 
-    public static void alert(String str){
-        throw  new RuntimeException(str);
+    public static void alert(String str) {
+        throw new RuntimeException(str);
     }
-    public static void print(Object obj){
+
+    public static void print(Object obj) {
         System.out.println(obj);
     }
+
     public static String readFile(String filePath) {
         try {
             return new String(Files.readAllBytes(Paths.get(filePath)));

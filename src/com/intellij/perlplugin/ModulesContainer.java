@@ -12,13 +12,13 @@ import java.util.HashSet;
  * Created by eli on 27-11-14.
  */
 public class ModulesContainer {
+    public static float totalDelays = 0;
     private static boolean initialized = false;
     private static HashMap<String, Package> packages = new HashMap<String, Package>();
     private static ArrayList<PendingPackage> pendingParentPackages = new ArrayList<PendingPackage>();
     private static HashMap<String, HashSet<Sub>> subs = new HashMap<String, HashSet<Sub>>();
     private static HashMap<String, ArrayList<Package>> filePackages = new HashMap<String, ArrayList<Package>>();
-    private static ArrayList<String>problematicFiles = new ArrayList<String>();
-    public static float totalDelays = 0;
+    private static ArrayList<String> problematicFiles = new ArrayList<String>();
 
     public static void addPackage(Package packageObj) {
         packages.put(packageObj.getPackageName(), packageObj);
@@ -50,7 +50,7 @@ public class ModulesContainer {
 
     public static ArrayList<Package> getPackageListFromFile(String filePath) {
         ArrayList<Package> packages = filePackages.get(filePath);
-        if(packages == null){
+        if (packages == null) {
             packages = new ArrayList<Package>();
         }
         return packages;
@@ -86,14 +86,14 @@ public class ModulesContainer {
     }
 
     public static void addPendingParentPackage(Package packageObj, String parentPackage) {
-        if(packageObj != null && parentPackage != null) {
+        if (packageObj != null && parentPackage != null) {
             pendingParentPackages.add(new PendingPackage(parentPackage, packageObj));
-        }else{
+        } else {
             Utils.alert("unexpected null!");
         }
     }
 
-    public static ArrayList<PendingPackage> getPendingParentPackages(){
+    public static ArrayList<PendingPackage> getPendingParentPackages() {
         return pendingParentPackages;
     }
 

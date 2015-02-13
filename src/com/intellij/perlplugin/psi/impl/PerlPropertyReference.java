@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by eli on 9-2-15.
  */
-public class PerlPropertyReference extends PsiReferenceBase<PsiElement>implements PsiPolyVariantReference {
+public class PerlPropertyReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     public PerlPropertyReference(PsiElement element, TextRange range, boolean soft) {
         super(element, range, soft);
     }
@@ -41,11 +41,6 @@ public class PerlPropertyReference extends PsiReferenceBase<PsiElement>implement
         return new Object[0];
     }
 
-    @Override
-    public void setRangeInElement(TextRange range) {
-        super.setRangeInElement(range);
-    }
-
     @NotNull
     @Override
     public String getValue() {
@@ -60,6 +55,11 @@ public class PerlPropertyReference extends PsiReferenceBase<PsiElement>implement
     @Override
     public TextRange getRangeInElement() {
         return super.getRangeInElement();
+    }
+
+    @Override
+    public void setRangeInElement(TextRange range) {
+        super.setRangeInElement(range);
     }
 
     @Override

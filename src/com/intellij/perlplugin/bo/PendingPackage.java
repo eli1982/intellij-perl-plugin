@@ -3,7 +3,7 @@ package com.intellij.perlplugin.bo;
 /**
  * Created by eli on 6-2-15.
  */
-public class PendingPackage{
+public class PendingPackage {
     String parentPackage;
     Package childPackage;
 

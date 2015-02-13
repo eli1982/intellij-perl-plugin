@@ -1,8 +1,5 @@
 package com.intellij.perlplugin;
 
-import com.intellij.perlplugin.bo.Package;
-import com.intellij.perlplugin.bo.Sub;
-import com.intellij.perlplugin.ui.SubListRenderer;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
@@ -11,6 +8,9 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.perlplugin.bo.Package;
+import com.intellij.perlplugin.bo.Sub;
+import com.intellij.perlplugin.ui.SubListRenderer;
 import com.intellij.ui.components.JBList;
 
 import javax.swing.*;

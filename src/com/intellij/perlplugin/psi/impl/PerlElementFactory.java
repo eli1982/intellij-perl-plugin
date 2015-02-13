@@ -1,8 +1,8 @@
 package com.intellij.perlplugin.psi.impl;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.perlplugin.language.PerlFile;
 import com.intellij.perlplugin.language.PerlFileType;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileFactory;
 

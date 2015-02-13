@@ -2,11 +2,11 @@
 package com.intellij.perlplugin.psi.impl;
 
 
-import com.intellij.perlplugin.psi.PerlPsiImplUtil;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.perlplugin.psi.PerlPsiImplUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
@@ -14,7 +14,7 @@ import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class PerlPropertyImpl extends ASTWrapperPsiElement implements PerlProperty,PsiReference {
+public class PerlPropertyImpl extends ASTWrapperPsiElement implements PerlProperty, PsiReference {
 
     public PerlPropertyImpl(ASTNode node) {
         super(node);
