@@ -118,6 +118,8 @@ public class PerlInternalParser {
     public static void parse(String filePath) {
         String fileContent = Utils.readFile(filePath);
 //        fileContent =fileContent.replaceAll("#.*","");//TODO:: handle =head1 =cut block comments
+        //fileContent.replaceAll("(=head1)(.|[\r\n])*?(=cut)","");
+
         float start = System.nanoTime();
         if (Utils.debug) {
             Utils.print("---------------------------------------------------");
@@ -233,19 +235,19 @@ public class PerlInternalParser {
     }
 
     private static String getPackageNameFromContent(String content) {
-        Matcher packageNameRegex = Utils.applyRegex("(\\s*?package\\s+((\\w|::)+)\\s*;)", content);
+        Matcher packageNameRegex = Utils.applyRegex("(\\s*?package\\s+((\\w|::)+)\\s*?;)", content);
         if (!packageNameRegex.find()) return "";//if this fails - then our regex for package name isn't good.
         return packageNameRegex.group(2);
     }
 
     private static String getPackageParentFromContent(String content) {
         //use parent 'Bookings::Db::db_bp';
-        Matcher packageNameRegexNoQW = Utils.applyRegex("(\\s*?use\\s+parent\\s+\'((\\w|::)+)\\s*\';)", content);
+        Matcher packageNameRegexNoQW = Utils.applyRegex("(\\s*?use\\s+parent\\s+\'((\\w|::)+)\\s*?\';)", content);
         if (packageNameRegexNoQW.find() && !packageNameRegexNoQW.group(2).isEmpty()) {
             return packageNameRegexNoQW.group(2);
         }
         //use parent qw(Bookings::Db::db_bp);
-        Matcher packageNameRegexWithQW = Utils.applyRegex("(\\s*?use\\s+parent\\s+qw\\s*\\(\\s*((\\w|::)+)\\s*\\)\\s*;)", content);
+        Matcher packageNameRegexWithQW = Utils.applyRegex("(\\s*?use\\s+parent\\s+qw\\s*?\\(\\s*?((\\w|::)+)\\s*?\\)\\s*?;)", content);
         if (packageNameRegexWithQW.find() && !packageNameRegexWithQW.group(2).isEmpty()) {
             return packageNameRegexWithQW.group(2);
         }

@@ -13,6 +13,6 @@ public class UpdateSourcesAction extends AnAction {
         long start = System.currentTimeMillis();
         PerlInternalParser.parseAllSources(e.getData(DataKeys.MODULE));
         long end = System.currentTimeMillis();
-        Utils.print("update completed in " + ((end - start) / 1000) + "sec");
+        Utils.print("update completed in " + ((end - start) / 1000F) + "sec");
     }
 }
