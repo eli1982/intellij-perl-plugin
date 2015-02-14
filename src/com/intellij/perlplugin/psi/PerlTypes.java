@@ -25,6 +25,8 @@ public interface PerlTypes {
     IElementType LANG_SYNTAX = new PerlTokenType("LANG_SYNTAX");
     IElementType LANG_FILE_HANDLES = new PerlTokenType("LANG_FILE_HANDLES");
     IElementType ARGUMENTS = new PerlTokenType("ARGUMENTS");
+    IElementType ATTRIBUTE = new PerlTokenType("ATTRIBUTE");
+    IElementType HASH_KEY = new PerlTokenType("HASH_KEY");
 
     class Factory {
         public static PsiElement createElement(ASTNode node) {
@@ -35,4 +37,5 @@ public interface PerlTypes {
 //      throw new AssertionError("Unknown element type: " + type);
         }
     }
+
 }

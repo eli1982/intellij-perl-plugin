@@ -84,9 +84,9 @@ public class PerlCompletionContributor extends CompletionContributor {
 
 
                 //get all subs in file
-                ArrayList<Package> packagelist = ModulesContainer.getPackageListFromFile(virtualFile.getCanonicalPath());
-                for (int i = 0; i < packagelist.size(); i++) {
-                    Package packageObj = packagelist.get(i);
+                ArrayList<Package> packageList = ModulesContainer.getPackageListFromFile(virtualFile.getCanonicalPath());
+                for (int i = 0; i < packageList.size(); i++) {
+                    Package packageObj = packageList.get(i);
                     if (editor.getCaretModel().getOffset() > packageObj.getStartPositionInFile() &&
                             editor.getCaretModel().getOffset() < packageObj.getEndPositionInFile()) {
                         ArrayList<Sub> subs = packageObj.getAllSubs();
