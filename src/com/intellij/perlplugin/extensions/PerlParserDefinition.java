@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class PerlParserDefinition implements ParserDefinition {
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-    public static final TokenSet COMMENTS = TokenSet.create(PerlTypes.ENDOFLINECOMMENT);
+    public static final TokenSet COMMENTS = TokenSet.create(PerlTypes.LINE_COMMENT);
 
     public static final IFileElementType FILE = new IFileElementType(Language.<PerlLanguage>findInstance(PerlLanguage.class));
 

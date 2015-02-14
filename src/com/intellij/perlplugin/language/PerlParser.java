@@ -20,7 +20,7 @@ public class PerlParser implements PsiParser {
         boolean r;
         Marker m = enter_section_(b);
         r = property(b, l + 1);
-        if (!r) r = consumeToken(b, ENDOFLINECOMMENT);
+        if (!r) r = consumeToken(b, LINE_COMMENT);
         if (!r) r = consumeToken(b, CRLF);
         exit_section_(b, m, null, r);
         return r;

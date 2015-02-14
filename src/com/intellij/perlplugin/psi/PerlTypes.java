@@ -18,8 +18,13 @@ public interface PerlTypes {
     IElementType SUBROUTINE = new PerlTokenType("SUBROUTINE");
     IElementType PACKAGE = new PerlTokenType("PACKAGE");
     IElementType POINTER = new PerlTokenType("POINTER");
-    IElementType ENDOFLINECOMMENT = new PerlTokenType("ENDOFLINECOMMENT");
+    IElementType LINE_COMMENT = new PerlTokenType("LINE_COMMENT");
     IElementType MARKUP = new PerlTokenType("MARKUP");
+    IElementType LANG_VARIABLE = new PerlTokenType("LANG_VARIABLE");
+    IElementType LANG_FUNCTION = new PerlTokenType("LANG_FUNCTION");
+    IElementType LANG_SYNTAX = new PerlTokenType("LANG_SYNTAX");
+    IElementType LANG_FILE_HANDLES = new PerlTokenType("LANG_FILE_HANDLES");
+    IElementType ARGUMENTS = new PerlTokenType("ARGUMENTS");
 
     class Factory {
         public static PsiElement createElement(ASTNode node) {
