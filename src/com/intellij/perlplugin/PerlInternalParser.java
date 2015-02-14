@@ -242,7 +242,7 @@ public class PerlInternalParser {
 
     private static String getPackageParentFromContent(String content) {
         //use parent 'Bookings::Db::db_bp';
-        Matcher packageNameRegexNoQW = Utils.applyRegex("(\\s*?use\\s+parent\\s+\'((\\w|::)+)\\s*?\';)", content);
+        Matcher packageNameRegexNoQW = Utils.applyRegex("(\\s*?use\\s*?parent\\s*?((\\w+\\:\\:)*\\w+))", content);
         if (packageNameRegexNoQW.find() && !packageNameRegexNoQW.group(2).isEmpty()) {
             return packageNameRegexNoQW.group(2);
         }
