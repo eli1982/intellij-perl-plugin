@@ -9,6 +9,8 @@ import com.intellij.perlplugin.filters.FileFilter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -148,7 +150,6 @@ public class PerlInternalParser {
             addPendingPackageParent(packageObj, getPackageParentFromContent(content));
             addImportedPackagesFromContent(packageObj, content);
             addSubsFromContent(packageObj, content.replaceAll("#.*", ""));
-
             //other
             packageObj.setStartPositionInFile(fileContent.indexOf("package", prevPos));
             packageObj.setEndPositionInFile(endPos);
