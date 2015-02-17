@@ -15,15 +15,15 @@ What can it do so far:
 -support inhertence - so you will see subroutines of parent packages as well
 -highlights subs and packages
 -adds a row symbol for packages in the gutter ( the blue Class symbol)
+-adds link in Gutter to inheriting files
+-detect attributes in the file
 
 There's a lot to do (here's some of the things)
 -----------------------------------------------
 -detect imports
 -support ctrl click imports (multiple sources) - references
 -support import with qw
--detect variables
 -detect constants
--add gutter icons for subs
 -ignore block comments for better support
 -update cache while editing files
 
