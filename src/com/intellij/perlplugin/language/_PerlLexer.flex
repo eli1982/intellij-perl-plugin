@@ -52,7 +52,7 @@ Pointer="->"
 HashKey="=>"
 String=(\".*\")
 PropertyCharacter=[^->\ \n\r\t\f\\\{\}=] | "\\"{LineTerminator}
-PackageName=({identifier}::{identifier})+{identifier}+
+PackageName=({identifier}::{identifier})+(::{identifier})*
 head="=head1"
 begin="=begin"
 cut="=cut"
