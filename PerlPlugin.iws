@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c481e998-91cb-4984-9080-ecc037cb15d0" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlCompletionContributor.java" afterPath="$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlCompletionContributor.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PerlPlugin.iws" afterPath="$PROJECT_DIR$/PerlPlugin.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlSyntaxHighlighter.java" afterPath="$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlSyntaxHighlighter.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/intellij/perlplugin/language/_PerlLexer.flex" afterPath="$PROJECT_DIR$/src/com/intellij/perlplugin/language/_PerlLexer.flex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/intellij/perlplugin/language/_PerlLexer.java" afterPath="$PROJECT_DIR$/src/com/intellij/perlplugin/language/_PerlLexer.java" />
     </list>
@@ -33,21 +33,61 @@
       <file leaf-file-name="_PerlLexer.flex" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/language/_PerlLexer.flex">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="957" max-vertical-offset="1598">
-              <caret line="62" column="1637" selection-start-line="62" selection-start-column="1637" selection-end-line="62" selection-end-column="1637" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="980" max-vertical-offset="1615">
+              <caret line="83" column="43" selection-start-line="83" selection-start-column="43" selection-end-line="83" selection-end-column="43" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PerlCompletionContributor.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="PerlSyntaxHighlighterFactory.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlSyntaxHighlighterFactory.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="357">
+              <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PropertyReferenceContributor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PropertyReferenceContributor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="17" max-vertical-offset="578">
+              <caret line="25" column="76" selection-start-line="25" selection-start-column="76" selection-end-line="25" selection-end-column="76" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PerlSyntaxHighlighter.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlSyntaxHighlighter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.24324325" vertical-offset="221" max-vertical-offset="1683">
+              <caret line="35" column="147" selection-start-line="35" selection-start-column="147" selection-end-line="35" selection-end-column="147" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PerlCompletionContributor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlCompletionContributor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.26948053" vertical-offset="939" max-vertical-offset="2142">
+            <state vertical-scroll-proportion="0.0" vertical-offset="939" max-vertical-offset="2142">
               <caret line="66" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="idea-flex.skeleton" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/language/idea-flex.skeleton">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4369">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -86,7 +126,6 @@
         <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/Utils.java" />
         <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/PerlInternalParser.java" />
         <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/psi/PerlTypes.java" />
-        <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlSyntaxHighlighter.java" />
         <option value="$PROJECT_DIR$/.git/config" />
         <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/ModulesContainer.java" />
         <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PropertyLineMarkerProvider.java" />
@@ -94,8 +133,9 @@
         <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/AppComponent.java" />
         <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/MainModuleComponent.java" />
         <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/psi/PerlPsiImplUtil.java" />
-        <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/language/_PerlLexer.flex" />
         <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlCompletionContributor.java" />
+        <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/language/_PerlLexer.flex" />
+        <option value="$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlSyntaxHighlighter.java" />
       </list>
     </option>
   </component>
@@ -797,7 +837,13 @@
       <option name="project" value="LOCAL" />
       <updated>1424133615339</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="fix lang syntax">
+      <created>1424133893394</created>
+      <option name="number" value="00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1424133893394</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -874,7 +920,8 @@
     <MESSAGE value="fix package issue" />
     <MESSAGE value="added more syntax attributes" />
     <MESSAGE value="gutter icon file menu added" />
-    <option name="LAST_COMMIT_MESSAGE" value="gutter icon file menu added" />
+    <MESSAGE value="fix lang syntax" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix lang syntax" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1124,20 +1171,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/ui/SubListRenderer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.42872807" vertical-offset="0" max-vertical-offset="912">
-          <caret line="29" column="35" selection-start-line="29" selection-start-column="35" selection-end-line="29" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/openapi.jar!/com/intellij/lang/ParserDefinition.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.16221766" vertical-offset="6" max-vertical-offset="748">
-          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/idea.jar!/com/intellij/openapi/fileEditor/ex/FileEditorManagerEx.class">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.15625" vertical-offset="0" max-vertical-offset="1836">
@@ -1328,14 +1361,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlSyntaxHighlighter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1683">
-          <caret line="41" column="97" selection-start-line="41" selection-start-column="97" selection-end-line="41" selection-end-column="97" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.44609666" vertical-offset="32" max-vertical-offset="595">
@@ -1494,17 +1519,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PropertyReferenceContributor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3783784" vertical-offset="17" max-vertical-offset="646">
-          <caret line="25" column="76" selection-start-line="25" selection-start-column="76" selection-end-line="25" selection-end-column="76" />
-          <folding>
-            <element signature="e#831#1588#0" expanded="true" />
-            <element signature="e#1587#1588#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/PerlInternalParser.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1029" max-vertical-offset="4301">
@@ -1513,21 +1527,53 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/language/_PerlLexer.flex">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="957" max-vertical-offset="1598">
-          <caret line="62" column="1637" selection-start-line="62" selection-start-column="1637" selection-end-line="62" selection-end-column="1637" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlCompletionContributor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.26948053" vertical-offset="939" max-vertical-offset="2142">
+        <state vertical-scroll-proportion="0.0" vertical-offset="939" max-vertical-offset="2142">
           <caret line="66" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/language/idea-flex.skeleton">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4369">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/language/_PerlLexer.flex">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="980" max-vertical-offset="1615">
+          <caret line="83" column="43" selection-start-line="83" selection-start-column="43" selection-end-line="83" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlSyntaxHighlighterFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="357">
+          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PropertyReferenceContributor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="17" max-vertical-offset="578">
+          <caret line="25" column="76" selection-start-line="25" selection-start-column="76" selection-end-line="25" selection-end-column="76" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/intellij/perlplugin/extensions/PerlSyntaxHighlighter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.24324325" vertical-offset="221" max-vertical-offset="1683">
+          <caret line="35" column="147" selection-start-line="35" selection-start-column="147" selection-end-line="35" selection-end-column="147" />
+          <folding />
         </state>
       </provider>
     </entry>

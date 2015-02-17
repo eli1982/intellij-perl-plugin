@@ -33,7 +33,7 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey MARKUP = createTextAttributesKey("MARKUP", DefaultLanguageHighlighterColors.MARKUP_ATTRIBUTE);
     public static final TextAttributesKey PACKAGE = createTextAttributesKey("PACKAGE", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey ARGUMENTS = createTextAttributesKey("ARGUMENTS", DefaultLanguageHighlighterColors.PARAMETER);
-    public static final TextAttributesKey ATTRIBUTE = createTextAttributesKey("ATTRIBUTE", DefaultLanguageHighlighterColors.IDENTIFIER);
+    public static final TextAttributesKey ATTRIBUTE = createTextAttributesKey("ATTRIBUTE",getTextAttribute(Color.getHSBColor(0.1F, 0.6F, 0.3F), false));
 
     public static final TextAttributesKey SUBROUTINE = createTextAttributesKey("SUBROUTINE", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("BAD_CHARACTER", getTextAttribute(Color.RED, true));
@@ -56,7 +56,7 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
     private static TextAttributes getTextAttribute(Color color, boolean bold) {
-        return new TextAttributes(color, null, null, null, (bold) ? Font.BOLD : null);
+        return new TextAttributes(color, null, null, null, (bold) ? Font.BOLD : Font.PLAIN);
     }
 
     @NotNull

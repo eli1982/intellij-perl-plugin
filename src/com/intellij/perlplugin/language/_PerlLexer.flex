@@ -81,7 +81,8 @@ Symbols=(\,|\.|\/|\;|\-|\=|\+|\*)
 {Variables} {return LANG_VARIABLE;}
 {Functions} {return LANG_FUNCTION;}
 {Filehandles} {return LANG_FILE_HANDLES;}
-({Perdicate})?{identifier} {return ATTRIBUTE;}
+({Perdicate}){identifier} {return ATTRIBUTE;}
+{identifier} {return PROPERTY;}
 /*{PropertyCharacter}+ { return PROPERTY; }*/
 {Subroutine} { return SUBROUTINE; }
 {LineComment} {return LINE_COMMENT;}
