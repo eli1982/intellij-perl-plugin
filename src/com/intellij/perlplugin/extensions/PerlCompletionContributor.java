@@ -101,6 +101,9 @@ public class PerlCompletionContributor extends CompletionContributor {
         };
         addCompleteHandler(PerlTypes.PROPERTY, handler);
         addCompleteHandler(PerlTypes.OPERATOR, handler);
+        addCompleteHandler(PerlTypes.POINTER, handler);
+        addCompleteHandler(PerlTypes.PACKAGE, handler);
+        addCompleteHandler(PerlTypes.ATTRIBUTE, handler);
         addCompleteHandler(PerlTypes.WHITESPACE, handler);
     }
 

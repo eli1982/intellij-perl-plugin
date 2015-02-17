@@ -1,6 +1,8 @@
 package com.intellij.perlplugin;
 
 import com.intellij.openapi.components.ApplicationComponent;
+import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 
 /**

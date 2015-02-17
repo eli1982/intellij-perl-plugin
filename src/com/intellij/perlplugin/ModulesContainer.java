@@ -14,14 +14,18 @@ import java.util.HashSet;
 public class ModulesContainer {
     public static float totalDelays = 0;
     private static boolean initialized = false;
-    private static HashMap<String, Package> packages = new HashMap<String, Package>();
+    private static HashMap<String, ArrayList<Package>> packages = new HashMap<String, ArrayList<Package>>();
     private static ArrayList<PendingPackage> pendingParentPackages = new ArrayList<PendingPackage>();
     private static HashMap<String, HashSet<Sub>> subs = new HashMap<String, HashSet<Sub>>();
     private static HashMap<String, ArrayList<Package>> filePackages = new HashMap<String, ArrayList<Package>>();
     private static ArrayList<String> problematicFiles = new ArrayList<String>();
 
     public static void addPackage(Package packageObj) {
-        packages.put(packageObj.getPackageName(), packageObj);
+        if(!packages.containsKey(packageObj.getPackageName())){
+            packages.put(packageObj.getPackageName(), new ArrayList<Package>());
+        }
+        packages.get(packageObj.getPackageName()).add(packageObj);
+
         if (!filePackages.containsKey(packageObj.getOriginFile())) {
             filePackages.put(packageObj.getOriginFile(), new ArrayList<Package>());
         }
@@ -32,8 +36,16 @@ public class ModulesContainer {
         ArrayList<Package> packageList = new ArrayList<Package>();
         for (String key : packages.keySet()) {
             if (key.equals(packageName)) {
-                packageList.add(packages.get(key));
+                packageList.addAll(packages.get(key));
             }
+        }
+        return packageList;
+    }
+
+    public static ArrayList<Package> getAllPackages() {
+        ArrayList<Package> packageList = new ArrayList<Package>();
+        for (String key : packages.keySet()) {
+            packageList.addAll(packages.get(key));
         }
         return packageList;
     }
@@ -42,7 +54,7 @@ public class ModulesContainer {
         ArrayList<Package> packageList = new ArrayList<Package>();
         for (String key : packages.keySet()) {
             if (key.contains(searchStr)) {
-                packageList.add(packages.get(key));
+                packageList.addAll(packages.get(key));
             }
         }
         return packageList;

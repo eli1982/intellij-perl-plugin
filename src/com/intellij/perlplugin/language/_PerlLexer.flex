@@ -37,7 +37,7 @@ letter          = [A-Za-z]
 digit           = [0-9]
 alphanumeric    = {letter}|{digit}|\_
 Perdicate   = (\_|\$|\@|\%)
-identifier      = ({Perdicate})?({letter}{alphanumeric}+)+
+identifier      = {letter}{alphanumeric}+
 integer         = {digit}*
 real            = {integer}\.{integer}
 char            = '.'
@@ -52,7 +52,7 @@ Pointer="->"
 HashKey="=>"
 String=(\".*\")
 PropertyCharacter=[^->\ \n\r\t\f\\\{\}=] | "\\"{LineTerminator}
-PackageName=({identifier}::{identifier})+{identifier}+;
+PackageName=({identifier}::{identifier})+{identifier}+
 head="=head1"
 begin="=begin"
 cut="=cut"
@@ -63,7 +63,7 @@ Variables=(\$\!|\$\"|\$\#|\$\$|\$\%|\$\&|\$\'|\$\*|\$\+|\$\,|\$\-|\$\.|\$\/|\$\0
 Functions=(-A|-B|-b|-C|-c|-d|-e|-f|-g|-k|-l|-M|-O|-o|-p|-r|-R|-S|-s|-T|-t|-u|-w|-W|-X|-x|-z|abs|accept|alarm|atan2|AUTOLOAD|BEGIN|bind|binmode|bless|break|caller|chdir|CHECK|chmod|chomp|chop|chown|chr|chroot|close|closedir|connect|cos|crypt|dbmclose|dbmopen|defined|delete|DESTROY|die|dump|each|END|endgrent|endhostent|endnetent|endprotoent|endpwent|endservent|eof|eval|exec|exists|exit|fcntl|fileno|flock|fork|format|formline|getc|getgrent|getgrgid|getgrnam|gethostbyaddr|gethostbyname|gethostent|getlogin|getnetbyaddr|getnetbyname|getnetent|getpeername|getpgrp|getppid|getpriority|getprotobyname|getprotobynumber|getprotoent|getpwent|getpwnam|getpwuid|getservbyname|getservbyport|getservent|getsockname|getsockopt|glob|gmtime|goto|grep|hex|index|INIT|int|ioctl|join|keys|kill|last|lc|each|lcfirst|setnetent|length|link|listen|local|localtime|log|lstat|map|mkdir|msgctl|msgget|msgrcv|msgsnd|my|next|not|oct|open|opendir|ord|our|pack|pipe|pop|pos|print|printf|prototype|push|quotemeta|rand|read|readdir|readline|readlink|readpipe|recv|redo|ref|rename|require|reset|return|reverse|rewinddir|rindex|rmdir|say|scalar|seek|seekdir|select|semctl|semget|semop|send|setgrent|sethostent|each|lcfirst|setnetent|setpgrp|setpriority|setprotoent|setpwent|setservent|setsockopt|shift|shmctl|shmget|shmread|shmwrite|shutdown|sin|sleep|socket|socketpair|sort|splice|split|sprintf|sqrt|srand|stat|state|study|substr|symlink|syscall|sysopen|sysread|sysseek|system|syswrite|tell|telldir|tie|tied|time|times|truncate|uc|ucfirst|umask|undef|UNITCHECK|unlink|unpack|unshift|untie|use|utime|values|vec|wait|waitpid|wantarray|warn|write|each|lcfirst|setnetent)\b
 Syntax=(and|cmp|continue|CORE|do|else|elsif|eq|exp|for|foreach|ge|gt|if|le|lock|lt|m|ne|no|or|package|q|qq|qr|qw|qx|s|sub|tr|unless|until|while|xor|y|\;)
 Filehandles=(ARGV|ARGVOUT|STDERR|STDIN|STDOUT)
-Symbols=(\,|\.|\/|\;|\-|\=|\+|\:|\*)
+Symbols=(\,|\.|\/|\;|\-|\=|\+|\*)
 %%
 {PackageName}        { return PACKAGE; }
 {LineTerminator} {return WHITESPACE;}
@@ -81,10 +81,9 @@ Symbols=(\,|\.|\/|\;|\-|\=|\+|\:|\*)
 {Variables} {return LANG_VARIABLE;}
 {Functions} {return LANG_FUNCTION;}
 {Filehandles} {return LANG_FILE_HANDLES;}
-{identifier} {return ATTRIBUTE;}
+({Perdicate})?{identifier} {return ATTRIBUTE;}
 /*{PropertyCharacter}+ { return PROPERTY; }*/
 {Subroutine} { return SUBROUTINE; }
 {LineComment} {return LINE_COMMENT;}
 /*{blockcomment} {return LINE_COMMENT;}*/
-
 [^] {return TokenType.BAD_CHARACTER;}
