@@ -99,6 +99,8 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
             return COMMENT_KEYS;
         } else if (tokenType.equals(PerlTypes.MARKUP)) {
             return MARKUP_KEYS;
+        } else if (tokenType.equals(PerlTypes.PREDICATE)) {
+            return ATTRIBUTE_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;
         } else {

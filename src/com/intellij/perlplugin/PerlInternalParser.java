@@ -145,7 +145,7 @@ public class PerlInternalParser {
             String content = fileContent.substring(startPos, endPos);
 
             //get package name
-            Package packageObj = new Package(filePath, getPackageNameFromContent(content));
+            Package packageObj = new Package(filePath.replace("\\","/"), getPackageNameFromContent(content));
 
             addPendingPackageParent(packageObj, getPackageParentFromContent(content));
             addImportedPackagesFromContent(packageObj, content);

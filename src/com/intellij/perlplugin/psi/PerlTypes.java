@@ -27,6 +27,7 @@ public interface PerlTypes {
     IElementType ARGUMENTS = new PerlTokenType("ARGUMENTS");
     IElementType ATTRIBUTE = new PerlTokenType("ATTRIBUTE");
     IElementType HASH_KEY = new PerlTokenType("HASH_KEY");
+    IElementType PREDICATE = new PerlTokenType("PREDICATE");
 
     class Factory {
         public static PsiElement createElement(ASTNode node) {

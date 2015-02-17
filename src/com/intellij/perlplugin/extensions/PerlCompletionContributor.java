@@ -55,7 +55,8 @@ public class PerlCompletionContributor extends CompletionContributor {
 //
 //    }
         CompletionProvider<CompletionParameters> handler = new CompletionProvider<CompletionParameters>() {
-            public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull final CompletionResultSet resultSet) {
+            public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
+
                 if (!ModulesContainer.isInitialized()) {
                     Utils.alert("warning: perl parser was not initialized");
                 }
@@ -66,8 +67,8 @@ public class PerlCompletionContributor extends CompletionContributor {
                 }
 
                 //get all subs of package if we are on a package's pointer
-                PsiElement currentElement = parameters.getPosition();
-                PsiElement prevElement = parameters.getPosition().getPrevSibling();
+                PsiElement currentElement = parameters.getOriginalPosition();
+                PsiElement prevElement = parameters.getOriginalPosition().getPrevSibling();
 
                 if (prevElement != null && prevElement.getPrevSibling() != null && prevElement.getNode().getElementType().equals(PerlTypes.POINTER)) {
                     if (prevElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.PACKAGE)) {
@@ -106,23 +107,26 @@ public class PerlCompletionContributor extends CompletionContributor {
                 //get all attributes in file if we are in value (String)
                 if (currentElement != null && currentElement.getNode().getElementType().equals(PerlTypes.VALUE)) {
                     HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null));
-                    rs.forEach(new Consumer<String>() {
-                        @Override
-                        public void accept(String str) {
-                            resultSet.addElement(getAttributeLookupElementBuilder(str));
-                        }
-                    });
+                    for (String str: rs) {
+                        resultSet.addElement(getAttributeLookupElementBuilder(str));
+                    }
                 }
-                //get all attributes in file if we are in a pointer that has attribute before it. (it will probably be an array)
-                if((prevElement !=null && prevElement.getPrevSibling() != null && prevElement.getNode().getElementType().equals(PerlTypes.POINTER) && prevElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.ATTRIBUTE)
-                    || ( prevElement.getNode().getElementType().equals(PerlTypes.POINTER) && prevElement.getParent() != null && prevElement.getParent().getPrevSibling() != null && prevElement.getParent().getPrevSibling().getLastChild() != null && prevElement.getParent().getPrevSibling().getLastChild().getNode().getElementType().equals(PerlTypes.ATTRIBUTE)))){
+
+                //get all attributes in file if we are in a pointer or have a pointer an element before that
+                if((prevElement !=null && (prevElement.getNode().getElementType().equals(PerlTypes.POINTER))
+                        || (prevElement !=null && prevElement.getPrevSibling() != null && prevElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.POINTER)))){
                     HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null));
-                    rs.forEach(new Consumer<String>() {
-                        @Override
-                        public void accept(String str) {
-                            resultSet.addElement(getAttributeLookupElementBuilder("{" + str + "}"));
-                        }
-                    });
+                    for (String str : rs) {
+                        resultSet.addElement(getAttributeLookupElementBuilder(str));
+                    }
+                }
+
+                //Predicate AutoCompletion ( _ $ @ % )
+                if(currentElement !=null && currentElement.getNode().getElementType().equals(PerlTypes.PREDICATE)){
+                    HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null));
+                    for (String str : rs) {
+                        resultSet.addElement(getAttributeLookupElementBuilder(str.replaceFirst("\\_|\\$|\\%|\\@|\\&","")));
+                    }
                 }
             }
         };
@@ -133,6 +137,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         addCompleteHandler(PerlTypes.ATTRIBUTE, handler);
         addCompleteHandler(PerlTypes.WHITESPACE, handler);
         addCompleteHandler(PerlTypes.VALUE, handler);
+        addCompleteHandler(PerlTypes.PREDICATE, handler);
     }
 
     private HashSet<String> findAllAttributes(ASTNode[] children){
@@ -165,7 +170,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         if (Utils.debug) {
             Utils.print("Attribute: " + text);
         }
-        return LookupElementBuilder.create(text).withIcon(AllIcons.Nodes.Field).withTypeText("Attribute",true);
+        return LookupElementBuilder.create(text).withIcon(AllIcons.Nodes.Parameter).withTypeText("Attribute",true);
     }
 
     private void addCompleteHandler(IElementType elementType, CompletionProvider<CompletionParameters> handler) {
