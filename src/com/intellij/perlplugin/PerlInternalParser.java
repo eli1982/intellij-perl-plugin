@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
  * Created by eli on 27-11-14.
  */
 public class PerlInternalParser {
+    public static final double PROBLEMATIC_FILE_TIME_THRESHOLD = 0.5;
     private static int sum;
 
     public static void parseAllSources(Module module) {
@@ -165,7 +166,7 @@ public class PerlInternalParser {
         if (Utils.debug) {
             Utils.print("time:" + result);
         }
-        if (false && result > 0.5) {
+        if (result > PROBLEMATIC_FILE_TIME_THRESHOLD) {
             ModulesContainer.addProblematicFiles(filePath + "(" + result + ")");
             ModulesContainer.totalDelays += result;
         }
@@ -205,15 +206,23 @@ public class PerlInternalParser {
     private static void addSubsFromContent(Package packageObj, String content) {
         ArrayList<Sub> subs = new ArrayList<Sub>();
         try {
-            //Matcher subsRegex = Utils.applyRegex("\\s+sub\\s+(\\w+)\\s*\\{", content);
-            Matcher subsRegex = Utils.applyRegex("\\s*?sub\\s+(\\w+)\\s*\\{\\s*(my\\s+\\(\\s*((\\s*\\$\\w+\\s*\\,?\\s*)*)\\s*\\)\\s*=\\s*(@\\_|\\(.*@_.*\\))\\;)?", content);
-            while (subsRegex.find()) {
+            Matcher subsRegex = Utils.applyRegex("\\s*sub\\s+(\\w+)\\s*\\{(\\s*my\\s+\\(\\s*((\\s*\\$\\w+\\s*\\,?\\s*)*)\\s*?\\)(\\S|\\s)*?\\;)?", content);
+            float start;
+            while (((start = System.nanoTime()) > 0F && subsRegex.find())) {
                 Sub sub = new Sub(packageObj, subsRegex.group(1));
                 sub.setArguments(getArgumentsFromContent(subsRegex.group(3)));
                 sub.setPositionInFile(subsRegex.end(1));
                 subs.add(sub);
                 if (Utils.debug) {
                     Utils.print(sub);
+                }
+                float end = System.nanoTime();
+                float result = (end - start) / 1000000000F;
+                if (Utils.debug) {
+                    Utils.print("time:" + result);
+                }
+                if (result > PROBLEMATIC_FILE_TIME_THRESHOLD) {
+                    ModulesContainer.addProblematicFiles(packageObj.getPackageName() + ">>>>" + sub.getName() + "(" + result + ")");
                 }
             }
         } catch (Exception e) {
