@@ -17,7 +17,7 @@ public class MainModuleComponent implements ModuleComponent {
     public void initComponent() {
 //        Utils.print("parsing started");
 //        long start = System.currentTimeMillis();
-          PerlInternalParser.parseAllSources(module);
+//          PerlInternalParser.parseAllSources(module);
 //        long end = System.currentTimeMillis();
 //        Utils.print("update completed in " + ((end - start) / 1000) + "sec");
 
