@@ -3,16 +3,15 @@ package com.intellij.perlplugin.extensions;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.perlplugin.ModulesContainer;
 import com.intellij.perlplugin.Utils;
 import com.intellij.perlplugin.bo.Package;
+import com.intellij.perlplugin.language.PerlIcons;
 import com.intellij.perlplugin.psi.PerlTypes;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.PsiShortNamesCache;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -53,14 +52,14 @@ public class PropertyLineMarkerProvider extends RelatedItemLineMarkerProvider {
             }
 
             if (packageList.size() > 0 && targets.length > 0) {
-                NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(AllIcons.Nodes.Class).
+                NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(PerlIcons.PACKAGE).
                                 setTargets(targets).
                                 setTooltipText("Navigate to package");
                 result.add(builder.createLineMarkerInfo(element));
             }
         } else if (element.getNode().getElementType().equals(PerlTypes.SUBROUTINE)) {
             boolean isConstructor = Utils.applyRegex("sub\\s+new", element.getNode().getText()).find();
-            NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create((isConstructor) ? AllIcons.Nodes.ClassInitializer : AllIcons.Nodes.Method).
+            NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create((isConstructor) ? PerlIcons.CONSTRUCTOR : PerlIcons.SUBROUTINE).
                     setTargets(element).
                     setTooltipText((isConstructor) ? "Constructor" : "");
             result.add(builder.createLineMarkerInfo(element));

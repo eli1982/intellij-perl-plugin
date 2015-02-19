@@ -25,7 +25,7 @@ public interface PerlTypes {
     IElementType LANG_SYNTAX = new PerlTokenType("LANG_SYNTAX");
     IElementType LANG_FILE_HANDLES = new PerlTokenType("LANG_FILE_HANDLES");
     IElementType ARGUMENTS = new PerlTokenType("ARGUMENTS");
-    IElementType ATTRIBUTE = new PerlTokenType("ATTRIBUTE");
+    IElementType VARIABLE = new PerlTokenType("VARIABLE");
     IElementType HASH_KEY = new PerlTokenType("HASH_KEY");
     IElementType PREDICATE = new PerlTokenType("PREDICATE");
 
