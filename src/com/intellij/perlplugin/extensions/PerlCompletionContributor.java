@@ -20,10 +20,12 @@ import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class PerlCompletionContributor extends CompletionContributor {
-
+    private static HashMap<String, LookupElement> attributesCache = new HashMap<String, LookupElement>();
+    private static HashMap<Sub, LookupElement> subsCache = new HashMap<Sub, LookupElement>();
 
     public PerlCompletionContributor() {
 //        extend(CompletionType.BASIC, PlatformPatterns.psiElement(PerlTypes.KEY).withLanguage(PerlLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
@@ -69,9 +71,9 @@ public class PerlCompletionContributor extends CompletionContributor {
                 PsiElement currentElement = parameters.getOriginalPosition();
                 PsiElement prevElement = parameters.getOriginalPosition().getPrevSibling();
 
-                if (prevElement != null && prevElement.getPrevSibling() != null && prevElement.getNode().getElementType().equals(PerlTypes.POINTER)) {
+                if (is(prevElement,PerlTypes.POINTER)) {
                     //get all subs of package if we are on a package's pointer
-                    if (prevElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.PACKAGE)) {
+                    if (is(prevElement.getPrevSibling(),PerlTypes.PACKAGE)) {
                         String packageName = prevElement.getPrevSibling().getText();
                         ArrayList<Package> packageList = ModulesContainer.getPackageList(packageName);
                         if (Utils.debug) {
@@ -82,10 +84,10 @@ public class PerlCompletionContributor extends CompletionContributor {
                             ArrayList<Sub> subs = packageObj.getAllSubs();
                             for (int j = 0; j < subs.size(); j++) {
                                 Sub sub = subs.get(j);
-                                resultSet.addElement(getSubLookupElementBuilder(sub));
+                                addCachedSub(resultSet, sub);
                             }
                         }
-                    } else if (prevElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.ATTRIBUTE)) {
+                    } else if (is(prevElement.getPrevSibling(),PerlTypes.ATTRIBUTE)) {
                         //get all subs of current package if we are on an attributes pointer
                         ArrayList<Package> packageList = ModulesContainer.getPackageListFromFile(parameters.getOriginalFile().getVirtualFile().getCanonicalPath());
                         for (int i = 0; i < packageList.size(); i++) {
@@ -93,7 +95,7 @@ public class PerlCompletionContributor extends CompletionContributor {
                             ArrayList<Sub> subs = packageObj.getAllSubs();
                             for (int j = 0; j < subs.size(); j++) {
                                 Sub sub = subs.get(j);
-                                resultSet.addElement(getSubLookupElementBuilder(sub));
+                                addCachedSub(resultSet, sub);
                             }
                         }
                     }
@@ -108,40 +110,19 @@ public class PerlCompletionContributor extends CompletionContributor {
                         ArrayList<Sub> subs = packageObj.getAllSubs();
                         for (int j = 0; j < subs.size(); j++) {
                             Sub sub = subs.get(j);
-                            resultSet.addElement(getSubLookupElementBuilder(sub));
+                            addCachedSub(resultSet, sub);
                         }
                         break;
                     }
                 }
 
-                boolean attributeFound = false;
-                //get all attributes in file if we are in value (String)
-                if (currentElement != null && currentElement.getNode().getElementType().equals(PerlTypes.VALUE)) {
+                if (is(currentElement, PerlTypes.VALUE) || is(prevElement, PerlTypes.POINTER) || is(currentElement, PerlTypes.POINTER) || is(prevElement,PerlTypes.PREDICATE)) {
                     HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.ATTRIBUTE);
                     for (String str : rs) {
-                        resultSet.addElement(getAttributeLookupElementBuilder(str));
-                        attributeFound = true;
+                        addCachedAttribute(resultSet, str);
                     }
                 }
 
-                //get all attributes in file if we are in a pointer or have a pointer an element before that
-                if (!attributeFound && (prevElement != null && (prevElement.getNode().getElementType().equals(PerlTypes.POINTER))
-                        || (prevElement != null && prevElement.getPrevSibling() != null && prevElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.POINTER)))) {
-                    HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.ATTRIBUTE);
-                    for (String str : rs) {
-                        resultSet.addElement(getAttributeLookupElementBuilder(str));
-                        attributeFound = true;
-                    }
-                }
-
-                //Predicate AutoCompletion ( _ $ @ % )
-                if (!attributeFound && currentElement != null && currentElement.getNode().getElementType().equals(PerlTypes.PREDICATE)) {
-                    HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.ATTRIBUTE);
-                    for (String str : rs) {
-                        resultSet.addElement(getAttributeLookupElementBuilder(str.replaceFirst("\\_|\\$|\\%|\\@|\\&", "")));
-                        attributeFound = true;
-                    }
-                }
             }
         };
         addCompleteHandler(PerlTypes.PROPERTY, handler);
@@ -152,6 +133,24 @@ public class PerlCompletionContributor extends CompletionContributor {
         addCompleteHandler(PerlTypes.WHITESPACE, handler);
         addCompleteHandler(PerlTypes.VALUE, handler);
         addCompleteHandler(PerlTypes.PREDICATE, handler);
+    }
+
+    private boolean is(PsiElement element, IElementType perlType) {
+        return element != null && !element.getNode().getElementType().equals(perlType);
+    }
+
+    private void addCachedAttribute(CompletionResultSet resultSet, String str) {
+        if (!attributesCache.containsKey(str)) {
+            attributesCache.put(str, getAttributeLookupElementBuilder(str));
+        }
+        resultSet.addElement(attributesCache.get(str));
+    }
+
+    private void addCachedSub(CompletionResultSet resultSet, Sub sub) {
+        if (!subsCache.containsKey(sub)) {
+            subsCache.put(sub, getSubLookupElementBuilder(sub));
+        }
+        resultSet.addElement(subsCache.get(sub));
     }
 
     private HashSet<String> findAllAttributes(ASTNode[] children, IElementType type) {
@@ -171,7 +170,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         return resultSet;
     }
 
-    private LookupElementBuilder getSubLookupElementBuilder(Sub sub) {
+    private LookupElement getSubLookupElementBuilder(Sub sub) {
         String text = sub.toString2();
         String containingPackage = sub.getPackageObj().getPackageName();
         if (Utils.debug) {
