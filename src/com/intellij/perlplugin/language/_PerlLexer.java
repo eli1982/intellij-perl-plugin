@@ -1670,7 +1670,7 @@ public class _PerlLexer implements FlexLexer {
           }
         case 24: break;
         case 10: 
-          { return ATTRIBUTE;
+          { return VARIABLE;
           }
         case 25: break;
         case 9: 
