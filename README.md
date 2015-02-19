@@ -26,4 +26,5 @@ There's a lot to do (here's some of the things)
 -detect constants
 -ignore block comments for better support
 -update cache while editing files
-
+-add format support
+-add scoping blocks (for subs etc...)
