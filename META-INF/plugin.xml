@@ -30,6 +30,7 @@
         <psi.referenceContributor implementation="com.intellij.perlplugin.extensions.PropertyReferenceContributor"/>
         <completion.contributor language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlCompletionContributor"/>
         <lang.commenter language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlCommenter"/>
+        <lang.formatter language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlFormattingModelBuilder"/>
     </extensions>
 
     <application-components>
