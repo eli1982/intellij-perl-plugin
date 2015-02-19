@@ -33,7 +33,7 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey MARKUP = createTextAttributesKey("MARKUP", DefaultLanguageHighlighterColors.MARKUP_ATTRIBUTE);
     public static final TextAttributesKey PACKAGE = createTextAttributesKey("PACKAGE", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey ARGUMENTS = createTextAttributesKey("ARGUMENTS", DefaultLanguageHighlighterColors.PARAMETER);
-    public static final TextAttributesKey ATTRIBUTE = createTextAttributesKey("ATTRIBUTE",getTextAttribute(Color.getHSBColor(0.1F, 0.6F, 0.3F), false));
+    public static final TextAttributesKey ATTRIBUTE = createTextAttributesKey("VARIABLE",getTextAttribute(Color.getHSBColor(0.1F, 0.6F, 0.3F), false));
 
     public static final TextAttributesKey SUBROUTINE = createTextAttributesKey("SUBROUTINE", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("BAD_CHARACTER", getTextAttribute(Color.RED, true));
@@ -47,7 +47,7 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] VALUE_KEYS = new TextAttributesKey[]{VALUE};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENTS};
     private static final TextAttributesKey[] SUBROUTINE_KEYS = new TextAttributesKey[]{SUBROUTINE};
-    private static final TextAttributesKey[] ATTRIBUTE_KEYS = new TextAttributesKey[]{ATTRIBUTE};
+    private static final TextAttributesKey[] VARIABLES_KEYS = new TextAttributesKey[]{ATTRIBUTE};
     private static final TextAttributesKey[] ARGUMENTS_KEYS = new TextAttributesKey[]{ARGUMENTS};
     private static final TextAttributesKey[] LANG_VARIABLE_KEYS = new TextAttributesKey[]{LANG_VARIABLE};
     private static final TextAttributesKey[] LANG_FUNCTION_KEYS = new TextAttributesKey[]{LANG_FUNCTION};
@@ -81,8 +81,8 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
             return SUBROUTINE_KEYS;
         } else if (tokenType.equals(PerlTypes.ARGUMENTS)) {
             return ARGUMENTS_KEYS;
-        } else if (tokenType.equals(PerlTypes.ATTRIBUTE)) {
-            return ATTRIBUTE_KEYS;
+        } else if (tokenType.equals(PerlTypes.VARIABLE)) {
+            return VARIABLES_KEYS;
         } else if (tokenType.equals(PerlTypes.BRACES)) {
             return BRACES_KEYS;
         } else if (tokenType.equals(PerlTypes.OPERATOR)) {
@@ -100,7 +100,7 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
         } else if (tokenType.equals(PerlTypes.MARKUP)) {
             return MARKUP_KEYS;
         } else if (tokenType.equals(PerlTypes.PREDICATE)) {
-            return ATTRIBUTE_KEYS;
+            return VARIABLES_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;
         } else {
