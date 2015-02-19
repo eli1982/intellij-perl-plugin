@@ -65,11 +65,12 @@ public class PerlCompletionContributor extends CompletionContributor {
                     return;
                 }
 
-                //get all subs of package if we are on a package's pointer
+
                 PsiElement currentElement = parameters.getOriginalPosition();
                 PsiElement prevElement = parameters.getOriginalPosition().getPrevSibling();
 
                 if (prevElement != null && prevElement.getPrevSibling() != null && prevElement.getNode().getElementType().equals(PerlTypes.POINTER)) {
+                    //get all subs of package if we are on a package's pointer
                     if (prevElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.PACKAGE)) {
                         String packageName = prevElement.getPrevSibling().getText();
                         ArrayList<Package> packageList = ModulesContainer.getPackageList(packageName);
@@ -84,7 +85,17 @@ public class PerlCompletionContributor extends CompletionContributor {
                                 resultSet.addElement(getSubLookupElementBuilder(sub));
                             }
                         }
-                        return;
+                    } else if (prevElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.ATTRIBUTE)) {
+                        //get all subs of current package if we are on an attributes pointer
+                        ArrayList<Package> packageList = ModulesContainer.getPackageListFromFile(parameters.getOriginalFile().getVirtualFile().getCanonicalPath());
+                        for (int i = 0; i < packageList.size(); i++) {
+                            Package packageObj = packageList.get(i);
+                            ArrayList<Sub> subs = packageObj.getAllSubs();
+                            for (int j = 0; j < subs.size(); j++) {
+                                Sub sub = subs.get(j);
+                                resultSet.addElement(getSubLookupElementBuilder(sub));
+                            }
+                        }
                     }
                 }
 
@@ -103,29 +114,33 @@ public class PerlCompletionContributor extends CompletionContributor {
                     }
                 }
 
+                boolean attributeFound = false;
                 //get all attributes in file if we are in value (String)
                 if (currentElement != null && currentElement.getNode().getElementType().equals(PerlTypes.VALUE)) {
-                    HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null));
-                    for (String str: rs) {
+                    HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.ATTRIBUTE);
+                    for (String str : rs) {
                         resultSet.addElement(getAttributeLookupElementBuilder(str));
                     }
+                    attributeFound = true;
                 }
 
                 //get all attributes in file if we are in a pointer or have a pointer an element before that
-                if((prevElement !=null && (prevElement.getNode().getElementType().equals(PerlTypes.POINTER))
-                        || (prevElement !=null && prevElement.getPrevSibling() != null && prevElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.POINTER)))){
-                    HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null));
+                if (!attributeFound && (prevElement != null && (prevElement.getNode().getElementType().equals(PerlTypes.POINTER))
+                        || (prevElement != null && prevElement.getPrevSibling() != null && prevElement.getPrevSibling().getNode().getElementType().equals(PerlTypes.POINTER)))) {
+                    HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.ATTRIBUTE);
                     for (String str : rs) {
                         resultSet.addElement(getAttributeLookupElementBuilder(str));
                     }
+                    attributeFound = true;
                 }
 
                 //Predicate AutoCompletion ( _ $ @ % )
-                if(currentElement !=null && currentElement.getNode().getElementType().equals(PerlTypes.PREDICATE)){
-                    HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null));
+                if (!attributeFound && currentElement != null && currentElement.getNode().getElementType().equals(PerlTypes.PREDICATE)) {
+                    HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.ATTRIBUTE);
                     for (String str : rs) {
-                        resultSet.addElement(getAttributeLookupElementBuilder(str.replaceFirst("\\_|\\$|\\%|\\@|\\&","")));
+                        resultSet.addElement(getAttributeLookupElementBuilder(str.replaceFirst("\\_|\\$|\\%|\\@|\\&", "")));
                     }
+                    attributeFound = true;
                 }
             }
         };
@@ -139,18 +154,18 @@ public class PerlCompletionContributor extends CompletionContributor {
         addCompleteHandler(PerlTypes.PREDICATE, handler);
     }
 
-    private HashSet<String> findAllAttributes(ASTNode[] children){
+    private HashSet<String> findAllAttributes(ASTNode[] children, IElementType type) {
         HashSet<String> resultSet = new HashSet<String>();
-        return findAllAttributes(children,resultSet);
+        return findAllAttributes(children, resultSet, type);
     }
 
-    private HashSet<String> findAllAttributes(ASTNode[] children,HashSet<String> resultSet){
+    private HashSet<String> findAllAttributes(ASTNode[] children, HashSet<String> resultSet, IElementType type) {
         for (int i = 0; i < children.length; i++) {
-            ASTNode astNode = children[i].findChildByType(PerlTypes.ATTRIBUTE);
-            if(astNode != null){
+            ASTNode astNode = children[i].findChildByType(type);
+            if (astNode != null) {
                 resultSet.add(astNode.getText());
-            }else if(children[i].getChildren(null) != null){
-                findAllAttributes(children[i].getChildren(null),resultSet);
+            } else if (children[i].getChildren(null) != null) {
+                findAllAttributes(children[i].getChildren(null), resultSet, type);
             }
         }
         return resultSet;
@@ -169,7 +184,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         if (Utils.debug) {
             Utils.print("Attribute: " + text);
         }
-        return LookupElementBuilder.create(text).withIcon(AllIcons.Nodes.Parameter).withTypeText("Attribute",true);
+        return LookupElementBuilder.create(text).withIcon(AllIcons.Nodes.Parameter).withTypeText("Attribute", true);
     }
 
     private void addCompleteHandler(IElementType elementType, CompletionProvider<CompletionParameters> handler) {
