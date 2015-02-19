@@ -29,33 +29,7 @@ public class PerlCompletionContributor extends CompletionContributor {
     private static HashMap<Package, LookupElement> packagesCache = new HashMap<Package, LookupElement>();
 
     public PerlCompletionContributor() {
-//        extend(CompletionType.BASIC, PlatformPatterns.psiElement(PerlTypes.KEY).withLanguage(PerlLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
-//            public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
-//                resultSet.addElement(LookupElementBuilder.create("KEY"));
-//            }
-//        });
-//        extend(CompletionType.BASIC, PlatformPatterns.psiElement(PerlTypes.PROPERTY).withLanguage(PerlLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
-//            public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
-//                resultSet.addElement(LookupElementBuilder.create("PROPERTY"));
-//            }
-//        });
-//        extend(CompletionType.BASIC, PlatformPatterns.psiElement(PerlTypes.OPERATOR).withLanguage(PerlLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
-//            public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
-//                resultSet.addElement(LookupElementBuilder.create("OPERATOR"));
-//            }
-//        });
-//        extend(CompletionType.BASIC, PlatformPatterns.psiElement(PerlTypes.VALUE).withLanguage(PerlLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
-//            public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
-//                resultSet.addElement(LookupElementBuilder.create("VALUE"));
-//            }
-//        });
-//        extend(CompletionType.BASIC, PlatformPatterns.psiElement(PerlTypes.SEPARATOR).withLanguage(PerlLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
-//            public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
-//                resultSet.addElement(LookupElementBuilder.create("SEPARATOR"));
-//            }
-//        });
-//
-//    }
+
         CompletionProvider<CompletionParameters> handler = new CompletionProvider<CompletionParameters>() {
             public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
 
@@ -73,26 +47,26 @@ public class PerlCompletionContributor extends CompletionContributor {
                 PsiElement prevElement = parameters.getOriginalPosition().getPrevSibling();
 
                 if (is(currentElement, PerlTypes.PROPERTY)) {
-                    getAllPackages(resultSet, currentElement);
-                }else if (is(currentElement, PerlTypes.WHITESPACE) && !is(prevElement,PerlTypes.POINTER)) {
-                    getAllSubsInFile(parameters, resultSet);
-                    getAllVariablesInFile(parameters, resultSet);
+                    addAllPackages(resultSet, currentElement);
+                } else if (is(currentElement, PerlTypes.WHITESPACE) && !is(prevElement, PerlTypes.POINTER)) {
+                    addAllSubsInFile(parameters, resultSet);
+                    addAllVariablesInFile(parameters, resultSet);
                 } else if (is(currentElement, PerlTypes.VARIABLE) || is(currentElement, PerlTypes.VALUE) || is(currentElement, PerlTypes.PREDICATE) || is(currentElement, PerlTypes.BRACES) || is(currentElement, PerlTypes.LANG_SYNTAX)) {
-                    getAllVariablesInFile(parameters, resultSet);
+                    addAllVariablesInFile(parameters, resultSet);
                 } else if (is(currentElement, PerlTypes.PACKAGE)) {
-                    getAllPackages(resultSet, currentElement);
+                    addAllPackages(resultSet, currentElement);
                 }
 
                 if (is(prevElement, PerlTypes.POINTER)) {
                     if (is(prevElement.getPrevSibling(), PerlTypes.PACKAGE)) {
                         //get all subs of package if we are on a package's pointer
-                        getAllSubsInPackage(resultSet, prevElement.getPrevSibling());
+                        addAllSubsInPackage(resultSet, prevElement.getPrevSibling());
                     } else if (is(prevElement.getPrevSibling(), PerlTypes.VARIABLE)) {
                         //get all subs of current package if we are on an variable pointer
-                        getAllSubsInFile(parameters, resultSet);
+                        addAllSubsInFile(parameters, resultSet);
                     }
                 } else if (is(prevElement, PerlTypes.WHITESPACE)) {
-                    getAllSubsInFile(parameters, resultSet);
+                    addAllSubsInFile(parameters, resultSet);
                 }
             }
         };
@@ -106,14 +80,19 @@ public class PerlCompletionContributor extends CompletionContributor {
         addCompleteHandler(PerlTypes.PREDICATE, handler);
     }
 
-    private void getAllPackages(CompletionResultSet resultSet, PsiElement element) {
+    private boolean is(PsiElement element, IElementType perlType) {
+        return element != null && element.getNode().getElementType().equals(perlType);
+    }
+
+    //add cached methods
+    private void addAllPackages(CompletionResultSet resultSet, PsiElement element) {
         ArrayList<Package> packageList = ModulesContainer.searchPackageList(element.getText());
         for (int i = 0; i < packageList.size(); i++) {
             addCachedPackage(resultSet, packageList.get(i));
         }
     }
 
-    private void getAllSubsInPackage(CompletionResultSet resultSet, PsiElement packageName) {
+    private void addAllSubsInPackage(CompletionResultSet resultSet, PsiElement packageName) {
         ArrayList<Package> packageList = ModulesContainer.getPackageList(packageName.getText());
         if (Utils.debug) {
             Utils.print("Detected Package:" + packageName);
@@ -127,7 +106,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         }
     }
 
-    private void getAllSubsInFile(CompletionParameters parameters, CompletionResultSet resultSet) {
+    private void addAllSubsInFile(CompletionParameters parameters, CompletionResultSet resultSet) {
         ArrayList<Package> packageList = ModulesContainer.getPackageListFromFile(parameters.getOriginalFile().getVirtualFile().getCanonicalPath());
         for (int i = 0; i < packageList.size(); i++) {
             Package packageObj = packageList.get(i);
@@ -138,18 +117,13 @@ public class PerlCompletionContributor extends CompletionContributor {
         }
     }
 
-    private void getAllVariablesInFile(CompletionParameters parameters, CompletionResultSet resultSet) {
+    private void addAllVariablesInFile(CompletionParameters parameters, CompletionResultSet resultSet) {
         HashSet<String> rs = findAllVariables(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.VARIABLE);
         for (String str : rs) {
             addCachedVariables(resultSet, str);
         }
     }
 
-    private boolean is(PsiElement element, IElementType perlType) {
-        return element != null && element.getNode().getElementType().equals(perlType);
-    }
-
-    //add cached methods
     private void addCachedPackage(CompletionResultSet resultSet, Package packageObj) {
         if (!packagesCache.containsKey(packageObj)) {
             packagesCache.put(packageObj, getPackageLookupElementBuilder(packageObj));
