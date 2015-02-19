@@ -120,8 +120,8 @@ public class PerlCompletionContributor extends CompletionContributor {
                     HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.ATTRIBUTE);
                     for (String str : rs) {
                         resultSet.addElement(getAttributeLookupElementBuilder(str));
+                        attributeFound = true;
                     }
-                    attributeFound = true;
                 }
 
                 //get all attributes in file if we are in a pointer or have a pointer an element before that
@@ -130,8 +130,8 @@ public class PerlCompletionContributor extends CompletionContributor {
                     HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.ATTRIBUTE);
                     for (String str : rs) {
                         resultSet.addElement(getAttributeLookupElementBuilder(str));
+                        attributeFound = true;
                     }
-                    attributeFound = true;
                 }
 
                 //Predicate AutoCompletion ( _ $ @ % )
@@ -139,8 +139,8 @@ public class PerlCompletionContributor extends CompletionContributor {
                     HashSet<String> rs = findAllAttributes(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.ATTRIBUTE);
                     for (String str : rs) {
                         resultSet.addElement(getAttributeLookupElementBuilder(str.replaceFirst("\\_|\\$|\\%|\\@|\\&", "")));
+                        attributeFound = true;
                     }
-                    attributeFound = true;
                 }
             }
         };
