@@ -75,8 +75,9 @@ public class PerlCompletionContributor extends CompletionContributor {
                 if (is(currentElement, PerlTypes.PROPERTY)) {
                     getAllPackages(resultSet, currentElement);
                 }else if (is(currentElement, PerlTypes.WHITESPACE)) {
-                    getAllSubsInFile(resultSet, editor, virtualFile);
-                } else if (is(currentElement, PerlTypes.VALUE) || is(prevElement, PerlTypes.PREDICATE) || is(prevElement, PerlTypes.BRACES)) {
+                    getAllSubsInFile(parameters, resultSet);
+                    getAllVariablesInFile(parameters, resultSet);
+                } else if (is(currentElement, PerlTypes.VARIABLE) || is(currentElement, PerlTypes.VALUE) || is(currentElement, PerlTypes.PREDICATE) || is(currentElement, PerlTypes.BRACES) || is(currentElement, PerlTypes.LANG_SYNTAX)) {
                     getAllVariablesInFile(parameters, resultSet);
                 } else if (is(currentElement, PerlTypes.PACKAGE)) {
                     getAllPackages(resultSet, currentElement);
@@ -85,31 +86,13 @@ public class PerlCompletionContributor extends CompletionContributor {
                 if (is(prevElement, PerlTypes.POINTER)) {
                     if (is(prevElement.getPrevSibling(), PerlTypes.PACKAGE)) {
                         //get all subs of package if we are on a package's pointer
-                        String packageName = prevElement.getPrevSibling().getText();
-                        ArrayList<Package> packageList = ModulesContainer.getPackageList(packageName);
-                        if (Utils.debug) {
-                            Utils.print("Detected Package:" + packageName);
-                        }
-                        for (int i = 0; i < packageList.size(); i++) {
-                            Package packageObj = packageList.get(i);
-                            ArrayList<Sub> subs = packageObj.getAllSubs();
-                            for (int j = 0; j < subs.size(); j++) {
-                                addCachedSub(resultSet, subs.get(j));
-                            }
-                        }
+                        getAllSubsInPackage(resultSet, prevElement.getPrevSibling());
                     } else if (is(prevElement.getPrevSibling(), PerlTypes.VARIABLE)) {
                         //get all subs of current package if we are on an variable pointer
-                        ArrayList<Package> packageList = ModulesContainer.getPackageListFromFile(parameters.getOriginalFile().getVirtualFile().getCanonicalPath());
-                        for (int i = 0; i < packageList.size(); i++) {
-                            Package packageObj = packageList.get(i);
-                            ArrayList<Sub> subs = packageObj.getAllSubs();
-                            for (int j = 0; j < subs.size(); j++) {
-                                addCachedSub(resultSet, subs.get(j));
-                            }
-                        }
+                        getAllSubsInFile(parameters, resultSet);
                     }
                 } else if (is(prevElement, PerlTypes.WHITESPACE)) {
-                    getAllSubsInFile(resultSet, editor, virtualFile);
+                    getAllSubsInFile(parameters, resultSet);
                 }
             }
         };
@@ -130,29 +113,37 @@ public class PerlCompletionContributor extends CompletionContributor {
         }
     }
 
+    private void getAllSubsInPackage(CompletionResultSet resultSet, PsiElement packageName) {
+        ArrayList<Package> packageList = ModulesContainer.getPackageList(packageName.getText());
+        if (Utils.debug) {
+            Utils.print("Detected Package:" + packageName);
+        }
+        for (int i = 0; i < packageList.size(); i++) {
+            Package packageObj = packageList.get(i);
+            ArrayList<Sub> subs = packageObj.getAllSubs();
+            for (int j = 0; j < subs.size(); j++) {
+                addCachedSub(resultSet, subs.get(j));
+            }
+        }
+    }
+
+    private void getAllSubsInFile(CompletionParameters parameters, CompletionResultSet resultSet) {
+        ArrayList<Package> packageList = ModulesContainer.getPackageListFromFile(parameters.getOriginalFile().getVirtualFile().getCanonicalPath());
+        for (int i = 0; i < packageList.size(); i++) {
+            Package packageObj = packageList.get(i);
+            ArrayList<Sub> subs = packageObj.getAllSubs();
+            for (int j = 0; j < subs.size(); j++) {
+                addCachedSub(resultSet, subs.get(j));
+            }
+        }
+    }
+
     private void getAllVariablesInFile(CompletionParameters parameters, CompletionResultSet resultSet) {
         HashSet<String> rs = findAllVariables(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.VARIABLE);
         for (String str : rs) {
             addCachedVariables(resultSet, str);
         }
     }
-
-    private void getAllSubsInFile(CompletionResultSet resultSet, Editor editor, VirtualFile virtualFile) {
-        //get all subs in file
-        ArrayList<Package> packageList = ModulesContainer.getPackageListFromFile(virtualFile.getCanonicalPath());
-        for (int i = 0; i < packageList.size(); i++) {
-            Package packageObj = packageList.get(i);
-            if (editor.getCaretModel().getOffset() > packageObj.getStartPositionInFile() &&
-                    editor.getCaretModel().getOffset() < packageObj.getEndPositionInFile()) {
-                ArrayList<Sub> subs = packageObj.getAllSubs();
-                for (int j = 0; j < subs.size(); j++) {
-                    addCachedSub(resultSet, subs.get(j));
-                }
-                break;
-            }
-        }
-    }
-
 
     private boolean is(PsiElement element, IElementType perlType) {
         return element != null && element.getNode().getElementType().equals(perlType);

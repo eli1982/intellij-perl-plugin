@@ -33,7 +33,7 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey MARKUP = createTextAttributesKey("MARKUP", DefaultLanguageHighlighterColors.MARKUP_ATTRIBUTE);
     public static final TextAttributesKey PACKAGE = createTextAttributesKey("PACKAGE", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey ARGUMENTS = createTextAttributesKey("ARGUMENTS", DefaultLanguageHighlighterColors.PARAMETER);
-    public static final TextAttributesKey ATTRIBUTE = createTextAttributesKey("VARIABLE",getTextAttribute(Color.getHSBColor(0.1F, 0.6F, 0.3F), false));
+    public static final TextAttributesKey ATTRIBUTE = createTextAttributesKey("VARIABLE", DefaultLanguageHighlighterColors.PARAMETER);
 
     public static final TextAttributesKey SUBROUTINE = createTextAttributesKey("SUBROUTINE", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("BAD_CHARACTER", getTextAttribute(Color.RED, true));
