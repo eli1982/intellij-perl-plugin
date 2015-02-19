@@ -16,7 +16,7 @@ public class PerlCommenter implements Commenter {
     @Nullable
     @Override
     public String getBlockCommentPrefix() {
-        return "=head";
+        return "=head1";
     }
 
     @Nullable
@@ -28,7 +28,7 @@ public class PerlCommenter implements Commenter {
     @Nullable
     @Override
     public String getCommentedBlockCommentPrefix() {
-        return "=head";
+        return "=head1";
     }
 
     @Nullable
