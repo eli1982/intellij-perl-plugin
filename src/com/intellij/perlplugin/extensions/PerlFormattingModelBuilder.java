@@ -7,7 +7,6 @@ import com.intellij.perlplugin.psi.PerlTypes;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
-import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
  
@@ -22,8 +21,8 @@ public class PerlFormattingModelBuilder implements FormattingModelBuilder {
  
     private static SpacingBuilder createSpaceBuilder(CodeStyleSettings settings) {
         SpacingBuilder spacingBuilder = new SpacingBuilder(settings);
-        spacingBuilder.between(PerlTypes.LANG_SYNTAX, PerlTypes.ATTRIBUTE).spaces(1);
-        spacingBuilder.between(PerlTypes.ATTRIBUTE, PerlTypes.LANG_SYNTAX).spaces(1);
+        spacingBuilder.between(PerlTypes.LANG_SYNTAX, PerlTypes.VARIABLE).spaces(1);
+        spacingBuilder.between(PerlTypes.VARIABLE, PerlTypes.LANG_SYNTAX).spaces(1);
         return spacingBuilder;
     }
  
