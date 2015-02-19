@@ -74,7 +74,7 @@ public class PerlCompletionContributor extends CompletionContributor {
 
                 if (is(currentElement, PerlTypes.PROPERTY)) {
                     getAllPackages(resultSet, currentElement);
-                }else if (is(currentElement, PerlTypes.WHITESPACE)) {
+                }else if (is(currentElement, PerlTypes.WHITESPACE) && !is(prevElement,PerlTypes.POINTER)) {
                     getAllSubsInFile(parameters, resultSet);
                     getAllVariablesInFile(parameters, resultSet);
                 } else if (is(currentElement, PerlTypes.VARIABLE) || is(currentElement, PerlTypes.VALUE) || is(currentElement, PerlTypes.PREDICATE) || is(currentElement, PerlTypes.BRACES) || is(currentElement, PerlTypes.LANG_SYNTAX)) {
