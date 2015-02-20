@@ -1,16 +1,18 @@
 package com.intellij.perlplugin;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.perlplugin.bo.*;
 import com.intellij.perlplugin.bo.Package;
 import com.intellij.perlplugin.filters.FileFilter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,27 +22,48 @@ import java.util.regex.Pattern;
 public class PerlInternalParser {
     public static final double PROBLEMATIC_FILE_TIME_THRESHOLD = 0.5;
     private static int sum;
+    private static FileFilter fileFilter = new FileFilter();
+    private static double totalFileCount = 0;
+    private static Module module;
 
-    public static void parseAllSources(Module module) {
+    public static void start(Module module) {
+        PerlInternalParser.module = module;
+        ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Caching Perl Modules") {
+            public void run(@NotNull ProgressIndicator progressIndicator) {
+                if (Utils.debug) {
+                    Utils.print("parsing started");
+                }
+                long start = System.currentTimeMillis();
+                PerlInternalParser.parseAllSources(PerlInternalParser.module, progressIndicator);
+                long end = System.currentTimeMillis();
+
+                if (Utils.debug) {
+                    Utils.print("update completed in " + ((end - start) / 1000) + "sec");
+                }
+            }
+        });
+    }
+
+    public static void parseAllSources(Module module, ProgressIndicator progressIndicator) {
         sum = 0;
         if (module == null) {
             //if you encounter this error - make sure to select a file in the editor before pressing ctrl+shift+G
             Utils.alert("No Module selected");//TODO: find a way to select a module without having to select a file
             return;
         }
-        ModulesContainer.clear();
+        clear();
         if (Utils.debug) {
             Utils.print("==================");
             Utils.print("\tFirst Pass");
             Utils.print("==================");
         }
-        firstPass(module);
+        firstPass(module, progressIndicator);
         if (Utils.debug) {
             Utils.print("==================");
             Utils.print("\tSecond Pass");
             Utils.print("==================");
         }
-        secondPass();
+        secondPass(progressIndicator);
         if (Utils.debug) {
             Utils.print("total number of files: " + sum);
             Utils.print("==================");
@@ -56,19 +79,41 @@ public class PerlInternalParser {
     //  PASSES
     //==========================
 
-    private static void firstPass(Module module) {
+    private static void firstPass(Module module, ProgressIndicator progressIndicator) {
         VirtualFile[] sourceFolders = ProjectRootManager.getInstance(module.getProject()).getContentSourceRoots();
         if (sourceFolders.length == 0) {
             Utils.alert("No source folders found. please go to > Project Structure > Modules > Sources and add your source folders");
         }
+        // Set the progress bar percentage and text
+        progressIndicator.setFraction(0.0);
+        progressIndicator.setText("estimating work...");
+
+        //get files estimation
+        for (int i = 0; i < sourceFolders.length; i++) {
+            if (progressIndicator.isCanceled()) {
+                clear();
+                return;
+            }
+            File folder = new File(sourceFolders[i].getCanonicalPath());
+            totalFileCount += Utils.getFilesCount(folder, fileFilter);
+        }
+
+        progressIndicator.setText("preparing cache...");
+
+
+        if (Utils.debug) {
+            System.out.println("totalFileCount:" + totalFileCount);
+        }
+        //parse files
         for (int i = 0; i < sourceFolders.length; i++) {
             File folder = new File(sourceFolders[i].getCanonicalPath());
-            File[] files = folder.listFiles(new FileFilter());
-            parseFiles(files);
+            File[] files = folder.listFiles(fileFilter);
+            parseFiles(files, progressIndicator);
         }
     }
 
-    private static void secondPass() {
+    private static void secondPass(ProgressIndicator progressIndicator) {
+        progressIndicator.setText("finishing work...");
         //handle parent packages
         ArrayList<PendingPackage> pendingParentPackages = ModulesContainer.getPendingParentPackages();
         if (Utils.debug) {
@@ -76,6 +121,10 @@ public class PerlInternalParser {
         }
         int errorsCount = 0;
         for (int i = 0; i < pendingParentPackages.size(); i++) {
+            if (progressIndicator.isCanceled()) {
+                clear();
+                return;
+            }
             PendingPackage pendingParentPackage = pendingParentPackages.get(i);
             ArrayList<Package> parentPackageObj = ModulesContainer.getPackageList(pendingParentPackage.getParentPackage());
 
@@ -99,20 +148,29 @@ public class PerlInternalParser {
     //  METHODS
     //==========================
 
-    private static void parseFiles(File[] files) {
-        sum += files.length;
+    private static void parseFiles(File[] files, ProgressIndicator progressIndicator) {
+        if (progressIndicator.isCanceled()) {
+            clear();
+            return;
+        }
         if (Utils.debug) {
             Utils.print("Total parsed files: " + sum);
         }
         for (File file : files) {
+            if (progressIndicator.isCanceled()) {
+                clear();
+                return;
+            }
+            sum++;
             if (file.isDirectory()) {
-                parseFiles(file.listFiles(new FileFilter()));
+                parseFiles(file.listFiles(fileFilter), progressIndicator);
             } else {
                 if (Utils.debug) {
                     Utils.print(file.getAbsolutePath());
                 }
-                String path = file.getAbsolutePath();
                 PerlInternalParser.parse(file.getAbsolutePath());
+                progressIndicator.setFraction(sum / totalFileCount);
+                progressIndicator.setText2(sum + "/" + (int) totalFileCount + " files parsed");
             }
         }
     }
@@ -146,7 +204,7 @@ public class PerlInternalParser {
             String content = fileContent.substring(startPos, endPos);
 
             //get package name
-            Package packageObj = new Package(filePath.replace("\\","/"), getPackageNameFromContent(content));
+            Package packageObj = new Package(filePath.replace("\\", "/"), getPackageNameFromContent(content));
 
             addPendingPackageParent(packageObj, getPackageParentFromContent(content));
             addImportedPackagesFromContent(packageObj, content);
@@ -262,6 +320,11 @@ public class PerlInternalParser {
             return packageNameRegexWithQW.group(2);
         }
         return null;//no parent package found.
+    }
+
+    public static void clear() {
+        totalFileCount = 0;
+        ModulesContainer.clear();
     }
 
 }

@@ -1,5 +1,8 @@
 package com.intellij.perlplugin;
 
+import com.intellij.perlplugin.filters.FileFilter;
+
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
@@ -35,5 +38,17 @@ public class Utils {
     public static Matcher applyRegex(String regex, String content, int flags) {
         Pattern pattern = Pattern.compile(regex, flags);
         return pattern.matcher(content);
+    }
+
+    public static int getFilesCount(File file, FileFilter fileFilter) {
+        File[] files = file.listFiles(fileFilter);
+        int count = 0;
+        for (File f : files)
+            if (f.isDirectory())
+                count += getFilesCount(f, fileFilter);
+            else
+                count++;
+
+        return count;
     }
 }

@@ -11,7 +11,7 @@ import java.util.HashSet;
 /**
  * Created by eli on 27-11-14.
  */
-public class ModulesContainer {
+public class ModulesContainer{
     public static float totalDelays = 0;
     private static boolean initialized = false;
     private static HashMap<String, ArrayList<Package>> packages = new HashMap<String, ArrayList<Package>>();
@@ -94,7 +94,7 @@ public class ModulesContainer {
         filePackages.clear();
         pendingParentPackages.clear();
         problematicFiles.clear();
-        ModulesContainer.totalDelays = 0;
+        totalDelays = 0;
     }
 
     public static void addPendingParentPackage(Package packageObj, String parentPackage) {
