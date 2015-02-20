@@ -44,14 +44,8 @@
     </project-components>
 
     <actions>
-        <!-- Add your actions here -->
         <action id="active" class="com.intellij.perlplugin.UpdateSourcesAction" text="Update Sources">
-            <add-to-group group-id="FileMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift G"/>
-        </action>
-        <action id="some action" class="com.intellij.perlplugin.AutoCompleteAction" text="action">
-            <add-to-group group-id="CodeInsightEditorActions" anchor="first"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift D"/>
         </action>
     </actions>
 
