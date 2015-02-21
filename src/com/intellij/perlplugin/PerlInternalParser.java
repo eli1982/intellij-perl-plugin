@@ -4,6 +4,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.perlplugin.bo.*;
@@ -24,17 +25,17 @@ public class PerlInternalParser {
     private static int sum;
     private static FileFilter fileFilter = new FileFilter();
     private static double totalFileCount = 0;
-    private static Module module;
+    private static Project project;
 
-    public static void start(Module module) {
-        PerlInternalParser.module = module;
-        ProgressManager.getInstance().run(new Task.Backgroundable(module.getProject(), "Caching Perl Modules") {
+    public static void start(Project project) {
+        PerlInternalParser.project = project;
+        ProgressManager.getInstance().run(new Task.Backgroundable(PerlInternalParser.project,"Caching Perl Modules") {
             public void run(@NotNull ProgressIndicator progressIndicator) {
                 if (Utils.debug) {
                     Utils.print("parsing started");
                 }
                 long start = System.currentTimeMillis();
-                PerlInternalParser.parseAllSources(PerlInternalParser.module, progressIndicator);
+                PerlInternalParser.parseAllSources(progressIndicator);
                 long end = System.currentTimeMillis();
 
                 if (Utils.debug) {
@@ -44,25 +45,22 @@ public class PerlInternalParser {
         });
     }
 
-    public static void parseAllSources(Module module, ProgressIndicator progressIndicator) {
-        sum = 0;
-        if (module == null) {
-            //if you encounter this error - make sure to select a file in the editor before pressing ctrl+shift+G
-            Utils.alert("No Module selected");//TODO: find a way to select a module without having to select a file
-            return;
-        }
+    public static void parseAllSources(ProgressIndicator progressIndicator) {
         clear();
+
         if (Utils.debug) {
             Utils.print("==================");
             Utils.print("\tFirst Pass");
             Utils.print("==================");
         }
-        firstPass(module, progressIndicator);
+
+        firstPass(progressIndicator);
         if (Utils.debug) {
             Utils.print("==================");
             Utils.print("\tSecond Pass");
             Utils.print("==================");
         }
+
         secondPass(progressIndicator);
         if (Utils.debug) {
             Utils.print("total number of files: " + sum);
@@ -79,8 +77,8 @@ public class PerlInternalParser {
     //  PASSES
     //==========================
 
-    private static void firstPass(Module module, ProgressIndicator progressIndicator) {
-        VirtualFile[] sourceFolders = ProjectRootManager.getInstance(module.getProject()).getContentSourceRoots();
+    private static void firstPass(ProgressIndicator progressIndicator) {
+        VirtualFile[] sourceFolders = ProjectRootManager.getInstance(PerlInternalParser.project).getContentSourceRoots();
         if (sourceFolders.length == 0) {
             Utils.alert("No source folders found. please go to > Project Structure > Modules > Sources and add your source folders");
         }
@@ -323,6 +321,7 @@ public class PerlInternalParser {
     }
 
     public static void clear() {
+        sum = 0;
         totalFileCount = 0;
         ModulesContainer.clear();
     }

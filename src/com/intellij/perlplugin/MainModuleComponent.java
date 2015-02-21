@@ -18,7 +18,7 @@ public class MainModuleComponent implements ModuleComponent {
     }
 
     public void initComponent() {
-        PerlInternalParser.start(module);
+        PerlInternalParser.start(module.getProject());
     }
 
     public void disposeComponent() {

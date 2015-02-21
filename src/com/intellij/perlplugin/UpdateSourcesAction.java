@@ -9,6 +9,6 @@ import com.intellij.openapi.actionSystem.DataKeys;
  */
 public class UpdateSourcesAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
-        PerlInternalParser.start(e.getData(DataKeys.MODULE));
+        PerlInternalParser.start(e.getProject());
     }
 }
