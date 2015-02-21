@@ -8,7 +8,7 @@ this is really the first stage... docs will be added a little later.
 
 
 Usage:
-
+----------------------
 1.run the plugin with intellij (sdk version)
 
 2.select the src folder (make sure to set it in project structure to src - so the folder will be blue)
