@@ -3,6 +3,9 @@ This is a plugin that adds support for perl language in intellij (Based on Intel
 
 this is really the first stage... docs will be added a little later.
 
+
+
+
 Usage:
 
 1.run the plugin with intellij (sdk version)
@@ -34,11 +37,14 @@ There's a lot to do (here's some of the things)
 -----------------------------------------------
 -update cache while editing files (Cache is in ModulesContainer)
 
-
 -support ctrl click imports (multiple sources) - (references handling in PropertyReferenceContributor)
-
 
 -add format support (spacing in PerlFormattingModelBuilder)
 
-
 -add scoping blocks (for subs etc...)
+
+-basic project management
+
+-add file changes listeners
+
+-support refactoring
