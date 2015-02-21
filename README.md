@@ -6,6 +6,7 @@ this is really the first stage... docs will be added a little later.
 
 
 
+
 Usage:
 
 1.run the plugin with intellij (sdk version)
@@ -14,10 +15,10 @@ Usage:
 
 3.press CTRL+SHIFT+G to load the cache (if your source folders were already selected on load there's no need for this step)
 
-
-
 What can it do so far:
 ----------------------
+-supports .pm and .pl files
+
 -auto complete packages subroutines (may require with CTRL+SPACE)
 
 -auto complete various variables in the files

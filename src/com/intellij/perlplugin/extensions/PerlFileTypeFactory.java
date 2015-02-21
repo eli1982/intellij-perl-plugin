@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public class PerlFileTypeFactory extends FileTypeFactory {
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
-        fileTypeConsumer.consume(PerlFileType.INSTANCE, Constants.FILE_TYPE);
+        fileTypeConsumer.consume(PerlFileType.INSTANCE, Constants.FILE_TYPE_PM);
+        fileTypeConsumer.consume(PerlFileType.INSTANCE,Constants.FILE_TYPE_PL);
     }
 }

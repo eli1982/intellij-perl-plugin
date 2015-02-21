@@ -28,7 +28,7 @@ public class PerlFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getDefaultExtension() {
-        return Constants.FILE_TYPE;
+        return Constants.FILE_TYPE_PM;
     }
 
     @Nullable

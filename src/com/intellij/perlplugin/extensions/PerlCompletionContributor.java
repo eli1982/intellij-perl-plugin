@@ -47,6 +47,9 @@ public class PerlCompletionContributor extends CompletionContributor {
 
 
                 PsiElement currentElement = parameters.getOriginalPosition();
+                if(currentElement == null){
+                    currentElement =  parameters.getPosition();//handle case where we are auto completing in the end of file
+                }
                 PsiElement prevElement = prevSibling(currentElement, 1);
 
                 //current element based
@@ -55,16 +58,16 @@ public class PerlCompletionContributor extends CompletionContributor {
                 } else if (is(currentElement, PerlTypes.WHITESPACE) && !is(prevElement, PerlTypes.POINTER)) {
                     //qw subs auto complete
                     if (prevElement != null) {
-                        PsiElement brace = prevSibling(currentElement,1);
-                        while(is(brace,PerlTypes.WHITESPACE) || is(brace,PerlTypes.VARIABLE) || is(brace,PerlTypes.PROPERTY)){
-                            brace = prevSibling(brace,1);
+                        PsiElement brace = prevSibling(currentElement, 1);
+                        while (is(brace, PerlTypes.WHITESPACE) || is(brace, PerlTypes.VARIABLE) || is(brace, PerlTypes.PROPERTY)) {
+                            brace = prevSibling(brace, 1);
                         }
                         if (is(brace, PerlTypes.BRACES) && (brace.getText().equals("(") || brace.getText().equals(")"))) {
-                            boolean condition = is(prevSibling(brace,1), PerlTypes.LANG_SYNTAX) && prevSibling(brace, 1).getText().equals("qw")
+                            boolean condition = is(prevSibling(brace, 1), PerlTypes.LANG_SYNTAX) && prevSibling(brace, 1).getText().equals("qw")
                                     && is(prevSibling(brace, 2), PerlTypes.WHITESPACE)
                                     && is(prevSibling(brace, 3), PerlTypes.PACKAGE)
                                     && is(prevSibling(brace, 4), PerlTypes.WHITESPACE)
-                                    && is(prevSibling(brace, 5), PerlTypes.LANG_FUNCTION) && prevSibling(brace,5).getText().equals("use");
+                                    && is(prevSibling(brace, 5), PerlTypes.LANG_FUNCTION) && prevSibling(brace, 5).getText().equals("use");
                             if (condition) {
                                 addAllSubsInPackage(resultSet, prevSibling(brace, 3), false);
                                 return;
@@ -110,16 +113,18 @@ public class PerlCompletionContributor extends CompletionContributor {
     //this is a temporary solution until we will have structured code blocks
     private PsiElement prevSibling(PsiElement psiElement, int times) {
         PsiElement result = psiElement;
-        for (int i = 0; i < times; i++) {
-            if(result.getPrevSibling() != null){
-                //get sibling
-                result = result.getPrevSibling();
-            }else if(result.getParent() != null && result.getParent().getPrevSibling() != null){
-                //get sibling from previous parent
-                result = result.getParent().getPrevSibling().getLastChild();
-            }else{
-                //we have no sibling - no point to continue
-                return null;
+        if (result != null) {
+            for (int i = 0; i < times; i++) {
+                if (result.getPrevSibling() != null) {
+                    //get sibling
+                    result = result.getPrevSibling();
+                } else if (result.getParent() != null && result.getParent().getPrevSibling() != null) {
+                    //get sibling from previous parent
+                    result = result.getParent().getPrevSibling().getLastChild();
+                } else {
+                    //we have no sibling - no point to continue
+                    return null;
+                }
             }
         }
         return result;
