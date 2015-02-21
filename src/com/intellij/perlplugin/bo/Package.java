@@ -15,6 +15,7 @@ public class Package {
     private Package parentPackage;
     private ArrayList<Sub> subs = new ArrayList<Sub>();
     private ArrayList<ImportedPackage> importedPackages = new ArrayList<ImportedPackage>();
+    private ArrayList<ImportedSub> importedSubs = new ArrayList<ImportedSub>();
 
     public Package(String originFile, String packageName) {
         this.originFile = originFile;
@@ -102,5 +103,23 @@ public class Package {
                 "   importedPackages=" + importedPackages + "\n" +
                 "   subs=" + subs + "\n" +
                 '}';
+    }
+
+    public void setImportedSubs(ArrayList<ImportedSub> importedSubs) {
+        this.importedSubs = importedSubs;
+    }
+
+    public ArrayList<ImportedSub> getImportedSubs() {
+        return importedSubs;
+    }
+
+    public Sub getSubByName(String subName) {
+        ArrayList<Sub> allSubs = getAllSubs();
+        for (int i = 0; i < allSubs.size(); i++) {
+             if(allSubs.get(i).getName().equals(subName)){
+                 return allSubs.get(i);
+             }
+        }
+        return null;
     }
 }

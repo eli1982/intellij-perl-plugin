@@ -20,11 +20,7 @@ What can it do so far:
 
 There's a lot to do (here's some of the things)
 -----------------------------------------------
--detect imports
--support ctrl click imports (multiple sources) - references
--support import with qw
--detect constants
--ignore block comments for better support
--update cache while editing files
--add format support
+-support ctrl click imports (multiple sources) - (references handling in PropertyReferenceContributor)
+-update cache while editing files (Cache is in ModulesContainer)
+-add format support (spacing in PerlFormattingModelBuilder)
 -add scoping blocks (for subs etc...)

@@ -1,6 +1,5 @@
 package com.intellij.perlplugin;
 
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -206,7 +205,9 @@ public class PerlInternalParser {
 
             addPendingPackageParent(packageObj, getPackageParentFromContent(content));
             addImportedPackagesFromContent(packageObj, content);
+            addImportedSubsFromContent(packageObj,content);
             addSubsFromContent(packageObj, content.replaceAll("#.*", ""));
+
             //other
             packageObj.setStartPositionInFile(fileContent.indexOf("package", prevPos));
             packageObj.setEndPositionInFile(endPos);
@@ -251,7 +252,7 @@ public class PerlInternalParser {
 
     private static void addImportedPackagesFromContent(Package packageObj, String content) {
         ArrayList<ImportedPackage> importedPackages = new ArrayList<ImportedPackage>();
-        //use 'Bookings::Db::db_bp';
+        //use 'AA::BB::CC';
         Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s*;)", content);
         while (packageNameRegex.find() && !packageNameRegex.group(2).isEmpty()) {
             importedPackages.add(new ImportedPackage(packageNameRegex.group(2), packageObj));
@@ -259,10 +260,25 @@ public class PerlInternalParser {
         packageObj.setImportedPackages(importedPackages);
     }
 
+    private static void addImportedSubsFromContent(Package packageObj, String content) {
+        ArrayList<ImportedSub> importedSubs = new ArrayList<ImportedSub>();
+        //use 'AA::BB::CC qw( several methods import )';
+        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s*qw\\(((\\s*(\\w+)+\\s*)+)\\);)", content);
+        while (packageNameRegex.find() && !packageNameRegex.group(2).isEmpty()) {
+            String subContainingPackage = packageNameRegex.group(2);
+            String[] subNames = packageNameRegex.group(4).trim().split("\\s+");
+            for (int i = 0; i < subNames.length; i++) {
+                importedSubs.add(new ImportedSub(subNames[i], subContainingPackage));
+            }
+        }
+        packageObj.setImportedSubs(importedSubs);
+    }
+
+
     private static void addSubsFromContent(Package packageObj, String content) {
         ArrayList<Sub> subs = new ArrayList<Sub>();
         try {
-            Matcher subsRegex = Utils.applyRegex("\\s*sub\\s+(\\w+)\\s*\\{(\\s*my\\s+\\(\\s*((\\s*\\$\\w+\\s*\\,?\\s*)*)\\s*?\\)(\\S|\\s)*?\\;)?", content);
+            Matcher subsRegex = Utils.applyRegex("\\s*sub\\s+(\\w+)\\s*\\{(\\s*my\\s+\\(\\s*((\\s*[\\$|\\%|\\@\\&]\\w+\\s*\\,?\\s*)*)\\s*?\\)(\\S|\\s)*?\\;)?", content);
             float start;
             while (((start = System.nanoTime()) > 0F && subsRegex.find())) {
                 Sub sub = new Sub(packageObj, subsRegex.group(1));
@@ -307,12 +323,12 @@ public class PerlInternalParser {
     }
 
     private static String getPackageParentFromContent(String content) {
-        //use parent 'Bookings::Db::db_bp';
+        //use parent 'AA::BB::CC';
         Matcher packageNameRegexNoQW = Utils.applyRegex("(\\s*?use\\s*?parent\\s*?((\\w+\\:\\:)*\\w+))", content);
         if (packageNameRegexNoQW.find() && !packageNameRegexNoQW.group(2).isEmpty()) {
             return packageNameRegexNoQW.group(2);
         }
-        //use parent qw(Bookings::Db::db_bp);
+        //use parent qw( AA::BB::CC );
         Matcher packageNameRegexWithQW = Utils.applyRegex("(\\s*?use\\s+parent\\s+qw\\s*?\\(\\s*?((\\w|::)+)\\s*?\\)\\s*?;)", content);
         if (packageNameRegexWithQW.find() && !packageNameRegexWithQW.group(2).isEmpty()) {
             return packageNameRegexWithQW.group(2);

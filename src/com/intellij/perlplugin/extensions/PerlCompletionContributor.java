@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.perlplugin.ModulesContainer;
 import com.intellij.perlplugin.Utils;
+import com.intellij.perlplugin.bo.ImportedSub;
 import com.intellij.perlplugin.bo.Package;
 import com.intellij.perlplugin.bo.Sub;
 import com.intellij.perlplugin.language.PerlIcons;
@@ -109,10 +110,17 @@ public class PerlCompletionContributor extends CompletionContributor {
     private void addAllSubsInFile(CompletionParameters parameters, CompletionResultSet resultSet) {
         ArrayList<Package> packageList = ModulesContainer.getPackageListFromFile(parameters.getOriginalFile().getVirtualFile().getCanonicalPath());
         for (int i = 0; i < packageList.size(); i++) {
-            Package packageObj = packageList.get(i);
-            ArrayList<Sub> subs = packageObj.getAllSubs();
+            ArrayList<Sub> subs = packageList.get(i).getAllSubs();
             for (int j = 0; j < subs.size(); j++) {
                 addCachedSub(resultSet, subs.get(j));
+            }
+            ArrayList<ImportedSub> importedSubs = packageList.get(i).getImportedSubs();
+            for (int j = 0; j < importedSubs.size(); j++) {
+                ArrayList<Package> packages = ModulesContainer.getPackageList(importedSubs.get(j).getContainingPackage());//TODO: handle more than 1 package
+                if (packages.size() > 0) {
+                    Sub sub = packages.get(0).getSubByName(importedSubs.get(j).getImportSub());
+                    addCachedSub(resultSet, sub);
+                }
             }
         }
     }
