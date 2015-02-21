@@ -26,7 +26,7 @@ import static com.intellij.perlplugin.psi.PerlTypes.*;
 LineTerminator = \r|\n|\r\n
 InputCharacter = [^\r\n]
 
-WhiteSpace = ( {LineTerminator} | [ \t\f]* )
+WhiteSpace = ( ({LineTerminator} | [ \t\f])* )
 
 LineComment = "#" {InputCharacter}* {LineTerminator}?
 TraditionalComment   = (\r|\n)"="[^*]~"=cut"
