@@ -1,5 +1,5 @@
 # intellij-perl-plugin
-This is a plugin that adds support for perl language in intellij (Based on Intellij Custom Languages)
+This is a plugin that adds support for perl language in intellij (Based on Intellij Custom Languages).
 
 this is really the first stage... docs will be added a little later.
 
@@ -18,9 +18,13 @@ Usage:
 
 What can it do so far:
 ----------------------
--autocomplete packages subroutines with CTRL+SPACE
+-auto complete packages subroutines (may require with CTRL+SPACE)
 
--support inhertence - so you will see subroutines of parent packages as well
+-auto complete various variables in the files
+
+-auto complete packages names
+
+-support inheritance - so you will see subroutines of parent packages as well
 
 -highlights subs and packages
 
