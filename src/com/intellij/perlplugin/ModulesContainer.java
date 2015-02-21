@@ -90,12 +90,13 @@ public class ModulesContainer{
 
     public static void clear() {
         packages.clear();
+        pendingParentPackages.clear();
         subs.clear();
         filePackages.clear();
-        pendingParentPackages.clear();
         problematicFiles.clear();
         totalDelays = 0;
     }
+
 
     public static void addPendingParentPackage(Package packageObj, String parentPackage) {
         if (packageObj != null && parentPackage != null) {
