@@ -30,16 +30,20 @@ public class PerlInternalParser {
         PerlInternalParser.project = project;
         ProgressManager.getInstance().run(new Task.Backgroundable(PerlInternalParser.project,"Caching Perl Modules") {
             public void run(@NotNull ProgressIndicator progressIndicator) {
-                if (Utils.debug) {
-                    Utils.print("parsing started");
-                }
-                long start = System.currentTimeMillis();
-                PerlInternalParser.parseAllSources(progressIndicator);
-                long end = System.currentTimeMillis();
+                try {
+                    if (Utils.debug) {
+                        Utils.print("parsing started");
+                    }
+                    long start = System.currentTimeMillis();
+                    PerlInternalParser.parseAllSources(progressIndicator);
+                    long end = System.currentTimeMillis();
 
-                if (Utils.debug) {
-                    Utils.print("update completed in " + ((end - start) / 1000) + "sec");
+                    if (Utils.debug) {
+                        Utils.print("update completed in " + ((end - start) / 1000) + "sec");
+                    }
+                }finally {
                 }
+                progressIndicator.stop();
             }
         });
     }

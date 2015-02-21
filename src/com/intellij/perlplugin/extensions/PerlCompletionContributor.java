@@ -27,7 +27,9 @@ import java.util.HashSet;
 public class PerlCompletionContributor extends CompletionContributor {
     private static HashMap<String, LookupElement> variablesCache = new HashMap<String, LookupElement>();
     private static HashMap<Sub, LookupElement> subsCache = new HashMap<Sub, LookupElement>();
+    private static HashMap<Sub, LookupElement> subsCacheNoArgs = new HashMap<Sub, LookupElement>();
     private static HashMap<Package, LookupElement> packagesCache = new HashMap<Package, LookupElement>();
+
 
     public PerlCompletionContributor() {
 
@@ -45,11 +47,30 @@ public class PerlCompletionContributor extends CompletionContributor {
 
 
                 PsiElement currentElement = parameters.getOriginalPosition();
-                PsiElement prevElement = parameters.getOriginalPosition().getPrevSibling();
+                PsiElement prevElement = prevSibling(currentElement, 1);
 
+                //current element based
                 if (is(currentElement, PerlTypes.PROPERTY)) {
                     addAllPackages(resultSet, currentElement);
                 } else if (is(currentElement, PerlTypes.WHITESPACE) && !is(prevElement, PerlTypes.POINTER)) {
+                    //qw subs auto complete
+                    if (prevElement != null) {
+                        PsiElement brace = prevSibling(currentElement,1);
+                        while(is(brace,PerlTypes.WHITESPACE) || is(brace,PerlTypes.VARIABLE) || is(brace,PerlTypes.PROPERTY)){
+                            brace = prevSibling(brace,1);
+                        }
+                        if (is(brace, PerlTypes.BRACES) && (brace.getText().equals("(") || brace.getText().equals(")"))) {
+                            boolean condition = is(prevSibling(brace,1), PerlTypes.LANG_SYNTAX) && prevSibling(brace, 1).getText().equals("qw")
+                                    && is(prevSibling(brace, 2), PerlTypes.WHITESPACE)
+                                    && is(prevSibling(brace, 3), PerlTypes.PACKAGE)
+                                    && is(prevSibling(brace, 4), PerlTypes.WHITESPACE)
+                                    && is(prevSibling(brace, 5), PerlTypes.LANG_FUNCTION) && prevSibling(brace,5).getText().equals("use");
+                            if (condition) {
+                                addAllSubsInPackage(resultSet, prevSibling(brace, 3), false);
+                                return;
+                            }
+                        }
+                    }
                     addAllSubsInFile(parameters, resultSet);
                     addAllVariablesInFile(parameters, resultSet);
                 } else if (is(currentElement, PerlTypes.VARIABLE) || is(currentElement, PerlTypes.VALUE) || is(currentElement, PerlTypes.PREDICATE) || is(currentElement, PerlTypes.BRACES) || is(currentElement, PerlTypes.LANG_SYNTAX)) {
@@ -58,11 +79,14 @@ public class PerlCompletionContributor extends CompletionContributor {
                     addAllPackages(resultSet, currentElement);
                 }
 
+
+                //prev element based
                 if (is(prevElement, PerlTypes.POINTER)) {
-                    if (is(prevElement.getPrevSibling(), PerlTypes.PACKAGE)) {
+                    PsiElement prevPrevElement = prevSibling(prevElement, 1);
+                    if (is(prevPrevElement, PerlTypes.PACKAGE)) {
                         //get all subs of package if we are on a package's pointer
-                        addAllSubsInPackage(resultSet, prevElement.getPrevSibling());
-                    } else if (is(prevElement.getPrevSibling(), PerlTypes.VARIABLE)) {
+                        addAllSubsInPackage(resultSet, prevPrevElement, true);
+                    } else if (is(prevPrevElement, PerlTypes.VARIABLE)) {
                         //get all subs of current package if we are on an variable pointer
                         addAllSubsInFile(parameters, resultSet);
                     }
@@ -79,6 +103,26 @@ public class PerlCompletionContributor extends CompletionContributor {
         addCompleteHandler(PerlTypes.WHITESPACE, handler);
         addCompleteHandler(PerlTypes.VALUE, handler);
         addCompleteHandler(PerlTypes.PREDICATE, handler);
+        addCompleteHandler(PerlTypes.LANG_SYNTAX, handler);
+        addCompleteHandler(PerlTypes.BRACES, handler);
+    }
+
+    //this is a temporary solution until we will have structured code blocks
+    private PsiElement prevSibling(PsiElement psiElement, int times) {
+        PsiElement result = psiElement;
+        for (int i = 0; i < times; i++) {
+            if(result.getPrevSibling() != null){
+                //get sibling
+                result = result.getPrevSibling();
+            }else if(result.getParent() != null && result.getParent().getPrevSibling() != null){
+                //get sibling from previous parent
+                result = result.getParent().getPrevSibling().getLastChild();
+            }else{
+                //we have no sibling - no point to continue
+                return null;
+            }
+        }
+        return result;
     }
 
     private boolean is(PsiElement element, IElementType perlType) {
@@ -93,7 +137,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         }
     }
 
-    private void addAllSubsInPackage(CompletionResultSet resultSet, PsiElement packageName) {
+    private void addAllSubsInPackage(CompletionResultSet resultSet, PsiElement packageName, boolean withArguments) {
         ArrayList<Package> packageList = ModulesContainer.getPackageList(packageName.getText());
         if (Utils.debug) {
             Utils.print("Detected Package:" + packageName);
@@ -102,7 +146,11 @@ public class PerlCompletionContributor extends CompletionContributor {
             Package packageObj = packageList.get(i);
             ArrayList<Sub> subs = packageObj.getAllSubs();
             for (int j = 0; j < subs.size(); j++) {
-                addCachedSub(resultSet, subs.get(j));
+                if (withArguments) {
+                    addCachedSub(resultSet, subs.get(j));
+                } else {
+                    addCachedSubNoArgs(resultSet, subs.get(j));
+                }
             }
         }
     }
@@ -141,9 +189,16 @@ public class PerlCompletionContributor extends CompletionContributor {
 
     private void addCachedSub(CompletionResultSet resultSet, Sub sub) {
         if (!subsCache.containsKey(sub)) {
-            subsCache.put(sub, getSubLookupElementBuilder(sub));
+            subsCache.put(sub, getSubLookupElementBuilder(sub, true));
         }
         resultSet.addElement(subsCache.get(sub));
+    }
+
+    private void addCachedSubNoArgs(CompletionResultSet resultSet, Sub sub) {
+        if (!subsCacheNoArgs.containsKey(sub)) {
+            subsCacheNoArgs.put(sub, getSubLookupElementBuilder(sub, false));
+        }
+        resultSet.addElement(subsCacheNoArgs.get(sub));
     }
 
     private void addCachedVariables(CompletionResultSet resultSet, String str) {
@@ -163,8 +218,8 @@ public class PerlCompletionContributor extends CompletionContributor {
         return LookupElementBuilder.create(text).withIcon(PerlIcons.PACKAGE).withTypeText("Package", true);
     }
 
-    private LookupElement getSubLookupElementBuilder(Sub sub) {
-        String text = sub.toString2();
+    private LookupElement getSubLookupElementBuilder(Sub sub, boolean withArguments) {
+        String text = (withArguments) ? sub.toString2() : sub.getName();
         String containingPackage = sub.getPackageObj().getPackageName();
         if (Utils.debug) {
             Utils.print("sub: " + text + " , containingPackage:" + containingPackage);
@@ -195,7 +250,6 @@ public class PerlCompletionContributor extends CompletionContributor {
         }
         return resultSet;
     }
-
 
     private void addCompleteHandler(IElementType elementType, CompletionProvider<CompletionParameters> handler) {
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(elementType).withLanguage(PerlLanguage.INSTANCE), handler);
