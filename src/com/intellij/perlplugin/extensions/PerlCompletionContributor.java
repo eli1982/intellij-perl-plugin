@@ -55,7 +55,7 @@ public class PerlCompletionContributor extends CompletionContributor {
                 //current element based
                 if (is(currentElement, PerlTypes.PROPERTY)) {
                     addAllPackages(resultSet, currentElement);
-                } else if (is(currentElement, PerlTypes.WHITESPACE) && !is(prevElement, PerlTypes.POINTER)) {
+                } else if (is(currentElement, PerlTypes.WHITESPACE) && !is(prevElement, PerlTypes.POINTER) || is(currentElement,PerlTypes.BRACES)) {
                     //qw subs auto complete
                     if (prevElement != null) {
                         PsiElement brace = prevSibling(currentElement, 1);
