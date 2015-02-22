@@ -44,8 +44,11 @@
     </project-components>
 
     <actions>
-        <action id="active" class="com.intellij.perlplugin.UpdateSourcesAction" text="Update Sources">
+        <action id="updateSourceAction" class="com.intellij.perlplugin.actions.UpdateSourcesAction" text="Update Sources">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift G"/>
+        </action>
+        <action id="newFileAction" class="com.intellij.perlplugin.actions.NewFileAction" text="Perl Script/Module" icon="/com/intellij/perlplugin/resources/icons/icon_16x16.png">
+            <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
     </actions>
 

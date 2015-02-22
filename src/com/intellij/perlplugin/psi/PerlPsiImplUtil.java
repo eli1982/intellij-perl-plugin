@@ -70,7 +70,7 @@ public class PerlPsiImplUtil {
             @Nullable
             @Override
             public Icon getIcon(boolean unused) {
-                return PerlIcons.FILE;
+                return PerlIcons.LANGUAGE;
             }
         };
     }

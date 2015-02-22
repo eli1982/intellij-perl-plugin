@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
@@ -118,9 +119,15 @@ public class PerlCompletionContributor extends CompletionContributor {
                 if (result.getPrevSibling() != null) {
                     //get sibling
                     result = result.getPrevSibling();
+                    while(is(result, GeneratedParserUtilBase.DUMMY_BLOCK)){
+                        result = result.getLastChild();
+                    }
                 } else if (result.getParent() != null && result.getParent().getPrevSibling() != null) {
                     //get sibling from previous parent
-                    result = result.getParent().getPrevSibling().getLastChild();
+                    result = result.getParent().getPrevSibling();
+                    while(is(result, GeneratedParserUtilBase.DUMMY_BLOCK)){
+                        result = result.getLastChild();
+                    }
                 } else {
                     //we have no sibling - no point to continue
                     return null;
@@ -258,5 +265,12 @@ public class PerlCompletionContributor extends CompletionContributor {
 
     private void addCompleteHandler(IElementType elementType, CompletionProvider<CompletionParameters> handler) {
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(elementType).withLanguage(PerlLanguage.INSTANCE), handler);
+    }
+
+    public static void clear(){
+        variablesCache.clear();
+        subsCache.clear();
+        subsCacheNoArgs.clear();
+        packagesCache.clear();
     }
 }

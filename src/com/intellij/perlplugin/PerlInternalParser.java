@@ -8,6 +8,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.perlplugin.bo.*;
 import com.intellij.perlplugin.bo.Package;
+import com.intellij.perlplugin.extensions.PerlCompletionContributor;
 import com.intellij.perlplugin.filters.FileFilter;
 import org.jetbrains.annotations.NotNull;
 
@@ -344,6 +345,7 @@ public class PerlInternalParser {
         sum = 0;
         totalFileCount = 0;
         ModulesContainer.clear();
+        PerlCompletionContributor.clear();
     }
 
 }

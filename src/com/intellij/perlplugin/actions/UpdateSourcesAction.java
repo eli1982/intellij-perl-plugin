@@ -1,8 +1,9 @@
-package com.intellij.perlplugin;
+package com.intellij.perlplugin.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.perlplugin.PerlInternalParser;
 
 /**
  * Created by eli on 27-11-14.

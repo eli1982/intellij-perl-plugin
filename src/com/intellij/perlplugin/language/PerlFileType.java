@@ -34,6 +34,6 @@ public class PerlFileType extends LanguageFileType {
     @Nullable
     @Override
     public Icon getIcon() {
-        return PerlIcons.FILE;
+        return PerlIcons.LANGUAGE;
     }
 }
