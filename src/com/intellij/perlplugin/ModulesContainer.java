@@ -1,12 +1,10 @@
 package com.intellij.perlplugin;
 
-import com.intellij.openapi.vfs.newvfs.events.VFileCreateEvent;
-import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent;
 import com.intellij.perlplugin.bo.Package;
 import com.intellij.perlplugin.bo.PendingPackage;
 import com.intellij.perlplugin.bo.Sub;
 
-import java.io.File;
+import javax.rmi.CORBA.Util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +18,7 @@ public class ModulesContainer {
     private static HashMap<String, ArrayList<Package>> packageNamesToPackages = new HashMap<String, ArrayList<Package>>();
     private static HashMap<String, HashSet<Sub>> subNamesToSubs = new HashMap<String, HashSet<Sub>>();
     private static HashMap<String, ArrayList<Package>> filePathsToPackages = new HashMap<String, ArrayList<Package>>();
+    private static HashMap<String, HashSet<String>> parentsToChildrenPackageNames = new HashMap<String, HashSet<String>>();
     private static ArrayList<PendingPackage> pendingParentPackages = new ArrayList<PendingPackage>();
     private static ArrayList<String> problematicFiles = new ArrayList<String>();
 
@@ -101,6 +100,7 @@ public class ModulesContainer {
         subNamesToSubs.clear();
         filePathsToPackages.clear();
         problematicFiles.clear();
+        parentsToChildrenPackageNames.clear();
         totalDelays = 0;
     }
 
@@ -113,8 +113,23 @@ public class ModulesContainer {
         }
     }
 
+    public static void addParentChild(String parentPackageName, String childPackageName) {
+        if (!parentsToChildrenPackageNames.containsKey(parentPackageName)) {
+            parentsToChildrenPackageNames.put(parentPackageName, new HashSet<String>());
+        }
+        parentsToChildrenPackageNames.get(parentPackageName).add(childPackageName);
+    }
+
     public static ArrayList<PendingPackage> getPendingParentPackages() {
         return pendingParentPackages;
+    }
+
+    public static void addProblematicFiles(String s) {
+        problematicFiles.add(s);
+    }
+
+    public static ArrayList<String> getProblematicFiles() {
+        return problematicFiles;
     }
 
     public static boolean isInitialized() {
@@ -125,14 +140,6 @@ public class ModulesContainer {
         ModulesContainer.initialized = true;
         pendingParentPackages.clear();
         problematicFiles.clear();
-    }
-
-    public static void addProblematicFiles(String s) {
-        problematicFiles.add(s);
-    }
-
-    public static ArrayList<String> getProblematicFiles() {
-        return problematicFiles;
     }
 
     public static void renameFile(String oldPath, String path) {
@@ -148,25 +155,44 @@ public class ModulesContainer {
                 addPackage(packageObj);
             }
             filePathsToPackages.remove(oldPath);
-        }else if(Utils.isValidateExtension(path)){
+        } else if (Utils.isValidateExtension(path)) {
             //handle renaming a file that doesn't have a package existing in the cache
             PerlInternalParser.parse(path);
         }
     }
 
     public static void removeFile(String path) {
-        if(filePathsToPackages.containsKey(path)) {
-            if(Utils.debug){
+        if (filePathsToPackages.containsKey(path)) {
+            if (Utils.debug) {
                 Utils.print("removing file: " + path);
             }
-            filePathsToPackages.remove(path);//TODO:find all packages referring to this package and remove this package as their parent
+            ArrayList<Package> packages = filePathsToPackages.remove(path);
+            for (int i = 0; i < packages.size(); i++) {
+                Package packageObj = packages.get(i);
+                //remove package from all it's children
+                HashSet<Package> children = packageObj.getChildren();
+                for (Package child : children) {
+                    if(Utils.verbose){
+                        Utils.print("removing: " + packageObj.getPackageName() + " from child:" + child.getPackageName());
+                    }
+                    child.setParentPackage(null);
+                }
+                if(Utils.verbose){
+                    Utils.print("removing: " + packageObj.getPackageName() + " from parent:" + packageObj.getParentPackage().getPackageName());
+                }
+                //remove package from it's parent
+                packageObj.getParentPackage().removeChild(packageObj);
+            }
         }
     }
 
     public static void createFile(String path) {
-        if(Utils.debug){
+        if (Utils.debug) {
             Utils.print("creating file: " + path);
         }
-        PerlInternalParser.parse(path);//TODO:find all packages referring to this package and populate them
+
+        //create package
+        PerlInternalParser.parse(path);
     }
+
 }

@@ -240,6 +240,7 @@ public class PerlInternalParser {
      * @param packageParent
      */
     private static void addPendingPackageParent(Package packageObj, String packageParent) {
+        ModulesContainer.addParentChild(packageParent,packageObj.getPackageName());
         if (packageParent != null) {
             ArrayList<Package> possiblePackages = ModulesContainer.getPackageList(packageParent);
             if (possiblePackages.size() > 0) {

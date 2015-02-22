@@ -51,7 +51,9 @@ public class Package {
 
     public void setParentPackage(Package parentPackage) {
         this.parentPackage = parentPackage;
-        this.parentPackage.addChild(this);
+        if(parentPackage != null) {
+            this.parentPackage.addChild(this);
+        }
     }
 
     public ArrayList<ImportedPackage> getImportedPackages() {
@@ -96,9 +98,15 @@ public class Package {
     }
 
     public void addChild(Package childPackage) {
-        if(!this.childrenPackages.contains(childPackage)) {
+        if (childPackage != null && !this.childrenPackages.contains(childPackage)) {
             this.childrenPackages.add(childPackage);
             childPackage.setParentPackage(this);
+        }
+    }
+
+    public void removeChild(Package childPackage) {
+        if (childPackage != null && !this.childrenPackages.contains(childPackage)) {
+            this.childrenPackages.remove(childPackage);
         }
     }
 
@@ -130,9 +138,9 @@ public class Package {
     public Sub getSubByName(String subName) {
         ArrayList<Sub> allSubs = getAllSubs();
         for (int i = 0; i < allSubs.size(); i++) {
-             if(allSubs.get(i).getName().equals(subName)){
-                 return allSubs.get(i);
-             }
+            if (allSubs.get(i).getName().equals(subName)) {
+                return allSubs.get(i);
+            }
         }
         return null;
     }
