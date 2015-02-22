@@ -145,18 +145,13 @@ public class ModulesContainer {
         if (Utils.debug) {
             Utils.print("file renamed/moved:\nold: " + oldPath + "\nnew: " + path);
         }
-        if (filePathsToPackages.containsKey(oldPath)) {
-            //handle renaming a file that have a package existing in the cache
-            ArrayList<Package> packages = filePathsToPackages.get(oldPath);
-            for (int i = 0; i < packages.size(); i++) {
-                Package packageObj = packages.get(i);
-                packageObj.setOriginFile(path);
-                addPackage(packageObj);
+        deleteFile(oldPath);
+        if(Utils.isValidateExtension(path)) {
+            createFile(path);
+        }else{
+            if (Utils.debug) {
+                Utils.print("not a valid file extension - renamed file won't be parsed");
             }
-            filePathsToPackages.remove(oldPath);
-        } else if (Utils.isValidateExtension(path)) {
-            //handle renaming a file that doesn't have a package existing in the cache
-            PerlInternalParser.parse(path);
         }
     }
 
