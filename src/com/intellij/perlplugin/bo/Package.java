@@ -3,6 +3,7 @@ package com.intellij.perlplugin.bo;
 import com.intellij.perlplugin.ModulesContainer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by eli on 28-11-14.
@@ -13,6 +14,7 @@ public class Package {
     private int startPositionInFile;
     private int endPositionInFile;
     private Package parentPackage;
+    private HashSet<Package> childrenPackages = new HashSet<Package>();
     private ArrayList<Sub> subs = new ArrayList<Sub>();
     private ArrayList<ImportedPackage> importedPackages = new ArrayList<ImportedPackage>();
     private ArrayList<ImportedSub> importedSubs = new ArrayList<ImportedSub>();
@@ -49,6 +51,7 @@ public class Package {
 
     public void setParentPackage(Package parentPackage) {
         this.parentPackage = parentPackage;
+        this.parentPackage.addChild(this);
     }
 
     public ArrayList<ImportedPackage> getImportedPackages() {
@@ -90,6 +93,17 @@ public class Package {
 
     public void setEndPositionInFile(int endPositionInFile) {
         this.endPositionInFile = endPositionInFile;
+    }
+
+    public void addChild(Package childPackage) {
+        if(!this.childrenPackages.contains(childPackage)) {
+            this.childrenPackages.add(childPackage);
+            childPackage.setParentPackage(this);
+        }
+    }
+
+    public HashSet<Package> getChildren() {
+        return childrenPackages;
     }
 
     @Override
