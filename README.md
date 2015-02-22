@@ -35,7 +35,7 @@ What can it do so far:
 
 -detect attributes in the file
 
-
+-added file changes listeners
 
 
 There's a lot to do (here's some of the things)
@@ -50,6 +50,5 @@ There's a lot to do (here's some of the things)
 
 -basic project management
 
--add file changes listeners
 
 -support refactoring
