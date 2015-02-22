@@ -4,7 +4,6 @@ import com.intellij.perlplugin.bo.Package;
 import com.intellij.perlplugin.bo.PendingPackage;
 import com.intellij.perlplugin.bo.Sub;
 
-import javax.rmi.CORBA.Util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -161,38 +160,78 @@ public class ModulesContainer {
         }
     }
 
-    public static void removeFile(String path) {
+    public static void deleteFile(String path) {
         if (filePathsToPackages.containsKey(path)) {
             if (Utils.debug) {
-                Utils.print("removing file: " + path);
+                Utils.print("deleting file: " + path);
             }
             ArrayList<Package> packages = filePathsToPackages.remove(path);
             for (int i = 0; i < packages.size(); i++) {
                 Package packageObj = packages.get(i);
+
                 //remove package from all it's children
                 HashSet<Package> children = packageObj.getChildren();
                 for (Package child : children) {
-                    if(Utils.verbose){
+                    if (Utils.verbose) {
                         Utils.print("removing: " + packageObj.getPackageName() + " from child:" + child.getPackageName());
                     }
                     child.setParentPackage(null);
                 }
-                if(Utils.verbose){
-                    Utils.print("removing: " + packageObj.getPackageName() + " from parent:" + packageObj.getParentPackage().getPackageName());
-                }
+                Package parentPackage = packageObj.getParentPackage();
+
                 //remove package from it's parent
-                packageObj.getParentPackage().removeChild(packageObj);
+                if (parentPackage == null) {
+                    if (Utils.verbose) {
+                        Utils.print("no parent to remove for package: " + packageObj.getPackageName());
+                    }
+                } else {
+                    if (Utils.verbose) {
+                        Utils.print("removing: " + packageObj.getPackageName() + " from parent:" + packageObj.getParentPackage().getPackageName());
+                    }
+                    packageObj.getParentPackage().removeChild(packageObj);
+                }
+
+                //remove package from remaining cache - make sure file path matches
+                ArrayList<Package> cachedPackages = packageNamesToPackages.get(packageObj.getPackageName());
+                for (int j = 0; j < cachedPackages.size(); j++) {
+                    if (cachedPackages.get(j).getOriginFile().equals(packageObj.getOriginFile())) {
+                        cachedPackages.remove(cachedPackages.get(j));
+                        j--;
+                    }
+                }
             }
         }
     }
 
-    public static void createFile(String path) {
-        if (Utils.debug) {
-            Utils.print("creating file: " + path);
-        }
+    public static void createFile(final String path) {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (Utils.debug) {
+                    Utils.print("creating file: " + path);
+                }
+                while (Utils.readFile(path).isEmpty()) {
 
-        //create package
-        PerlInternalParser.parse(path);
+                }
+                //also happen when undoing a file deletion!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //create package
+                PerlInternalParser.parse(path);
+                //set parent package for all inheriting children
+                ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(path);
+                for (Package packageObj : packages) {
+                    HashSet<String> children = parentsToChildrenPackageNames.get(packageObj.getPackageName());
+                    if (children != null) {
+                        for (String child : children) {
+                            ArrayList<Package> childPackages = packageNamesToPackages.get(child);
+                            for (Package childPackage : childPackages) {
+                                childPackage.setParentPackage(packageObj);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        t.start();
     }
 
 }

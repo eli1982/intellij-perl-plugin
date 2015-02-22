@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  */
 public class Utils {
     public static boolean debug = true;
-    public static boolean verbose = false;
+    public static boolean verbose = true;
 
     public static void alert(String str) {
         throw new RuntimeException(str);

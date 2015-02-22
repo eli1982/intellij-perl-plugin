@@ -40,27 +40,32 @@ public class ApplicationComponent implements com.intellij.openapi.components.App
 
     @Override
     public void after(@NotNull List<? extends VFileEvent> list) {
-        VFileEvent fileEvent;
-        for (int i = 0; i < list.size(); i++) {
-            fileEvent = list.get(i);
-            if (fileEvent instanceof VFileMoveEvent) {
-                VFileMoveEvent vFile = (VFileMoveEvent) fileEvent;
-                if(!vFile.getOldPath().equals(vFile.getPath())) {
-                    ModulesContainer.renameFile(vFile.getOldPath(), vFile.getPath());
+        try {
+            VFileEvent fileEvent;
+            for (int i = 0; i < list.size(); i++) {
+                fileEvent = list.get(i);
+                if (fileEvent instanceof VFileMoveEvent) {
+                    VFileMoveEvent vFile = (VFileMoveEvent) fileEvent;
+                    if (!vFile.getOldPath().equals(vFile.getPath())) {
+                        ModulesContainer.renameFile(vFile.getOldPath(), vFile.getPath());
+                    }
+                } else if (fileEvent instanceof VFilePropertyChangeEvent) {
+                    VFilePropertyChangeEvent vFile = (VFilePropertyChangeEvent) fileEvent;
+                    if (!vFile.getOldPath().equals(vFile.getPath())) {
+                        ModulesContainer.renameFile(vFile.getOldPath(), vFile.getPath());
+                    }
+                } else if (fileEvent instanceof VFileDeleteEvent) {
+                    VFileDeleteEvent vFile = (VFileDeleteEvent) fileEvent;
+                    ModulesContainer.deleteFile(vFile.getPath());
+                } else if (fileEvent instanceof VFileCreateEvent) {
+                    VFileCreateEvent vFile = (VFileCreateEvent) fileEvent;
+                    ModulesContainer.createFile(vFile.getPath());
                 }
-            } else if (fileEvent instanceof VFilePropertyChangeEvent) {
-                VFilePropertyChangeEvent vFile = (VFilePropertyChangeEvent) fileEvent;
-                if(!vFile.getOldPath().equals(vFile.getPath())) {
-                    ModulesContainer.renameFile(vFile.getOldPath(), vFile.getPath());
-                }
-            } else if (fileEvent instanceof VFileDeleteEvent){
-                VFileDeleteEvent vFile = (VFileDeleteEvent) fileEvent;
-                ModulesContainer.removeFile(vFile.getPath());
-            } else if (fileEvent instanceof VFileCreateEvent){
-                VFileCreateEvent vFile = (VFileCreateEvent) fileEvent;
-                ModulesContainer.createFile(vFile.getPath());
-            }
 
+            }
+        }catch (Exception e){
+            //if we get an exception we don't want to mess up the listener - (file listener goes into infinite loop)
+            e.printStackTrace();
         }
     }
 }
