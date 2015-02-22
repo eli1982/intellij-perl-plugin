@@ -35,7 +35,7 @@ What can it do so far:
 
 -detect attributes in the file
 
--added file changes listeners
+-added file changes listeners - autocompletion will handle cases where user create/deletes/renames/undo delete files (not source code changes)
 
 
 There's a lot to do (here's some of the things)
