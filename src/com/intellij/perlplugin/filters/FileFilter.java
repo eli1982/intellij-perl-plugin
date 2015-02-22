@@ -1,5 +1,8 @@
 package com.intellij.perlplugin.filters;
 
+import com.intellij.perlplugin.Utils;
+import com.intellij.perlplugin.language.Constants;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -9,12 +12,9 @@ import java.io.IOException;
  */
 public class FileFilter implements FilenameFilter {
     @Override
-    public boolean accept(File file, String s) {
+    public boolean accept(File file, String path) {
         try {
-            //    Utils.print("warning! excluding app");
-            return /*!s.equals("app") && */!file.getCanonicalPath().contains(".git") &&
-                    (s.endsWith(".pm") || s.endsWith(".pl") ||
-                            new File(file.getCanonicalPath() + "/" + s).isDirectory()) && file.exists();
+            return  (Utils.isValidateExtension(path) || (new File(file.getCanonicalPath() + "/" + path).isDirectory()) && file.exists());
         } catch (IOException e) {
             return false;
         }

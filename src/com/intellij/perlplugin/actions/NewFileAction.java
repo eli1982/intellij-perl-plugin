@@ -4,6 +4,7 @@ import com.intellij.ide.IdeBundle;
 import com.intellij.ide.actions.CreateFileAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.perlplugin.language.Constants;
 import com.intellij.perlplugin.language.PerlIcons;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
@@ -19,7 +20,7 @@ public class NewFileAction extends CreateFileAction {
         final CreateFileAction.MyValidator validator = new CreateFileAction.MyValidator(project, directory){
             @Override
             public boolean checkInput(String inputString) {
-                if(!inputString.endsWith(".pm") && !inputString.endsWith(".pl")){
+                if(!inputString.endsWith(Constants.PM_EXTENSION) && !inputString.endsWith(Constants.PL_EXTENSION)){
                     return false;
                 }
                 return super.checkInput(inputString);

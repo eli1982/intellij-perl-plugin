@@ -69,9 +69,9 @@ public class PerlInternalParser {
         if (Utils.debug) {
             Utils.print("total number of files: " + sum);
             Utils.print("==================");
-            System.out.println("Problematic files:(" + ModulesContainer.totalDelays + ")");
-            Utils.print("==================");
+            System.out.println("Problematic files time delay: " + ModulesContainer.totalDelays);
             System.out.println(ModulesContainer.getProblematicFiles());
+            Utils.print("==================");
         }
         ModulesContainer.setInitialized();
     }
@@ -104,7 +104,7 @@ public class PerlInternalParser {
 
 
         if (Utils.debug) {
-            System.out.println("totalFileCount:" + totalFileCount);
+            System.out.println("totalFileCount:" + (int)totalFileCount);
         }
         //parse files
         for (int i = 0; i < sourceFolders.length; i++) {
@@ -118,7 +118,7 @@ public class PerlInternalParser {
         progressIndicator.setText("finishing work...");
         //handle parent packages
         ArrayList<PendingPackage> pendingParentPackages = ModulesContainer.getPendingParentPackages();
-        if (Utils.debug) {
+        if (Utils.verbose) {
             Utils.print("Pending Parent Packages: " + pendingParentPackages.size());
         }
         int errorsCount = 0;
@@ -155,7 +155,7 @@ public class PerlInternalParser {
             clear();
             return;
         }
-        if (Utils.debug) {
+        if (Utils.verbose) {
             Utils.print("Total parsed files: " + sum);
         }
         for (File file : files) {
@@ -168,9 +168,9 @@ public class PerlInternalParser {
                 parseFiles(file.listFiles(fileFilter), progressIndicator);
             } else {
                 if (Utils.debug) {
-                    Utils.print(file.getAbsolutePath());
+                    Utils.print(file.getPath());
                 }
-                PerlInternalParser.parse(file.getAbsolutePath());
+                PerlInternalParser.parse(file.getPath());
                 progressIndicator.setFraction(sum / totalFileCount);
                 progressIndicator.setText2(sum + "/" + (int) totalFileCount + " files parsed");
             }
@@ -180,11 +180,9 @@ public class PerlInternalParser {
 
     public static void parse(String filePath) {
         String fileContent = Utils.readFile(filePath);
-//        fileContent =fileContent.replaceAll("#.*","");//TODO:: handle =head1 =cut block comments
-        //fileContent.replaceAll("(=head1)(.|[\r\n])*?(=cut)","");
 
         float start = System.nanoTime();
-        if (Utils.debug) {
+        if (Utils.verbose) {
             Utils.print("---------------------------------------------------");
             Utils.print("parsing file: " + filePath);
         }
@@ -217,7 +215,7 @@ public class PerlInternalParser {
             packageObj.setStartPositionInFile(fileContent.indexOf("package", prevPos));
             packageObj.setEndPositionInFile(endPos);
 
-            if (Utils.debug) {
+            if (Utils.verbose) {
                 Utils.print(packageObj);
                 Utils.print("---------------------------------------------------");
             }
@@ -225,7 +223,7 @@ public class PerlInternalParser {
         }
         float end = System.nanoTime();
         float result = (end - start) / 1000000000F;
-        if (Utils.debug) {
+        if (Utils.verbose) {
             Utils.print("time:" + result);
         }
         if (result > PROBLEMATIC_FILE_TIME_THRESHOLD) {
@@ -290,12 +288,12 @@ public class PerlInternalParser {
                 sub.setArguments(getArgumentsFromContent(subsRegex.group(3)));
                 sub.setPositionInFile(subsRegex.end(1));
                 subs.add(sub);
-                if (Utils.debug) {
+                if (Utils.verbose) {
                     Utils.print(sub);
                 }
                 float end = System.nanoTime();
                 float result = (end - start) / 1000000000F;
-                if (Utils.debug) {
+                if (Utils.verbose) {
                     Utils.print("time:" + result);
                 }
                 if (result > PROBLEMATIC_FILE_TIME_THRESHOLD) {

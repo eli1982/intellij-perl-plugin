@@ -35,7 +35,7 @@
 
     <application-components>
         <component>
-            <implementation-class>com.intellij.perlplugin.AppComponent</implementation-class>
+            <implementation-class>com.intellij.perlplugin.components.ApplicationComponent</implementation-class>
         </component>
     </application-components>
 
@@ -54,7 +54,7 @@
 
     <module-components>
         <component>
-            <implementation-class>com.intellij.perlplugin.MainModuleComponent</implementation-class>
+            <implementation-class>com.intellij.perlplugin.components.MainModuleComponent</implementation-class>
         </component>
     </module-components>
 </idea-plugin>

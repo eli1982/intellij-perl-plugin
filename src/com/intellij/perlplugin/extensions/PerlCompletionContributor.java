@@ -164,7 +164,7 @@ public class PerlCompletionContributor extends CompletionContributor {
 
     private void addAllSubsInPackage(CompletionResultSet resultSet, PsiElement packageName, boolean withArguments) {
         ArrayList<Package> packageList = ModulesContainer.getPackageList(packageName.getText());
-        if (Utils.debug) {
+        if (Utils.verbose) {
             Utils.print("Detected Package:" + packageName);
         }
         for (int i = 0; i < packageList.size(); i++) {
@@ -237,7 +237,7 @@ public class PerlCompletionContributor extends CompletionContributor {
     //get lookup elements methods
     private LookupElement getPackageLookupElementBuilder(Package packageObj) {
         String text = packageObj.getPackageName();
-        if (Utils.debug) {
+        if (Utils.verbose) {
             Utils.print("package: " + text);
         }
         return LookupElementBuilder.create(text).withIcon(PerlIcons.PACKAGE).withTypeText("Package", true);
@@ -246,14 +246,14 @@ public class PerlCompletionContributor extends CompletionContributor {
     private LookupElement getSubLookupElementBuilder(Sub sub, boolean withArguments) {
         String text = (withArguments) ? sub.toString2() : sub.getName();
         String containingPackage = sub.getPackageObj().getPackageName();
-        if (Utils.debug) {
+        if (Utils.verbose) {
             Utils.print("sub: " + text + " , containingPackage:" + containingPackage);
         }
         return LookupElementBuilder.create(text).withIcon(PerlIcons.SUBROUTINE).withTypeText(containingPackage, true);
     }
 
     private LookupElement getVariableLookupElementBuilder(String text) {
-        if (Utils.debug) {
+        if (Utils.verbose) {
             Utils.print("variable: " + text);
         }
         return LookupElementBuilder.create(text).withIcon(PerlIcons.VARIABLE).withTypeText("Variable", true);

@@ -1,6 +1,7 @@
 package com.intellij.perlplugin;
 
 import com.intellij.perlplugin.filters.FileFilter;
+import com.intellij.perlplugin.language.Constants;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -12,7 +13,8 @@ import java.util.regex.Pattern;
  * Created by eli on 27-11-14.
  */
 public class Utils {
-    public static boolean debug = false;
+    public static boolean debug = true;
+    public static boolean verbose = false;
 
     public static void alert(String str) {
         throw new RuntimeException(str);
@@ -50,5 +52,9 @@ public class Utils {
                 count++;
 
         return count;
+    }
+
+    public static boolean isValidateExtension(String path) {
+        return path.endsWith(Constants.FILE_TYPE_PM) || path.endsWith(Constants.FILE_TYPE_PL);
     }
 }

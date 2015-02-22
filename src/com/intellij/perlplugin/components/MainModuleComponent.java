@@ -1,16 +1,14 @@
-package com.intellij.perlplugin;
+package com.intellij.perlplugin.components;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleComponent;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
+import com.intellij.perlplugin.ModulesContainer;
+import com.intellij.perlplugin.PerlInternalParser;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by eli on 27-11-14.
  */
-public class MainModuleComponent implements ModuleComponent {
+public class MainModuleComponent implements com.intellij.openapi.module.ModuleComponent {
     private final Module module;
 
     public MainModuleComponent(Module module) {
@@ -27,7 +25,7 @@ public class MainModuleComponent implements ModuleComponent {
 
     @NotNull
     public String getComponentName() {
-        return "MainModuleComponent";
+        return "ModuleComponent";
     }
 
     public void projectOpened() {
@@ -42,4 +40,5 @@ public class MainModuleComponent implements ModuleComponent {
         // Invoked when the module corresponding to this component instance has been completely
         // loaded and added to the project.
     }
+
 }
