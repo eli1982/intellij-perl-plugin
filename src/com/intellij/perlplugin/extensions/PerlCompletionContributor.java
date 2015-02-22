@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.regex.Matcher;
 
 public class PerlCompletionContributor extends CompletionContributor {
     private static HashMap<String, LookupElement> variablesCache = new HashMap<String, LookupElement>();
@@ -48,15 +49,18 @@ public class PerlCompletionContributor extends CompletionContributor {
 
 
                 PsiElement currentElement = parameters.getOriginalPosition();
-                if(currentElement == null){
-                    currentElement =  parameters.getPosition();//handle case where we are auto completing in the end of file
+                if (currentElement == null) {
+                    currentElement = parameters.getPosition();//handle case where we are auto completing in the end of file
                 }
                 PsiElement prevElement = prevSibling(currentElement, 1);
 
                 //current element based
                 if (is(currentElement, PerlTypes.PROPERTY)) {
                     addAllPackages(resultSet, currentElement);
-                } else if (is(currentElement, PerlTypes.WHITESPACE) && !is(prevElement, PerlTypes.POINTER) || is(currentElement,PerlTypes.BRACES)) {
+                    if (currentElement.getTextLength() >= 2) {
+                        addLanguageKeyword(resultSet, currentElement.getText());
+                    }
+                } else if (is(currentElement, PerlTypes.WHITESPACE) && !is(prevElement, PerlTypes.POINTER) || is(currentElement, PerlTypes.BRACES)) {
                     //qw subs auto complete
                     if (prevElement != null) {
                         PsiElement brace = prevSibling(currentElement, 1);
@@ -111,6 +115,14 @@ public class PerlCompletionContributor extends CompletionContributor {
         addCompleteHandler(PerlTypes.BRACES, handler);
     }
 
+    private void addLanguageKeyword(CompletionResultSet resultSet, String text) {
+        String keywords = "(|abs|accept|alarm|atan2|AUTOLOAD|BEGIN|bind|binmode|bless|break|caller|chdir|CHECK|chmod|chomp|chop|chown|chr|chroot|close|closedir|connect|cos|crypt|dbmclose|dbmopen|defined|delete|DESTROY|die|dump|each|END|endgrent|endhostent|endnetent|endprotoent|endpwent|endservent|eof|eval|exec|exists|exit|fcntl|fileno|flock|fork|format|formline|getc|getgrent|getgrgid|getgrnam|gethostbyaddr|gethostbyname|gethostent|getlogin|getnetbyaddr|getnetbyname|getnetent|getpeername|getpgrp|getppid|getpriority|getprotobyname|getprotobynumber|getprotoent|getpwent|getpwnam|getpwuid|getservbyname|getservbyport|getservent|getsockname|getsockopt|glob|gmtime|goto|grep|hex|index|INIT|int|ioctl|join|keys|kill|last|lc|each|lcfirst|setnetent|length|link|listen|local|localtime|log|lstat|map|mkdir|msgctl|msgget|msgrcv|msgsnd|my|next|not|oct|open|opendir|ord|our|pack|pipe|pop|pos|print|printf|prototype|push|quotemeta|rand|read|readdir|readline|readlink|readpipe|recv|redo|ref|rename|require|reset|return|reverse|rewinddir|rindex|rmdir|say|scalar|seek|seekdir|select|semctl|semget|semop|send|setgrent|sethostent|each|lcfirst|setnetent|setpgrp|setpriority|setprotoent|setpwent|setservent|setsockopt|shift|shmctl|shmget|shmread|shmwrite|shutdown|sin|sleep|socket|socketpair|sort|splice|split|sprintf|sqrt|srand|stat|state|study|substr|symlink|syscall|sysopen|sysread|sysseek|system|syswrite|tell|telldir|tie|tied|time|times|truncate|uc|ucfirst|umask|undef|UNITCHECK|unlink|unpack|unshift|untie|use|utime|values|vec|wait|waitpid|wantarray|warn|write|each|lcfirst|setnetent|cmp|continue|CORE|else|elsif|exp|for|foreach|lock|package|unless|until|while|ARGV|ARGVOUT|STDERR|STDIN|STDOUT|)";
+        Matcher matcher = Utils.applyRegex("\\|(" + text + "[^\\|]+)", keywords);
+        while (matcher.find()) {
+            resultSet.addElement(LookupElementBuilder.create(matcher.group(1)));
+        }
+    }
+
     //this is a temporary solution until we will have structured code blocks
     private PsiElement prevSibling(PsiElement psiElement, int times) {
         PsiElement result = psiElement;
@@ -119,13 +131,13 @@ public class PerlCompletionContributor extends CompletionContributor {
                 if (result.getPrevSibling() != null) {
                     //get sibling
                     result = result.getPrevSibling();
-                    while(is(result, GeneratedParserUtilBase.DUMMY_BLOCK)){
+                    while (is(result, GeneratedParserUtilBase.DUMMY_BLOCK)) {
                         result = result.getLastChild();
                     }
                 } else if (result.getParent() != null && result.getParent().getPrevSibling() != null) {
                     //get sibling from previous parent
                     result = result.getParent().getPrevSibling();
-                    while(is(result, GeneratedParserUtilBase.DUMMY_BLOCK)){
+                    while (is(result, GeneratedParserUtilBase.DUMMY_BLOCK)) {
                         result = result.getLastChild();
                     }
                 } else {
@@ -267,7 +279,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(elementType).withLanguage(PerlLanguage.INSTANCE), handler);
     }
 
-    public static void clear(){
+    public static void clear() {
         variablesCache.clear();
         subsCache.clear();
         subsCacheNoArgs.clear();
