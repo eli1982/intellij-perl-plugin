@@ -179,7 +179,12 @@ public class PerlInternalParser {
 
 
     public static void parse(String filePath) {
-        String fileContent = Utils.readFile(filePath);
+        parse(filePath, null);
+    }
+    public static void parse(String filePath, String fileContent) {
+        if(fileContent == null){
+            fileContent = Utils.readFile(filePath);
+        }
 
         float start = System.nanoTime();
         if (Utils.verbose) {

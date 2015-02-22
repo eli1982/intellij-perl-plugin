@@ -141,13 +141,21 @@ public class ModulesContainer {
         problematicFiles.clear();
     }
 
+    public static void updateFile(String path, String fileContent) {
+        if (Utils.debug) {
+            Utils.print("updating file: " + path);
+        }
+        deleteFile(path);
+        createFile(path,fileContent);
+    }
+
     public static void renameFile(String oldPath, String path) {
         if (Utils.debug) {
             Utils.print("file renamed/moved:\nold: " + oldPath + "\nnew: " + path);
         }
         deleteFile(oldPath);
         if(Utils.isValidateExtension(path)) {
-            createFile(path);
+            createFile(path,null);
         }else{
             if (Utils.debug) {
                 Utils.print("not a valid file extension - renamed file won't be parsed");
@@ -198,7 +206,7 @@ public class ModulesContainer {
         }
     }
 
-    public static void createFile(final String path) {
+    public static void createFile(final String path, final String fileContent) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -206,11 +214,15 @@ public class ModulesContainer {
                     Utils.print("creating file: " + path);
                 }
                 while (Utils.readFile(path).isEmpty()) {
-
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 //also happen when undoing a file deletion!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 //create package
-                PerlInternalParser.parse(path);
+                PerlInternalParser.parse(path,fileContent);
                 //set parent package for all inheriting children
                 ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(path);
                 for (Package packageObj : packages) {

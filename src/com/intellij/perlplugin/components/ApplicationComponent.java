@@ -1,10 +1,14 @@
 package com.intellij.perlplugin.components;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.*;
 import com.intellij.perlplugin.ModulesContainer;
+import com.intellij.perlplugin.Utils;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,11 +63,18 @@ public class ApplicationComponent implements com.intellij.openapi.components.App
                     ModulesContainer.deleteFile(vFile.getPath());
                 } else if (fileEvent instanceof VFileCreateEvent) {
                     VFileCreateEvent vFile = (VFileCreateEvent) fileEvent;
-                    ModulesContainer.createFile(vFile.getPath());
+                    ModulesContainer.createFile(vFile.getPath(), null);
+                } if (fileEvent instanceof VFileContentChangeEvent) {
+                    VFileContentChangeEvent vFile = (VFileContentChangeEvent) fileEvent;
+                    if (Utils.isValidateExtension(vFile.getPath())) {
+                        Project project = ProjectManager.getInstance().getOpenProjects()[0];
+                        String fileContent = FileEditorManager.getInstance(project).getSelectedTextEditor().getDocument().getText();
+                        ModulesContainer.updateFile(vFile.getPath(), fileContent);
+                    }
                 }
 
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             //if we get an exception we don't want to mess up the listener - (file listener goes into infinite loop)
             e.printStackTrace();
         }

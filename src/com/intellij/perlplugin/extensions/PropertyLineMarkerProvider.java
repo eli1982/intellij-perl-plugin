@@ -57,7 +57,7 @@ public class PropertyLineMarkerProvider extends RelatedItemLineMarkerProvider {
                                 setTooltipText("Navigate to package");
                 result.add(builder.createLineMarkerInfo(element));
             }
-        } else if (element.getNode().getElementType().equals(PerlTypes.SUBROUTINE)) {
+        } else if (element !=null && element.getNode().getElementType().equals(PerlTypes.SUBROUTINE)) {
             boolean isConstructor = Utils.applyRegex("sub\\s+new", element.getNode().getText()).find();
             NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create((isConstructor) ? PerlIcons.CONSTRUCTOR : PerlIcons.SUBROUTINE).
                     setTargets(element).

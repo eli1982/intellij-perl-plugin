@@ -85,7 +85,9 @@ public class PerlCompletionContributor extends CompletionContributor {
                     addAllVariablesInFile(parameters, resultSet);
                 } else if (is(currentElement, PerlTypes.PACKAGE)) {
                     addAllPackages(resultSet, currentElement);
-                }
+                }/* else if (is(currentElement, PerlTypes.SUBROUTINE)) {
+                    ModulesContainer.updateFile(virtualFile.getPath(),editor.getDocument().getText());
+                }*/
 
 
                 //prev element based
@@ -101,6 +103,7 @@ public class PerlCompletionContributor extends CompletionContributor {
                 } else if (is(prevElement, PerlTypes.WHITESPACE)) {
                     addAllSubsInFile(parameters, resultSet);
                 }
+                ModulesContainer.updateFile(virtualFile.getPath(), editor.getDocument().getText());
             }
         };
         addCompleteHandler(PerlTypes.PROPERTY, handler);
@@ -113,6 +116,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         addCompleteHandler(PerlTypes.PREDICATE, handler);
         addCompleteHandler(PerlTypes.LANG_SYNTAX, handler);
         addCompleteHandler(PerlTypes.BRACES, handler);
+        addCompleteHandler(PerlTypes.SUBROUTINE, handler);
     }
 
     private void addLanguageKeyword(CompletionResultSet resultSet, String text) {
