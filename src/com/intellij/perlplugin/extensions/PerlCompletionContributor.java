@@ -287,7 +287,7 @@ public class PerlCompletionContributor extends CompletionContributor {
     }
 
     public static void clear() {
-        variablesCache.clear();
+        //variablesCache.clear();//temporarily commented to improve performance
         subsCache.clear();
         subsCacheNoArgs.clear();
         packagesCache.clear();
