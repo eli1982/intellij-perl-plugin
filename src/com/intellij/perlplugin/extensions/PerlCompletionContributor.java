@@ -103,6 +103,8 @@ public class PerlCompletionContributor extends CompletionContributor {
                 } else if (is(prevElement, PerlTypes.WHITESPACE)) {
                     addAllSubsInFile(parameters, resultSet);
                 }
+
+                //ya, i know this is crappy - temporary fix
                 ModulesContainer.updateFile(virtualFile.getPath(), editor.getDocument().getText());
             }
         };
