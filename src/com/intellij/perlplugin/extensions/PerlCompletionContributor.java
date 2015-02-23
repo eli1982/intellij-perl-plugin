@@ -31,6 +31,7 @@ public class PerlCompletionContributor extends CompletionContributor {
     private static HashMap<Sub, LookupElement> subsCache = new HashMap<Sub, LookupElement>();
     private static HashMap<Sub, LookupElement> subsCacheNoArgs = new HashMap<Sub, LookupElement>();
     private static HashMap<Package, LookupElement> packagesCache = new HashMap<Package, LookupElement>();
+    private static boolean updateFlipper = false;
 
 
     public PerlCompletionContributor() {
@@ -105,7 +106,10 @@ public class PerlCompletionContributor extends CompletionContributor {
                 }
 
                 //ya, i know this is crappy - temporary fix
-                ModulesContainer.updateFile(virtualFile.getPath(), editor.getDocument().getText());
+                if(updateFlipper) {
+                    ModulesContainer.updateFile(virtualFile.getPath(), editor.getDocument().getText());
+                }
+                updateFlipper = !updateFlipper;
             }
         };
         addCompleteHandler(PerlTypes.PROPERTY, handler);
