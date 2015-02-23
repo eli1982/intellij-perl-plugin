@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
  * Created by eli on 27-11-14.
  */
 public class Utils {
-    public static boolean debug = true;
-    public static boolean verbose = true;
+    public static boolean debug = false;
+    public static boolean verbose = false;
 
     public static void alert(String str) {
         throw new RuntimeException(str);
