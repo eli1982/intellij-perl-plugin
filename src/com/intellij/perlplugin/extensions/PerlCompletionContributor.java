@@ -106,7 +106,6 @@ public class PerlCompletionContributor extends CompletionContributor {
                 }
                 float end = System.nanoTime();
                 float result = (end - start) / 1000000000F;
-                System.out.println("isAutoPopup: " + parameters.isAutoPopup() + " ,invocation_count: " + parameters.getInvocationCount() + " ,result: " + result);
                 //ya, i know this is crappy - temporary fix
                 if ((parameters.isAutoPopup() && updateFlipper) || parameters.getInvocationCount() == 1 || parameters.getInvocationCount() == 3) {
                     ModulesContainer.updateFile(virtualFile.getPath(), editor.getDocument().getText());
