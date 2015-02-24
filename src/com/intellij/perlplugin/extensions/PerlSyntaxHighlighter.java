@@ -26,14 +26,14 @@ public class PerlSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey KEY = createTextAttributesKey("KEY", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey VALUE = createTextAttributesKey("VALUE", DefaultLanguageHighlighterColors.STRING);
     public static final TextAttributesKey COMMENTS = createTextAttributesKey("COMMENTS", DefaultLanguageHighlighterColors.LINE_COMMENT);
-    public static final TextAttributesKey LANG_VARIABLE = createTextAttributesKey("LANG_VARIABLE", DefaultLanguageHighlighterColors.MARKUP_ATTRIBUTE);
-    public static final TextAttributesKey LANG_FUNCTION = createTextAttributesKey("LANG_FUNCTION", DefaultLanguageHighlighterColors.MARKUP_ATTRIBUTE);
-    public static final TextAttributesKey LANG_SYNTAX = createTextAttributesKey("LANG_SYNTAX", DefaultLanguageHighlighterColors.KEYWORD);
+    public static final TextAttributesKey LANG_VARIABLE = createTextAttributesKey("LANG_VARIABLE", DefaultLanguageHighlighterColors.MARKUP_ENTITY);
+    public static final TextAttributesKey LANG_FUNCTION = createTextAttributesKey("LANG_FUNCTION", DefaultLanguageHighlighterColors.STATIC_FIELD);
+    public static final TextAttributesKey LANG_SYNTAX = createTextAttributesKey("LANG_SYNTAX", DefaultLanguageHighlighterColors.MARKUP_ENTITY);
     public static final TextAttributesKey LANG_FILE_HANDLES = createTextAttributesKey("LANG_FILE_HANDLES", DefaultLanguageHighlighterColors.MARKUP_ATTRIBUTE);
     public static final TextAttributesKey MARKUP = createTextAttributesKey("MARKUP", DefaultLanguageHighlighterColors.MARKUP_ATTRIBUTE);
     public static final TextAttributesKey PACKAGE = createTextAttributesKey("PACKAGE", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey ARGUMENTS = createTextAttributesKey("ARGUMENTS", DefaultLanguageHighlighterColors.PARAMETER);
-    public static final TextAttributesKey ATTRIBUTE = createTextAttributesKey("VARIABLE", DefaultLanguageHighlighterColors.PARAMETER);
+    public static final TextAttributesKey ATTRIBUTE = createTextAttributesKey("VARIABLE", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL);
 
     public static final TextAttributesKey SUBROUTINE = createTextAttributesKey("SUBROUTINE", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("BAD_CHARACTER", getTextAttribute(Color.RED, true));
