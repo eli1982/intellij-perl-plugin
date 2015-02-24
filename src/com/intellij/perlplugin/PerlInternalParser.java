@@ -333,12 +333,12 @@ public class PerlInternalParser {
 
     private static String getPackageParentFromContent(String content) {
         //use parent 'AA::BB::CC';
-        Matcher packageNameRegexNoQW = Utils.applyRegex("(\\s*?use\\s*?parent\\s*?((\\w+\\:\\:)*\\w+))", content);
+        Matcher packageNameRegexNoQW = Utils.applyRegex("(\\s*?use\\s*?(?:parent|base)\\s*?((\\w+\\:\\:)*\\w+))", content);
         if (packageNameRegexNoQW.find() && !packageNameRegexNoQW.group(2).isEmpty()) {
             return packageNameRegexNoQW.group(2);
         }
         //use parent qw( AA::BB::CC );
-        Matcher packageNameRegexWithQW = Utils.applyRegex("(\\s*?use\\s+parent\\s+qw\\s*?\\(\\s*?((\\w|::)+)\\s*?\\)\\s*?;)", content);
+        Matcher packageNameRegexWithQW = Utils.applyRegex("(\\s*?use\\s+(?:parent|base)\\s+qw\\s*?\\(\\s*?((\\w|::)+)\\s*?\\)\\s*?;)", content);
         if (packageNameRegexWithQW.find() && !packageNameRegexWithQW.group(2).isEmpty()) {
             return packageNameRegexWithQW.group(2);
         }
