@@ -29,7 +29,7 @@ public class PerlInternalParser {
 
     public static void start(Project project) {
         PerlInternalParser.project = project;
-        ProgressManager.getInstance().run(new Task.Backgroundable(PerlInternalParser.project,"Caching Perl Modules") {
+        ProgressManager.getInstance().run(new Task.Backgroundable(PerlInternalParser.project, "Caching Perl Modules") {
             public void run(@NotNull ProgressIndicator progressIndicator) {
                 try {
                     if (Utils.debug) {
@@ -42,7 +42,7 @@ public class PerlInternalParser {
                     if (Utils.debug) {
                         Utils.print("update completed in " + ((end - start) / 1000) + "sec");
                     }
-                }finally {
+                } finally {
                 }
                 progressIndicator.stop();
             }
@@ -69,8 +69,8 @@ public class PerlInternalParser {
         if (Utils.debug) {
             Utils.print("total number of files: " + sum);
             Utils.print("==================");
-            System.out.println("Problematic files time delay: " + ModulesContainer.totalDelays);
-            System.out.println(ModulesContainer.getProblematicFiles());
+            Utils.print("Problematic files time delay: " + ModulesContainer.totalDelays);
+            Utils.print(ModulesContainer.getProblematicFiles());
             Utils.print("==================");
         }
         ModulesContainer.setInitialized();
@@ -104,7 +104,7 @@ public class PerlInternalParser {
 
 
         if (Utils.debug) {
-            System.out.println("totalFileCount:" + (int)totalFileCount);
+            Utils.print("totalFileCount:" + (int) totalFileCount);
         }
         //parse files
         for (int i = 0; i < sourceFolders.length; i++) {
@@ -181,8 +181,9 @@ public class PerlInternalParser {
     public static void parse(String filePath) {
         parse(filePath, null);
     }
+
     public static void parse(String filePath, String fileContent) {
-        if(fileContent == null){
+        if (fileContent == null) {
             fileContent = Utils.readFile(filePath);
         }
 
@@ -213,7 +214,7 @@ public class PerlInternalParser {
 
             addPendingPackageParent(packageObj, getPackageParentFromContent(content));
             addImportedPackagesFromContent(packageObj, content);
-            addImportedSubsFromContent(packageObj,content);
+            addImportedSubsFromContent(packageObj, content);
             addSubsFromContent(packageObj, content.replaceAll("#.*", ""));
 
             //other
@@ -245,7 +246,7 @@ public class PerlInternalParser {
      * @param packageParent
      */
     private static void addPendingPackageParent(Package packageObj, String packageParent) {
-        ModulesContainer.addParentChild(packageParent,packageObj.getPackageName());
+        ModulesContainer.addParentChild(packageParent, packageObj.getPackageName());
         if (packageParent != null) {
             ArrayList<Package> possiblePackages = ModulesContainer.getPackageList(packageParent);
             if (possiblePackages.size() > 0) {
@@ -287,11 +288,15 @@ public class PerlInternalParser {
     private static void addSubsFromContent(Package packageObj, String content) {
         ArrayList<Sub> subs = new ArrayList<Sub>();
         try {
-            Matcher subsRegex = Utils.applyRegex("\\s*sub\\s+(\\w+)\\s*\\{(\\s*my\\s+\\(\\s*((\\s*[\\$|\\%|\\@\\&]\\w+\\s*\\,?\\s*)*)\\s*?\\)(\\S|\\s)*?\\;)?", content);
+            Matcher subsRegex = Utils.applyRegex("\\s*sub\\s+(\\w+)\\s*\\{(\\s*my\\s+\\(?\\s*((\\s*[\\$|\\%|\\@\\&]\\w+\\s*\\,?\\s*)*)\\s*?\\)?(\\S|\\s)*?\\;)?", content);
             float start;
             while (((start = System.nanoTime()) > 0F && subsRegex.find())) {
                 Sub sub = new Sub(packageObj, subsRegex.group(1));
-                sub.setArguments(getArgumentsFromContent(subsRegex.group(3)));
+
+                if ((subsRegex.group().contains("@_") || subsRegex.group().contains("shift"))) {
+                    sub.setArguments(getArgumentsFromContent(subsRegex.group(3)));
+                }
+
                 sub.setPositionInFile(subsRegex.end(1));
                 subs.add(sub);
                 if (Utils.verbose) {
