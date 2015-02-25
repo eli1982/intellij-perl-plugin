@@ -46,6 +46,12 @@ public class PerlInternalParser {
                 }
                 progressIndicator.stop();
             }
+
+            @Override
+            public void onCancel() {
+                clear();
+                super.onCancel();
+            }
         });
     }
 
@@ -94,6 +100,7 @@ public class PerlInternalParser {
         for (int i = 0; i < sourceFolders.length; i++) {
             if (progressIndicator.isCanceled()) {
                 clear();
+                progressIndicator.stop();
                 return;
             }
             File folder = new File(sourceFolders[i].getCanonicalPath());
@@ -194,7 +201,7 @@ public class PerlInternalParser {
         }
 
         //get package
-        Matcher contentSeparationRegex = Utils.applyRegex("(\\s*?package\\s+((\\w|::)+)\\s*;)", fileContent, Pattern.MULTILINE);
+        Matcher contentSeparationRegex = Utils.applyRegex("(\\s*?package\\s+\\'?((\\w|_|-|::)+)\\'?\\s*;)", fileContent, Pattern.MULTILINE);
 
         //get packages start positions
         ArrayList<Integer> contentStartPositions = new ArrayList<Integer>();
@@ -207,16 +214,41 @@ public class PerlInternalParser {
             //split packages
             int startPos = contentStartPositions.get(i);
             int endPos = (i + 1 < contentStartPositions.size()) ? contentStartPositions.get(i + 1) : fileContent.length();
-            String content = fileContent.substring(startPos, endPos);
+            final String content = fileContent.substring(startPos, endPos);
 
             //get package name
-            Package packageObj = new Package(filePath.replace("\\", "/"), getPackageNameFromContent(content));
+            final Package packageObj = new Package(filePath.replace("\\", "/"), getPackageNameFromContent(content));
 
+            float startInner = 0;
+            float endInner = 0;
+
+            if (Utils.verbose) {
+                startInner = System.nanoTime();
+            }
             addPendingPackageParent(packageObj, getPackageParentFromContent(content));
+            if (Utils.verbose) {
+                endInner = System.nanoTime();
+                Utils.print("performance[pndprn]:" + ((endInner - startInner) / 1000000000F));
+                startInner = System.nanoTime();
+            }
             addImportedPackagesFromContent(packageObj, content);
-            addImportedSubsFromContent(packageObj, content);
-            addSubsFromContent(packageObj, content.replaceAll("#.*", ""));
+            if (Utils.verbose) {
+                endInner = System.nanoTime();
+                Utils.print("performance[imppkg]:" + ((endInner - startInner) / 1000000000F));
+                startInner = System.nanoTime();
+            }
+            addImportedSubsFromContent(packageObj, fileContent);
+            if (Utils.verbose) {
+                endInner = System.nanoTime();
+                Utils.print("performance[impsub]:" + ((endInner - startInner) / 1000000000F));
+                startInner = System.nanoTime();
+            }
 
+            addSubsFromContent(packageObj, content.replaceAll("#.*", ""));
+            if (Utils.verbose) {
+                endInner = System.nanoTime();
+                Utils.print("performance[regsub]:" + ((endInner - startInner) / 1000000000F));
+            }
             //other
             packageObj.setStartPositionInFile(fileContent.indexOf("package", prevPos));
             packageObj.setEndPositionInFile(endPos);
@@ -230,7 +262,7 @@ public class PerlInternalParser {
         float end = System.nanoTime();
         float result = (end - start) / 1000000000F;
         if (Utils.verbose) {
-            Utils.print("time:" + result);
+            Utils.print("performance[total][" + new File(filePath).getName() + "]:" + result);
         }
         if (result > PROBLEMATIC_FILE_TIME_THRESHOLD) {
             ModulesContainer.addProblematicFiles(filePath + "(" + result + ")");
@@ -265,6 +297,9 @@ public class PerlInternalParser {
         //use 'AA::BB::CC';
         Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s*;)", content);
         while (packageNameRegex.find() && !packageNameRegex.group(2).isEmpty()) {
+            if (Utils.verbose) {
+                Utils.print("imported package: " + packageNameRegex.group(2));
+            }
             importedPackages.add(new ImportedPackage(packageNameRegex.group(2), packageObj));
         }
         packageObj.setImportedPackages(importedPackages);
@@ -273,11 +308,14 @@ public class PerlInternalParser {
     private static void addImportedSubsFromContent(Package packageObj, String content) {
         ArrayList<ImportedSub> importedSubs = new ArrayList<ImportedSub>();
         //use 'AA::BB::CC qw( several methods import )';
-        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s*qw\\(((\\s*(\\w+)+\\s*)+)\\);)", content);
+        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s*qw\\s*\\(((\\s*([\\:A-Za-z0-9_-]+)+\\s{0,512})+)\\);?)+", content);
         while (packageNameRegex.find() && !packageNameRegex.group(2).isEmpty()) {
             String subContainingPackage = packageNameRegex.group(2);
             String[] subNames = packageNameRegex.group(4).trim().split("\\s+");
             for (int i = 0; i < subNames.length; i++) {
+                if (Utils.verbose) {
+                    Utils.print("imported sub: " + subNames[i]);
+                }
                 importedSubs.add(new ImportedSub(subNames[i], subContainingPackage));
             }
         }
@@ -286,9 +324,9 @@ public class PerlInternalParser {
 
 
     private static void addSubsFromContent(Package packageObj, String content) {
-        ArrayList<Sub> subs = new ArrayList<Sub>();
+        final ArrayList<Sub> subs = new ArrayList<Sub>();
         try {
-            Matcher subsRegex = Utils.applyRegex("\\s*sub\\s+(\\w+)\\s*\\{(\\s*my\\s+\\(?\\s*((\\s*[\\$|\\%|\\@\\&]\\w+\\s*\\,?\\s*)*)\\s*?\\)?(\\S|\\s)*?\\;)?", content);
+            Matcher subsRegex = Utils.applyRegex("sub\\s+(\\w+)\\s*?\\{(\\s*my\\s+\\(?\\s*?((\\s*?[\\$|\\%|\\@\\&]\\w+\\s*?\\,?\\s*)*)\\s*?\\)?(\\S|\\s){0,512}?\\;)?", content);//we limit up to 512 characters to avoid stack overflow
             float start;
             while (((start = System.nanoTime()) > 0F && subsRegex.find())) {
                 Sub sub = new Sub(packageObj, subsRegex.group(1));
@@ -298,6 +336,9 @@ public class PerlInternalParser {
                 }
 
                 sub.setPositionInFile(subsRegex.end(1));
+                if (Utils.verbose) {
+                    Utils.print("add sub: " + sub.getName());
+                }
                 subs.add(sub);
                 if (Utils.verbose) {
                     Utils.print(sub);
@@ -305,12 +346,14 @@ public class PerlInternalParser {
                 float end = System.nanoTime();
                 float result = (end - start) / 1000000000F;
                 if (Utils.verbose) {
-                    Utils.print("time:" + result);
+                    Utils.print("performance[persub]:" + result);
                 }
                 if (result > PROBLEMATIC_FILE_TIME_THRESHOLD) {
                     ModulesContainer.addProblematicFiles(packageObj.getPackageName() + ">>>>" + sub.getName() + "(" + result + ")");
                 }
             }
+        } catch (StackOverflowError e) {
+            Utils.print(e);
         } catch (Exception e) {
             Utils.print(e);
         }
@@ -338,12 +381,12 @@ public class PerlInternalParser {
 
     private static String getPackageParentFromContent(String content) {
         //use parent 'AA::BB::CC';
-        Matcher packageNameRegexNoQW = Utils.applyRegex("(\\s*?use\\s*?(?:parent|base)\\s*?((\\w+\\:\\:)*\\w+))", content);
+        Matcher packageNameRegexNoQW = Utils.applyRegex("(\\s*?use\\s*?(?:parent|base)\\s*?\\'?((\\w+\\:\\:)*\\'?\\w+))", content);
         if (packageNameRegexNoQW.find() && !packageNameRegexNoQW.group(2).isEmpty()) {
             return packageNameRegexNoQW.group(2);
         }
         //use parent qw( AA::BB::CC );
-        Matcher packageNameRegexWithQW = Utils.applyRegex("(\\s*?use\\s+(?:parent|base)\\s+qw\\s*?\\(\\s*?((\\w|::)+)\\s*?\\)\\s*?;)", content);
+        Matcher packageNameRegexWithQW = Utils.applyRegex("(\\s*?use\\s+(?:parent|base)\\s+qw\\s*?\\(\\s*?((\\w|::)+)\\s*?\\)\\s{0,512}?;)", content);
         if (packageNameRegexWithQW.find() && !packageNameRegexWithQW.group(2).isEmpty()) {
             return packageNameRegexWithQW.group(2);
         }
