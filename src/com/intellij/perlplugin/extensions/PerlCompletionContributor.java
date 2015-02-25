@@ -38,7 +38,6 @@ public class PerlCompletionContributor extends CompletionContributor {
 
         CompletionProvider<CompletionParameters> handler = new CompletionProvider<CompletionParameters>() {
             public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
-                float start = System.nanoTime();
                 if (!ModulesContainer.isInitialized()) {
                     Utils.alert("warning: perl parser was not initialized");
                 }
@@ -104,8 +103,6 @@ public class PerlCompletionContributor extends CompletionContributor {
                 } else if (is(prevElement, PerlTypes.WHITESPACE)) {
                     addAllSubsInFile(parameters, resultSet);
                 }
-                float end = System.nanoTime();
-                float result = (end - start) / 1000000000F;
                 //ya, i know this is crappy - temporary fix
                 if ((parameters.isAutoPopup() && updateFlipper) || parameters.getInvocationCount() == 1 || parameters.getInvocationCount() == 3) {
                     ModulesContainer.updateFile(virtualFile.getPath(), editor.getDocument().getText());
