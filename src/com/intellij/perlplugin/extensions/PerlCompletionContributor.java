@@ -8,6 +8,7 @@ import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
+import com.intellij.perlplugin.ConfigurationHolder;
 import com.intellij.perlplugin.ModulesContainer;
 import com.intellij.perlplugin.Utils;
 import com.intellij.perlplugin.bo.ImportedSub;
@@ -252,12 +253,12 @@ public class PerlCompletionContributor extends CompletionContributor {
     }
 
     private LookupElement getSubLookupElementBuilder(Sub sub, boolean withArguments) {
-        String text = (withArguments) ? sub.toString2() : sub.getName();
+        String text = (withArguments) ? sub.toString2(ConfigurationHolder.isHideFirstSelfArgument) : sub.getName();
         String containingPackage = sub.getPackageObj().getPackageName();
         if (Utils.verbose) {
             Utils.print("sub: " + text + " , containingPackage:" + containingPackage);
         }
-        return LookupElementBuilder.create(text).withIcon(PerlIcons.SUBROUTINE).withTypeText(containingPackage, true);
+        return LookupElementBuilder.create(text).withIcon(PerlIcons.SUBROUTINE).withPresentableText(text).withTypeText(containingPackage, true);
     }
 
     private LookupElement getVariableLookupElementBuilder(String text) {

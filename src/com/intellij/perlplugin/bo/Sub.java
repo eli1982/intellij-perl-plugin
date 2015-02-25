@@ -58,19 +58,33 @@ public class Sub {
     }
 
     public String toString2() {
+       return toString2(false);
+    }
+
+    /**
+     *
+     * @param hideSelf true - hide in auto complete the 1st variable if it's $self,$class or $proto
+     */
+    public String toString2(boolean hideSelf) {
         StringBuffer sb = new StringBuffer();
         sb.append(getName());
         sb.append("(");
+        boolean isFirstHidden = false;
         for (int i = 0; i < getArguments().size(); i++) {
             Argument argument = getArguments().get(i);
+            if(hideSelf && i == 0 && argument.getName().matches("\\$(self|class|proto)")){
+                isFirstHidden = true;
+                continue;
+            }
             sb.append(" " + argument.toString2());
             if (i < getArguments().size() - 1) {
                 sb.append(",");
             }
+
         }
 
 
-        if (getArguments().size() == 0) {
+        if (getArguments().size() == 0 || (getArguments().size() == 1 && isFirstHidden)) {
             sb.append(")");
         } else {
             sb.append(" )");

@@ -326,7 +326,7 @@ public class PerlInternalParser {
     private static void addSubsFromContent(Package packageObj, String content) {
         final ArrayList<Sub> subs = new ArrayList<Sub>();
         try {
-            Matcher subsRegex = Utils.applyRegex("sub\\s+(\\w+)\\s*?\\{(\\s*my\\s+\\(?\\s*?((\\s*?[\\$|\\%|\\@\\&]\\w+\\s*?\\,?\\s*)*)\\s*?\\)?(\\S|\\s){0,512}?\\;)?", content);//we limit up to 512 characters to avoid stack overflow
+            Matcher subsRegex = Utils.applyRegex("sub\\s+(\\w+)\\s*\\{(\\s*my\\s+\\(?\\s*((\\s*[\\$|\\%|\\@\\&](\\w|_|-)+\\s*\\,?\\s*)*)\\s*?\\)?(\\S|\\s){0,512}?\\;)?", content);//we limit up to 512 characters to avoid stack overflow
             float start;
             while (((start = System.nanoTime()) > 0F && subsRegex.find())) {
                 Sub sub = new Sub(packageObj, subsRegex.group(1));
