@@ -63,7 +63,7 @@ public class Sub {
 
     /**
      *
-     * @param hideSelf true - hide in auto complete the 1st variable if it's $self,$class or $proto
+     * @param hideSelf true - hide in auto complete the 1st sub argument if it's $self,$class or $proto
      */
     public String toString2(boolean hideSelf) {
         StringBuffer sb = new StringBuffer();
