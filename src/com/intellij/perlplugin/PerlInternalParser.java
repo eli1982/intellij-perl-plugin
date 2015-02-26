@@ -303,7 +303,7 @@ public class PerlInternalParser {
     private static void addImportedPackagesFromContent(Package packageObj, String content) {
         ArrayList<ImportedPackage> importedPackages = new ArrayList<ImportedPackage>();
         //use 'AA::BB::CC';
-        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s*;)", content);
+        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s{0,512};)", content);
         while (packageNameRegex.find() && !packageNameRegex.group(2).isEmpty()) {
             if (Utils.verbose) {
                 Utils.print("imported package: " + packageNameRegex.group(2));
@@ -382,7 +382,7 @@ public class PerlInternalParser {
     }
 
     private static String getPackageNameFromContent(String content) {
-        Matcher packageNameRegex = Utils.applyRegex("(\\s*?package\\s+((\\w|::)+)\\s*?;)", content);
+        Matcher packageNameRegex = Utils.applyRegex("(\\s*?package\\s+((\\w|::)+)\\s{0,512}?;)", content);
         if (!packageNameRegex.find()) return "";//if this fails - then our regex for package name isn't good.
         return packageNameRegex.group(2);
     }
