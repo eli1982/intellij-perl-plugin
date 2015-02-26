@@ -1,8 +1,16 @@
 package com.intellij.perlplugin.components;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.perlplugin.ModulesContainer;
 import com.intellij.perlplugin.PerlInternalParser;
+import com.intellij.perlplugin.Utils;
+import com.intellij.perlplugin.extensions.PerlCompletionContributor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,6 +29,7 @@ public class MainModuleComponent implements com.intellij.openapi.module.ModuleCo
 
     public void disposeComponent() {
         ModulesContainer.clear();
+        PerlCompletionContributor.clear();
     }
 
     @NotNull
@@ -40,5 +49,4 @@ public class MainModuleComponent implements com.intellij.openapi.module.ModuleCo
         // Invoked when the module corresponding to this component instance has been completely
         // loaded and added to the project.
     }
-
 }

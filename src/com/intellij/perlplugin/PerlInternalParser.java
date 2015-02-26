@@ -1,5 +1,9 @@
 package com.intellij.perlplugin;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -8,6 +12,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.perlplugin.bo.*;
 import com.intellij.perlplugin.bo.Package;
+import com.intellij.perlplugin.components.FileEditorManagerListenerEX;
 import com.intellij.perlplugin.extensions.PerlCompletionContributor;
 import com.intellij.perlplugin.filters.FileFilter;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +58,10 @@ public class PerlInternalParser {
                 super.onCancel();
             }
         });
+        //attach file editor listener
+        project.getMessageBus().connect(project).subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListenerEX(project));
     }
+
 
     public static void parseAllSources(ProgressIndicator progressIndicator) {
         clear();

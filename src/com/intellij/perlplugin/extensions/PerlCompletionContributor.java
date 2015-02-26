@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -38,9 +39,22 @@ public class PerlCompletionContributor extends CompletionContributor {
     private static HashMap<Package, LookupElement> packagesCache = new HashMap<Package, LookupElement>();
     private static boolean updateFlipper = false;
 
-    static{
-        cacheAllPackages();
-        cacheAllSubsAndVarsOfOpenedFiles();
+    static {
+        ApplicationManager.getApplication().invokeLater(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        while (!ModulesContainer.isInitialized()) {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        System.out.println(ModulesContainer.getAllPackages().size());
+                        initialize();
+                    }
+                });
     }
 
     public PerlCompletionContributor() {
@@ -132,6 +146,19 @@ public class PerlCompletionContributor extends CompletionContributor {
         addCompleteHandler(PerlTypes.SUBROUTINE, handler);
     }
 
+    public static void initialize() {
+        float start = 0;
+        if (Utils.verbose) {
+            start = System.currentTimeMillis();
+        }
+        cacheAllPackages();
+        cacheAllSubsAndVarsOfOpenedFiles();
+        if (Utils.verbose) {
+            float end = System.currentTimeMillis();
+            Utils.print("performance[intcch]: " + ((end - start) / 1000) + "sec");
+        }
+    }
+
     private static void cacheAllPackages() {
         ArrayList<Package> packages = ModulesContainer.getAllPackages();
         for (int i = 0; i < packages.size(); i++) {
@@ -145,23 +172,26 @@ public class PerlCompletionContributor extends CompletionContributor {
             VirtualFile[] openFiles = FileEditorManager.getInstance(projects[i]).getOpenFiles();
             for (int j = 0; j < openFiles.length; j++) {
                 VirtualFile openFile = openFiles[j];
-
-                //cache attributes
-                HashSet<String> rs = findAllVariables(PsiManager.getInstance(projects[i]).findFile(openFile).getNode().getChildren(null), PerlTypes.VARIABLE);
-                for (String str : rs) {
-                    addCachedVariables(null, str);
-                }
-                //cache subs
-                ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(openFile.getPath());
-                for (int k = 0; k < packages.size(); k++) {
-                    ArrayList<Sub> subs = packages.get(k).getAllSubs();
-                    for (int h = 0; h < subs.size(); h++) {
-                        addCachedSub(null, subs.get(h));
-                    }
-                }
+                cacheSingleFile(projects[i], openFile);
             }
         }
 
+    }
+
+    public static void cacheSingleFile(Project project, VirtualFile openFile) {
+        //cache attributes
+        HashSet<String> rs = findAllVariables(PsiManager.getInstance(project).findFile(openFile).getNode().getChildren(null), PerlTypes.VARIABLE);
+        for (String str : rs) {
+            addCachedVariables(null, str);
+        }
+        //cache subs
+        ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(openFile.getPath());
+        for (int i = 0; i < packages.size(); i++) {
+            ArrayList<Sub> subs = packages.get(i).getAllSubs();
+            for (int j = 0; j < subs.size(); j++) {
+                addCachedSub(null, subs.get(j));
+            }
+        }
     }
 
     private void addLanguageKeyword(CompletionResultSet resultSet, String text) {
@@ -258,6 +288,9 @@ public class PerlCompletionContributor extends CompletionContributor {
 
     private static void addCachedPackage(CompletionResultSet resultSet, Package packageObj) {
         if (packageObj != null && !packagesCache.containsKey(packageObj)) {
+            if (Utils.verbose) {
+                Utils.print("cache package: " + packageObj.getPackageName());
+            }
             packagesCache.put(packageObj, getPackageLookupElementBuilder(packageObj));
         }
         if (resultSet != null) {
@@ -267,7 +300,11 @@ public class PerlCompletionContributor extends CompletionContributor {
 
     private static void addCachedSub(CompletionResultSet resultSet, Sub sub) {
         if (sub != null && !subsCache.containsKey(sub)) {
+            if (Utils.verbose) {
+                Utils.print("cache sub: " + sub.getName() + " , containingPackage:" + sub.getPackageObj().getPackageName());
+            }
             subsCache.put(sub, getSubLookupElementBuilder(sub, true));
+
         }
         if (resultSet != null) {
             resultSet.addElement(subsCache.get(sub));
@@ -276,6 +313,9 @@ public class PerlCompletionContributor extends CompletionContributor {
 
     private static void addCachedSubNoArgs(CompletionResultSet resultSet, Sub sub) {
         if (!subsCacheNoArgs.containsKey(sub)) {
+            if (Utils.verbose) {
+                Utils.print("cache sub(no args): " + sub.getName() + " , containingPackage:" + sub.getPackageObj().getPackageName());
+            }
             subsCacheNoArgs.put(sub, getSubLookupElementBuilder(sub, false));
         }
         if (resultSet != null) {
@@ -285,6 +325,9 @@ public class PerlCompletionContributor extends CompletionContributor {
 
     private static void addCachedVariables(CompletionResultSet resultSet, String str) {
         if (str != null && !variablesCache.containsKey(str)) {
+            if (Utils.verbose) {
+                Utils.print("cache variable: " + str);
+            }
             variablesCache.put(str, getVariableLookupElementBuilder(str));
         }
         if (resultSet != null) {
@@ -296,25 +339,16 @@ public class PerlCompletionContributor extends CompletionContributor {
     //get lookup elements methods
     private static LookupElement getPackageLookupElementBuilder(Package packageObj) {
         String text = packageObj.getPackageName();
-        if (Utils.verbose) {
-            Utils.print("package: " + text);
-        }
         return LookupElementBuilder.create(text).withIcon(PerlIcons.PACKAGE).withTypeText("Package", true);
     }
 
     private static LookupElement getSubLookupElementBuilder(Sub sub, boolean withArguments) {
         String text = (withArguments) ? sub.toString2(ConfigurationHolder.isHideFirstSelfArgument) : sub.getName();
         String containingPackage = sub.getPackageObj().getPackageName();
-        if (Utils.verbose) {
-            Utils.print("sub: " + text + " , containingPackage:" + containingPackage);
-        }
         return LookupElementBuilder.create(text).withIcon(PerlIcons.SUBROUTINE).withPresentableText(text).withTypeText(containingPackage, true);
     }
 
     private static LookupElement getVariableLookupElementBuilder(String text) {
-        if (Utils.verbose) {
-            Utils.print("variable: " + text);
-        }
         return LookupElementBuilder.create(text).withIcon(PerlIcons.VARIABLE).withTypeText("Variable", true);
     }
 
