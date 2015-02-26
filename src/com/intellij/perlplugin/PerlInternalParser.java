@@ -106,11 +106,6 @@ public class PerlInternalParser {
 
         //get files estimation
         for (int i = 0; i < sourceFolders.length; i++) {
-            if (progressIndicator.isCanceled()) {
-                clear();
-                progressIndicator.stop();
-                return;
-            }
             File folder = new File(sourceFolders[i].getCanonicalPath());
             totalFileCount += Utils.getFilesCount(folder, fileFilter);
         }
@@ -178,10 +173,10 @@ public class PerlInternalParser {
                 clear();
                 return;
             }
-            sum++;
             if (file.isDirectory()) {
                 parseFiles(file.listFiles(fileFilter), progressIndicator);
             } else {
+                sum++;
                 if (Utils.debug) {
                     Utils.print(file.getPath());
                 }
