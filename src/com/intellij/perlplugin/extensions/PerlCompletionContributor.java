@@ -6,6 +6,9 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.perlplugin.ConfigurationHolder;
@@ -18,6 +21,7 @@ import com.intellij.perlplugin.language.PerlIcons;
 import com.intellij.perlplugin.language.PerlLanguage;
 import com.intellij.perlplugin.psi.PerlTypes;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +38,10 @@ public class PerlCompletionContributor extends CompletionContributor {
     private static HashMap<Package, LookupElement> packagesCache = new HashMap<Package, LookupElement>();
     private static boolean updateFlipper = false;
 
+    static{
+        cacheAllPackages();
+        cacheAllSubsAndVarsOfOpenedFiles();
+    }
 
     public PerlCompletionContributor() {
 
@@ -124,6 +132,38 @@ public class PerlCompletionContributor extends CompletionContributor {
         addCompleteHandler(PerlTypes.SUBROUTINE, handler);
     }
 
+    private static void cacheAllPackages() {
+        ArrayList<Package> packages = ModulesContainer.getAllPackages();
+        for (int i = 0; i < packages.size(); i++) {
+            addCachedPackage(null, packages.get(i));
+        }
+    }
+
+    private static void cacheAllSubsAndVarsOfOpenedFiles() {
+        Project[] projects = ProjectManager.getInstance().getOpenProjects();
+        for (int i = 0; i < projects.length; i++) {
+            VirtualFile[] openFiles = FileEditorManager.getInstance(projects[i]).getOpenFiles();
+            for (int j = 0; j < openFiles.length; j++) {
+                VirtualFile openFile = openFiles[j];
+
+                //cache attributes
+                HashSet<String> rs = findAllVariables(PsiManager.getInstance(projects[i]).findFile(openFile).getNode().getChildren(null), PerlTypes.VARIABLE);
+                for (String str : rs) {
+                    addCachedVariables(null, str);
+                }
+                //cache subs
+                ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(openFile.getPath());
+                for (int k = 0; k < packages.size(); k++) {
+                    ArrayList<Sub> subs = packages.get(k).getAllSubs();
+                    for (int h = 0; h < subs.size(); h++) {
+                        addCachedSub(null, subs.get(h));
+                    }
+                }
+            }
+        }
+
+    }
+
     private void addLanguageKeyword(CompletionResultSet resultSet, String text) {
         //TODO:: order most common used first
         String keywords = "|abs|accept|alarm|atan2|AUTOLOAD|BEGIN|bind|binmode|bless|break|caller|chdir|CHECK|chmod|chomp|chop|chown|chr|chroot|close|closedir|connect|cos|crypt|dbmclose|dbmopen|defined|delete|DESTROY|die|dump|each|END|endgrent|endhostent|endnetent|endprotoent|endpwent|endservent|eof|eval|exec|exists|exit|fcntl|fileno|flock|fork|format|formline|getc|getgrent|getgrgid|getgrnam|gethostbyaddr|gethostbyname|gethostent|getlogin|getnetbyaddr|getnetbyname|getnetent|getpeername|getpgrp|getppid|getpriority|getprotobyname|getprotobynumber|getprotoent|getpwent|getpwnam|getpwuid|getservbyname|getservbyport|getservent|getsockname|getsockopt|glob|gmtime|goto|grep|hex|index|INIT|int|ioctl|join|keys|kill|last|lc|each|lcfirst|setnetent|length|link|listen|local|localtime|log|lstat|map|mkdir|msgctl|msgget|msgrcv|msgsnd|next|not|oct|open|opendir|ord|our|pack|pipe|pop|pos|print|printf|prototype|push|quotemeta|rand|read|readdir|readline|readlink|readpipe|recv|redo|ref|rename|require|reset|return|reverse|rewinddir|rindex|rmdir|say|scalar|seek|seekdir|select|semctl|semget|semop|send|setgrent|sethostent|each|lcfirst|setnetent|setpgrp|setpriority|setprotoent|setpwent|setservent|setsockopt|shift|shmctl|shmget|shmread|shmwrite|shutdown|sin|sleep|socket|socketpair|sort|splice|split|sprintf|sqrt|srand|stat|state|study|substr|symlink|syscall|sysopen|sysread|sysseek|system|syswrite|tell|telldir|tie|tied|time|times|truncate|ucfirst|umask|undef|UNITCHECK|unlink|unpack|unshift|untie|use|utime|values|vec|wait|waitpid|wantarray|warn|write|each|lcfirst|setnetent|cmp|continue|CORE|else|elsif|exp|for|foreach|lock|package|unless|until|while|ARGV|ARGVOUT|STDERR|STDIN|STDOUT";
@@ -201,7 +241,9 @@ public class PerlCompletionContributor extends CompletionContributor {
                 ArrayList<Package> packages = ModulesContainer.getPackageList(importedSubs.get(j).getContainingPackage());//TODO: handle more than 1 package
                 if (packages.size() > 0) {
                     Sub sub = packages.get(0).getSubByName(importedSubs.get(j).getImportSub());
-                    addCachedSub(resultSet, sub);
+                    if (sub != null) {
+                        addCachedSub(resultSet, sub);
+                    }
                 }
             }
         }
@@ -214,37 +256,45 @@ public class PerlCompletionContributor extends CompletionContributor {
         }
     }
 
-    private void addCachedPackage(CompletionResultSet resultSet, Package packageObj) {
-        if (!packagesCache.containsKey(packageObj)) {
+    private static void addCachedPackage(CompletionResultSet resultSet, Package packageObj) {
+        if (packageObj != null && !packagesCache.containsKey(packageObj)) {
             packagesCache.put(packageObj, getPackageLookupElementBuilder(packageObj));
         }
-        resultSet.addElement(packagesCache.get(packageObj));
+        if (resultSet != null) {
+            resultSet.addElement(packagesCache.get(packageObj));
+        }
     }
 
-    private void addCachedSub(CompletionResultSet resultSet, Sub sub) {
-        if (!subsCache.containsKey(sub)) {
+    private static void addCachedSub(CompletionResultSet resultSet, Sub sub) {
+        if (sub != null && !subsCache.containsKey(sub)) {
             subsCache.put(sub, getSubLookupElementBuilder(sub, true));
         }
-        resultSet.addElement(subsCache.get(sub));
+        if (resultSet != null) {
+            resultSet.addElement(subsCache.get(sub));
+        }
     }
 
-    private void addCachedSubNoArgs(CompletionResultSet resultSet, Sub sub) {
+    private static void addCachedSubNoArgs(CompletionResultSet resultSet, Sub sub) {
         if (!subsCacheNoArgs.containsKey(sub)) {
             subsCacheNoArgs.put(sub, getSubLookupElementBuilder(sub, false));
         }
-        resultSet.addElement(subsCacheNoArgs.get(sub));
+        if (resultSet != null) {
+            resultSet.addElement(subsCacheNoArgs.get(sub));
+        }
     }
 
-    private void addCachedVariables(CompletionResultSet resultSet, String str) {
-        if (!variablesCache.containsKey(str)) {
+    private static void addCachedVariables(CompletionResultSet resultSet, String str) {
+        if (str != null && !variablesCache.containsKey(str)) {
             variablesCache.put(str, getVariableLookupElementBuilder(str));
         }
-        resultSet.addElement(variablesCache.get(str));
+        if (resultSet != null) {
+            resultSet.addElement(variablesCache.get(str));
+        }
     }
 
 
     //get lookup elements methods
-    private LookupElement getPackageLookupElementBuilder(Package packageObj) {
+    private static LookupElement getPackageLookupElementBuilder(Package packageObj) {
         String text = packageObj.getPackageName();
         if (Utils.verbose) {
             Utils.print("package: " + text);
@@ -252,7 +302,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         return LookupElementBuilder.create(text).withIcon(PerlIcons.PACKAGE).withTypeText("Package", true);
     }
 
-    private LookupElement getSubLookupElementBuilder(Sub sub, boolean withArguments) {
+    private static LookupElement getSubLookupElementBuilder(Sub sub, boolean withArguments) {
         String text = (withArguments) ? sub.toString2(ConfigurationHolder.isHideFirstSelfArgument) : sub.getName();
         String containingPackage = sub.getPackageObj().getPackageName();
         if (Utils.verbose) {
@@ -261,19 +311,19 @@ public class PerlCompletionContributor extends CompletionContributor {
         return LookupElementBuilder.create(text).withIcon(PerlIcons.SUBROUTINE).withPresentableText(text).withTypeText(containingPackage, true);
     }
 
-    private LookupElement getVariableLookupElementBuilder(String text) {
+    private static LookupElement getVariableLookupElementBuilder(String text) {
         if (Utils.verbose) {
             Utils.print("variable: " + text);
         }
         return LookupElementBuilder.create(text).withIcon(PerlIcons.VARIABLE).withTypeText("Variable", true);
     }
 
-    private HashSet<String> findAllVariables(ASTNode[] children, IElementType type) {
+    private static HashSet<String> findAllVariables(ASTNode[] children, IElementType type) {
         HashSet<String> resultSet = new HashSet<String>();
         return findAllVariables(children, resultSet, type);
     }
 
-    private HashSet<String> findAllVariables(ASTNode[] children, HashSet<String> resultSet, IElementType type) {
+    private static HashSet<String> findAllVariables(ASTNode[] children, HashSet<String> resultSet, IElementType type) {
         for (int i = 0; i < children.length; i++) {
             ASTNode astNode = children[i].findChildByType(type);
             if (astNode != null) {

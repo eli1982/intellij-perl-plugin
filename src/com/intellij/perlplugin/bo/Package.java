@@ -136,6 +136,9 @@ public class Package {
     }
 
     public Sub getSubByName(String subName) {
+        if (subName.startsWith(":")) {
+            subName = subName.substring(1,subName.length());
+        }
         ArrayList<Sub> allSubs = getAllSubs();
         for (int i = 0; i < allSubs.size(); i++) {
             if (allSubs.get(i).getName().equals(subName)) {
