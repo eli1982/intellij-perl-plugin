@@ -29,7 +29,12 @@ InputCharacter = [^\r\n]
 WhiteSpace = ( ({LineTerminator} | [ \t\f])* )
 
 LineComment = "#" {InputCharacter}* {LineTerminator}?
-TraditionalComment   = (\r|\n)"="[^*]~"=cut"
+startComment="="(head|for|pod)
+endComment="=cut"
+simpleComment=[^=]
+complexComment="="[/]([^c][^u][^t])
+
+TraditionalComment   = ({startComment} ( {simpleComment} | {complexComment} ) *)+ {endComment}
 
 /*-*
  * PATTERN DEFINITIONS:
