@@ -51,7 +51,7 @@ public class PerlCompletionContributor extends CompletionContributor {
                                 e.printStackTrace();
                             }
                         }
-                        System.out.println(ModulesContainer.getAllPackages().size());
+                        Utils.print("package count: " + ModulesContainer.getAllPackages().size());
                         initialize();
                     }
                 });

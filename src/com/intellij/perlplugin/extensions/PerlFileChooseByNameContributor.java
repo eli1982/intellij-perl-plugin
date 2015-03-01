@@ -8,6 +8,7 @@ import com.intellij.perlplugin.bo.Package;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by ELI-HOME on 28-Feb-15.
@@ -17,18 +18,22 @@ public class PerlFileChooseByNameContributor implements ChooseByNameContributor 
     @Override
     public String[] getNames(Project project, boolean b) {
         ArrayList<Package> packages = ModulesContainer.getAllPackages();
-        String[] packagesResult = new String[packages.size()];
+        HashSet<String> paths = new HashSet<String>();
         for (int i = 0; i < packages.size(); i++) {
-            packagesResult[i] = packages.get(i).getOriginFile();
+            paths.add(packages.get(i).getOriginFile());
         }
-        System.out.println(packages.size());
+
+        String[] packagesResult = new String[paths.size()];
+        int i=0;
+        for (String path : paths) {
+            packagesResult[i++] = path;
+        }
         return packagesResult;
     }
 
     @NotNull
     @Override
     public NavigationItem[] getItemsByName(String s, String s1, Project project, boolean b) {
-        System.out.println(b);
         ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(s);
         NavigationItem[] navigationItems;
         if(packages.size() > 0){
