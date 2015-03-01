@@ -43,7 +43,7 @@ public class PropertyLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
             for (int i = 0; i < packageList.size(); i++) {
                 String file = packageList.get(i).getOriginFile();
-                VirtualFile res = getVirtualFileFromPath(project,file);//element.getProject().getBaseDir().findChild("PerlDummyProject").findChild("src").findChild("test").findChild(new File(file).getName());
+                VirtualFile res = ModulesContainer.getVirtualFileFromPath(project,file);//element.getProject().getBaseDir().findChild("PerlDummyProject").findChild("src").findChild("test").findChild(new File(file).getName());
                 if(res != null) {
                     targets[i] = PsiManager.getInstance(project).findFile(res);
                 }else{
@@ -66,31 +66,4 @@ public class PropertyLineMarkerProvider extends RelatedItemLineMarkerProvider {
         }
     }
 
-    private VirtualFile getVirtualFileFromPath(Project project, String filePath) {
-        File file = new File(filePath);
-        VirtualFile vFile = project.getBaseDir();
-        VirtualFile result = vFile;
-
-        File temp = file;
-        boolean first = true;
-        while(true) {
-            if (result.findChild(temp.getName()) == null){
-                first = false;
-                temp = temp.getParentFile();
-                if(temp == null){
-                    //couldn't find file
-                    return  null;
-                }
-            }else {
-                result = result.findChild(temp.getName());
-                if(first) {
-                    //file found
-                    return result;
-                }else{
-                    temp = file;
-                }
-                first = true;
-            }
-        }
-    }
 }

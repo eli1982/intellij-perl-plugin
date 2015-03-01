@@ -1,9 +1,12 @@
 package com.intellij.perlplugin;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.perlplugin.bo.Package;
 import com.intellij.perlplugin.bo.PendingPackage;
 import com.intellij.perlplugin.bo.Sub;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -241,4 +244,31 @@ public class ModulesContainer {
         t.start();
     }
 
+    public static VirtualFile getVirtualFileFromPath(Project project, String filePath) {
+        File file = new File(filePath);
+        VirtualFile vFile = project.getBaseDir();
+        VirtualFile result = vFile;
+
+        File temp = file;
+        boolean first = true;
+        while(true) {
+            if (result.findChild(temp.getName()) == null){
+                first = false;
+                temp = temp.getParentFile();
+                if(temp == null){
+                    //couldn't find file
+                    return  null;
+                }
+            }else {
+                result = result.findChild(temp.getName());
+                if(first) {
+                    //file found
+                    return result;
+                }else{
+                    temp = file;
+                }
+                first = true;
+            }
+        }
+    }
 }

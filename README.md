@@ -37,6 +37,7 @@ What can it do so far:
 
 -added file changes listeners - autocompletion will handle cases where user create/deletes/renames/undo delete files (not source code changes)
 
+-go to class CTRL+N goes to searches files
 
 There's a lot to do (here's some of the things)
 -----------------------------------------------

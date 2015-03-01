@@ -1,6 +1,7 @@
 package com.intellij.perlplugin.bo;
 
 import com.intellij.perlplugin.ModulesContainer;
+import org.jetbrains.generate.tostring.psi.PsiAdapter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,7 +9,7 @@ import java.util.HashSet;
 /**
  * Created by eli on 28-11-14.
  */
-public class Package {
+public class Package{
     private String originFile;
     private String packageName;
     private int startPositionInFile;
@@ -23,6 +24,7 @@ public class Package {
         this.originFile = originFile;
         this.packageName = packageName;
         ModulesContainer.addPackage(this);
+
     }
 
     public Package(String packageName) {
