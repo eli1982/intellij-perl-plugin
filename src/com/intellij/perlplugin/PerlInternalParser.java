@@ -295,7 +295,7 @@ public class PerlInternalParser {
     private static void addImportedPackagesFromContent(Package packageObj, String content) {
         ArrayList<ImportedPackage> importedPackages = new ArrayList<ImportedPackage>();
         //use 'AA::BB::CC';
-        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s{0,512};)", content);
+        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s{0,256};)", content);
         while (packageNameRegex.find() && !packageNameRegex.group(2).isEmpty()) {
             if (Utils.verbose) {
                 Utils.print("imported package: " + packageNameRegex.group(2));
@@ -308,7 +308,7 @@ public class PerlInternalParser {
     private static void addImportedSubsFromContent(Package packageObj, String content) {
         ArrayList<ImportedSub> importedSubs = new ArrayList<ImportedSub>();
         //use 'AA::BB::CC qw( several methods import )';
-        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s*qw\\s*\\(((\\s*([\\:A-Za-z0-9_-]+)+\\s{0,512})+)\\);?)+", content);
+        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s*qw\\s*\\(((\\s*([\\:A-Za-z0-9_-]+)+\\s{0,256}(#.*)?)+)\\);?)+", content);
         while (packageNameRegex.find() && !packageNameRegex.group(2).isEmpty()) {
             String subContainingPackage = packageNameRegex.group(2);
             String[] subNames = packageNameRegex.group(4).trim().split("\\s+");
@@ -326,7 +326,7 @@ public class PerlInternalParser {
     private static void addSubsFromContent(Package packageObj, String content) {
         final ArrayList<Sub> subs = new ArrayList<Sub>();
         try {
-            Matcher subsRegex = Utils.applyRegex("sub\\s+(\\w+)\\s*\\{(\\s*my\\s+\\(?\\s*((\\s*[\\$|\\%|\\@\\&](\\w|_|-)+\\s*\\,?\\s*)*)\\s*?\\)?(\\S|\\s){0,512}?\\;)?", content);//we limit up to 512 characters to avoid stack overflow
+            Matcher subsRegex = Utils.applyRegex("sub\\s+(\\w+)\\s*\\{(\\s*my\\s+\\(?\\s*((\\s*[\\$|\\%|\\@\\&](\\w|_|-)+\\s*\\,?\\s*)*)\\s*?\\)?(\\S|\\s){0,256}?\\;)?", content);//we limit up to 256 characters to avoid stack overflow
             float start;
             while (((start = System.nanoTime()) > 0F && subsRegex.find())) {
                 Sub sub = new Sub(packageObj, subsRegex.group(1));
@@ -374,7 +374,7 @@ public class PerlInternalParser {
     }
 
     private static String getPackageNameFromContent(String content) {
-        Matcher packageNameRegex = Utils.applyRegex("(\\s*?package\\s+((\\w|::)+)\\s{0,512}?;)", content);
+        Matcher packageNameRegex = Utils.applyRegex("(\\s*?package\\s+((\\w|::)+)\\s{0,256}?;)", content);
         if (!packageNameRegex.find()) return "";//if this fails - then our regex for package name isn't good.
         return packageNameRegex.group(2);
     }
@@ -386,7 +386,7 @@ public class PerlInternalParser {
             return packageNameRegexNoQW.group(2);
         }
         //use parent qw( AA::BB::CC );
-        Matcher packageNameRegexWithQW = Utils.applyRegex("(\\s*?use\\s+(?:parent|base)\\s+qw\\s*?\\(\\s*?((\\w|::)+)\\s*?\\)\\s{0,512}?;)", content);
+        Matcher packageNameRegexWithQW = Utils.applyRegex("(\\s*?use\\s+(?:parent|base)\\s+qw\\s*?\\(\\s*?((\\w|::)+)\\s*?\\)\\s{0,256}?;)", content);
         if (packageNameRegexWithQW.find() && !packageNameRegexWithQW.group(2).isEmpty()) {
             return packageNameRegexWithQW.group(2);
         }
