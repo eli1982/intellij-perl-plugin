@@ -149,7 +149,7 @@ public class ModulesContainer {
             Utils.print("updating file: " + path);
         }
         deleteFile(path);
-        createFile(path,fileContent);
+        createFile(path, fileContent);
     }
 
     public static void renameFile(String oldPath, String path) {
@@ -157,9 +157,9 @@ public class ModulesContainer {
             Utils.print("file renamed/moved:\nold: " + oldPath + "\nnew: " + path);
         }
         deleteFile(oldPath);
-        if(Utils.isValidateExtension(path)) {
-            createFile(path,null);
-        }else{
+        if (Utils.isValidateExtension(path)) {
+            createFile(path, null);
+        } else {
             if (Utils.debug) {
                 Utils.print("not a valid file extension - renamed file won't be parsed");
             }
@@ -167,6 +167,9 @@ public class ModulesContainer {
     }
 
     public static void deleteFile(String path) {
+        if (new File(path).isDirectory()) {
+            return;
+        }
         if (filePathsToPackages.containsKey(path)) {
             if (Utils.debug) {
                 Utils.print("deleting file: " + path);
@@ -210,6 +213,9 @@ public class ModulesContainer {
     }
 
     public static void createFile(final String path, final String fileContent) {
+        if (new File(path).isDirectory()) {
+            return;
+        }
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -225,7 +231,7 @@ public class ModulesContainer {
                 }
                 //also happen when undoing a file deletion!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 //create package
-                PerlInternalParser.parse(path,fileContent);
+                PerlInternalParser.parse(path, fileContent);
                 //set parent package for all inheriting children
                 ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(path);
                 for (Package packageObj : packages) {
@@ -251,20 +257,20 @@ public class ModulesContainer {
 
         File temp = file;
         boolean first = true;
-        while(true) {
-            if (result.findChild(temp.getName()) == null){
+        while (true) {
+            if (result.findChild(temp.getName()) == null) {
                 first = false;
                 temp = temp.getParentFile();
-                if(temp == null){
+                if (temp == null) {
                     //couldn't find file
-                    return  null;
+                    return null;
                 }
-            }else {
+            } else {
                 result = result.findChild(temp.getName());
-                if(first) {
+                if (first) {
                     //file found
                     return result;
-                }else{
+                } else {
                     temp = file;
                 }
                 first = true;

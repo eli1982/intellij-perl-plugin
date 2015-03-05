@@ -201,7 +201,7 @@ public class PerlInternalParser {
         }
 
         //get package
-        Matcher contentSeparationRegex = Utils.applyRegex("(\\s*?package\\s+\\'?((\\w|_|-|::)+)\\'?\\s*;)", fileContent, Pattern.MULTILINE);
+        Matcher contentSeparationRegex = Utils.applyRegex("(package\\s+\\'?((\\w|_|-|::)+)\\'?\\s*;)", fileContent, Pattern.MULTILINE);
 
         //get packages start positions
         ArrayList<Integer> contentStartPositions = new ArrayList<Integer>();
@@ -295,7 +295,7 @@ public class PerlInternalParser {
     private static void addImportedPackagesFromContent(Package packageObj, String content) {
         ArrayList<ImportedPackage> importedPackages = new ArrayList<ImportedPackage>();
         //use 'AA::BB::CC';
-        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s{0,256};)", content);
+        Matcher packageNameRegex = Utils.applyRegex("(use\\s+((\\w|::)+)\\s{0,256};)", content);
         while (packageNameRegex.find() && !packageNameRegex.group(2).isEmpty()) {
             if (Utils.verbose) {
                 Utils.print("imported package: " + packageNameRegex.group(2));
@@ -308,7 +308,7 @@ public class PerlInternalParser {
     private static void addImportedSubsFromContent(Package packageObj, String content) {
         ArrayList<ImportedSub> importedSubs = new ArrayList<ImportedSub>();
         //use 'AA::BB::CC qw( several methods import )';
-        Matcher packageNameRegex = Utils.applyRegex("(\\s*?use\\s+((\\w|::)+)\\s*qw\\s*\\(((\\s*([\\:A-Za-z0-9_-]+)+\\s{0,256}(#.*)?)+)\\);?)+", content);
+        Matcher packageNameRegex = Utils.applyRegex("(use\\s+((\\w|::)+)\\s*qw\\s*[(/]((\\s*([\\:\\$\\@\\%A-Za-z0-9_-]+)+\\s{0,256}(#.*)?)+)[)/]\\s{0,256};)+", content);
         while (packageNameRegex.find() && !packageNameRegex.group(2).isEmpty()) {
             String subContainingPackage = packageNameRegex.group(2);
             String[] subNames = packageNameRegex.group(4).trim().split("\\s+");

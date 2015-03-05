@@ -29,7 +29,7 @@ InputCharacter = [^\r\n]
 WhiteSpace = ( ({LineTerminator} | [ \t\f])* )
 
 LineComment = "#" {InputCharacter}* {LineTerminator}?
-startComment="="(head|for|pod)
+startComment= ("=for"|"=pod"|"=head")
 endComment="=cut"
 simpleComment=[^=]
 complexComment="="[/]([^c][^u][^t])
@@ -61,9 +61,7 @@ HashKey="=>"
 String=(\".*\"|\'.*\')
 PropertyCharacter=[^->\ \n\r\t\f\\\{\}=] | "\\"{LineTerminator}
 PackageName=({identifier}::{identifier})+(::{identifier})*
-head="=head1"
 begin="=begin"
-cut="=cut"
 Variable=({Predicate}({identifier})+);
 Arguments=(\s+{Variable}\s+)(\,\s+{Variable}\s+)+
 Variables=(\$\!|\$\"|\$\#|\$\$|\$\%|\$\&|\$\'|\$\*|\$\+|\$\,|\$\-|\$\.|\$\/|\$\0|\$\:|\$\;|\$\<|\$\=|\$\>|\$\?|\$\@|\$\^|\$\^\A|\$\^\C|\$\^CHILD_ERROR_NATIVE|\$\^D|\$\^E|\$\^ENCODING|\$\^F|\$\^H|\$\^I|\$\^L|\$\^M|\$\^N|\$\^O|\$\^OPEN|\$\^P|\$\^R|\$\^RE_DEBUG_FLAGS|\$\^RE_TRIE_MAXBUF|\$\^S|\$\^T|\$\^TAINT|\$\^UNICODE|\$\^UTF8LOCALE|\$\^V|\$\^W|\$\^WARNING_BITS|\$\^WIDE_SYSTEM_CALLS|\$\^X|\$\_|\$\`|\$ACCUMULATOR|\$ARG|\$ARGV|\$BASETIME|\$CHILD_ERROR|\$COMPILING|\$DEBUGGING|\$EFFECTIVE_GROUP_ID|\$EFFECTIVE_USER_ID|\$EGID|\$ERRNO|\$EUID|\$EVAL_ERROR|\$EXCEPTIONS_BEING_CAUGHT|\$EXECUTABLE_NAME|\$EXTENDED_OS_ERROR|\$FORMAT_FORMFEED|\$FORMAT_LINE_BREAK_CHARACTERS|\$FORMAT_LINES_LEFT|\$FORMAT_LINES_PER_PAGE|\$FORMAT_NAME|\$FORMAT_PAGE_NUMBER|\$FORMAT_TOP_NAME|\$GID|\$INPLACE_EDIT|\$INPUT_LINE_NUMBER|\$INPUT_RECORD_SEPARATOR|\$LAST_REGEXP_CODE_RESULT|\$LIST_SEPARATOR|\$MATCH|\$MULTILINE_MATCHING|\$NR|\$OFMT|\$OFS|\$ORS|\$OS_ERROR|\$OSNAME|\$OUTPUT_AUTO_FLUSH|\$OUTPUT_FIELD_SEPARATOR|\$OUTPUT_RECORD_SEPARATOR|\$PERL_VERSION|\$PERLDB|\$PID|\$POSTMATCH|\$PREMATCH|\$PROCESS_ID|\$PROGRAM_NAME|\$REAL_GROUP_ID|\$REAL_USER_ID|\$RS|\$SUBSCRIPT_SEPARATOR|\$SUBSEP|\$SYSTEM_FD_MAX|\$UID|\$WARNING|\$\~|\%\!|\%\^H|\%ENV|\%INC|\%OVERLOAD|\%SIG|\@\+|\@\-|\@\_|\@ARGV|\@INC|\@LAST_MATCH_START|\$LAST_MATCH_END|\$LAST_PAREN_MATCH)

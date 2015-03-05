@@ -45,11 +45,6 @@ public class PerlCompletionContributor extends CompletionContributor {
                     @Override
                     public void run() {
                         while (!ModulesContainer.isInitialized()) {
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
                         }
                         Utils.print("package count: " + ModulesContainer.getAllPackages().size());
                         initialize();
