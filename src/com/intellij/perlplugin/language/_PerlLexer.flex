@@ -33,7 +33,7 @@ startComment= ("=for"|"=pod"|"=head")
 endComment="=cut"
 simpleComment=[^=]
 complexComment="="[/]([^c][^u][^t])
-
+end_of_file_comment = "__END__" [^]*
 TraditionalComment   = ({startComment} ( {simpleComment} | {complexComment} ) *)+ {endComment}
 
 /*-*
@@ -71,6 +71,7 @@ Filehandles=(ARGV|ARGVOUT|STDERR|STDIN|STDOUT)
 Symbols=(\,|\.|\\|\/|\;|\-|\=|\+|\*|\||\?|\:|\|\||\!|\^|\~|\<|\>)
 %%
 
+{end_of_file_comment} {return LINE_COMMENT;}
 {TraditionalComment} {return LINE_COMMENT;}
 {PackageName}        { return PACKAGE; }
 {LineTerminator} {return WHITESPACE;}

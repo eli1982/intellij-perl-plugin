@@ -192,6 +192,10 @@ public class PerlInternalParser {
     public static void parse(String filePath, String fileContent) {
         if (fileContent == null) {
             fileContent = Utils.readFile(filePath);
+            int eof = fileContent.indexOf("__END__");
+            if(eof != -1){
+                fileContent = fileContent.substring(0,eof);
+            }
         }
 
         float start = System.nanoTime();
