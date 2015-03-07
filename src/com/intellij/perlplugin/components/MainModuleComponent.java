@@ -1,22 +1,16 @@
 package com.intellij.perlplugin.components;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.perlplugin.ModulesContainer;
 import com.intellij.perlplugin.PerlInternalParser;
-import com.intellij.perlplugin.Utils;
 import com.intellij.perlplugin.extensions.PerlCompletionContributor;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by eli on 27-11-14.
  */
-public class MainModuleComponent implements com.intellij.openapi.module.ModuleComponent {
+public class MainModuleComponent implements ModuleComponent {
     private final Module module;
 
     public MainModuleComponent(Module module) {
@@ -43,6 +37,7 @@ public class MainModuleComponent implements com.intellij.openapi.module.ModuleCo
 
     public void projectClosed() {
         // called when project is being closed
+        ModulesContainer.clear();
     }
 
     public void moduleAdded() {

@@ -31,7 +31,7 @@ public class PerlInternalParser {
 
     public static void start(Project project) {
         PerlInternalParser.project = project;
-        ProgressManager.getInstance().run(new Task.Backgroundable(PerlInternalParser.project, "Caching Perl Modules") {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Caching Perl Modules",true) {
             public void run(@NotNull ProgressIndicator progressIndicator) {
                 try {
                     if (Utils.debug) {
@@ -47,22 +47,32 @@ public class PerlInternalParser {
                 } finally {
                 }
                 progressIndicator.stop();
+
+                //attach file editor listener
+                PerlInternalParser.project.getMessageBus().connect(PerlInternalParser.project).subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListenerEX(PerlInternalParser.project));
+            }
+
+            @Override
+            public void onSuccess() {
+                super.onSuccess();
+                PerlCompletionContributor.initialize();
             }
 
             @Override
             public void onCancel() {
+                if(Utils.debug){
+                    Utils.print("Caching Canceled");
+                }
                 clear();
                 super.onCancel();
             }
         });
-        //attach file editor listener
-        project.getMessageBus().connect(project).subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListenerEX(project));
+
     }
 
 
     public static void parseAllSources(ProgressIndicator progressIndicator) {
         clear();
-
         if (Utils.debug) {
             Utils.print("==================");
             Utils.print("\tFirst Pass");
@@ -159,7 +169,7 @@ public class PerlInternalParser {
 
     private static void parseFiles(File[] files, ProgressIndicator progressIndicator) {
         if (progressIndicator.isCanceled()) {
-            clear();
+//            clear();
             return;
         }
         if (Utils.verbose) {
@@ -378,21 +388,21 @@ public class PerlInternalParser {
     }
 
     private static String getPackageNameFromContent(String content) {
-        Matcher packageNameRegex = Utils.applyRegex("(\\s*?package\\s+((\\w|::)+)\\s{0,256}?;)", content);
+        Matcher packageNameRegex = Utils.applyRegex("(package\\s+((\\w|::)+)\\s{0,256}?;)", content);
         if (!packageNameRegex.find()) return "";//if this fails - then our regex for package name isn't good.
         return packageNameRegex.group(2);
     }
 
     private static String getPackageParentFromContent(String content) {
-        //use parent 'AA::BB::CC';
-        Matcher packageNameRegexNoQW = Utils.applyRegex("(\\s*?use\\s*?(?:parent|base)\\s*?\\'?((\\w+\\:\\:)*\\'?\\w+))", content);
-        if (packageNameRegexNoQW.find() && !packageNameRegexNoQW.group(2).isEmpty()) {
-            return packageNameRegexNoQW.group(2);
-        }
         //use parent qw( AA::BB::CC );
-        Matcher packageNameRegexWithQW = Utils.applyRegex("(\\s*?use\\s+(?:parent|base)\\s+qw\\s*?\\(\\s*?((\\w|::)+)\\s*?\\)\\s{0,256}?;)", content);
+        Matcher packageNameRegexWithQW = Utils.applyRegex("(use\\s+(?:parent|base)\\s+qw\\s*?\\(\\s*?((\\w|::)+)\\s*?\\)\\s{0,256}?;)", content);
         if (packageNameRegexWithQW.find() && !packageNameRegexWithQW.group(2).isEmpty()) {
             return packageNameRegexWithQW.group(2);
+        }
+        //use parent 'AA::BB::CC';
+        Matcher packageNameRegexNoQW = Utils.applyRegex("(use\\s*?(?:parent|base)\\s*?\\'?((\\w+\\:\\:)*\\'?\\w+))", content);
+        if (packageNameRegexNoQW.find() && !packageNameRegexNoQW.group(2).isEmpty()) {
+            return packageNameRegexNoQW.group(2);
         }
         return null;//no parent package found.
     }
