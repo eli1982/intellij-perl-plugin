@@ -322,7 +322,7 @@ public class PerlInternalParser {
     private static void addImportedSubsFromContent(Package packageObj, String content) {
         ArrayList<ImportedSub> importedSubs = new ArrayList<ImportedSub>();
         //use 'AA::BB::CC qw( several methods import )';
-        Matcher packageNameRegex = Utils.applyRegex("(use\\s+((\\w|::)+)\\s*qw\\s*[(/]((\\s*([\\:\\$\\@\\%A-Za-z0-9_-]+)+\\s{0,256}(#.*)?)+)[)/]\\s{0,256};)+", content);
+        Matcher packageNameRegex = Utils.applyRegex("(use\\s+((\\w|::)+)\\s*qw\\s*[(/]((\\s*([\\:\\$\\@\\%A-Za-z0-9_-]+)+\\s{0,256}(#.*)?)+)[)/])+", content);
         while (packageNameRegex.find() && !packageNameRegex.group(2).isEmpty()) {
             String subContainingPackage = packageNameRegex.group(2);
             String[] subNames = packageNameRegex.group(4).trim().split("\\s+");
