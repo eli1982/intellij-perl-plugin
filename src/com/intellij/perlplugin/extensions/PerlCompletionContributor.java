@@ -5,7 +5,6 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -33,6 +32,9 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 
 public class PerlCompletionContributor extends CompletionContributor {
+    public static final int AUTO_POPUP_PACKAGE_ITEMS_LIMIT = 100;
+    public static final int AUTO_POPUP_SUBS_ITEMS_LIMIT = 50;
+    public static final int AUTO_POPUP_VARS_ITEMS_LIMIT = 200;
     private static HashMap<String, LookupElement> variablesCache = new HashMap<String, LookupElement>();
     private static HashMap<Sub, LookupElement> subsCache = new HashMap<Sub, LookupElement>();
     private static HashMap<Sub, LookupElement> subsCacheNoArgs = new HashMap<Sub, LookupElement>();
@@ -61,7 +63,7 @@ public class PerlCompletionContributor extends CompletionContributor {
 
                 //current element based
                 if (is(currentElement, PerlTypes.PROPERTY)) {
-                    addAllPackages(resultSet, currentElement);
+                    addAllPackages(resultSet, currentElement, parameters.isAutoPopup());
                     if (currentElement.getTextLength() >= 2) {
                         addLanguageKeyword(resultSet, currentElement.getText());
                     }
@@ -79,17 +81,17 @@ public class PerlCompletionContributor extends CompletionContributor {
                                     && is(prevSibling(brace, 4), PerlTypes.WHITESPACE)
                                     && is(prevSibling(brace, 5), PerlTypes.LANG_FUNCTION) && prevSibling(brace, 5).getText().equals("use");
                             if (condition) {
-                                addAllSubsInPackage(resultSet, prevSibling(brace, 3), false);
+                                addAllSubsInPackage(resultSet, prevSibling(brace, 3), false, parameters.isAutoPopup());
                                 return;
                             }
                         }
                     }
-                    addAllSubsInFile(parameters, resultSet);
-                    addAllVariablesInFile(parameters, resultSet);
+                    addAllSubsInFile(parameters, resultSet, parameters.isAutoPopup());
+                    addAllVariablesInFile(parameters, resultSet, parameters.isAutoPopup());
                 } else if (is(currentElement, PerlTypes.VARIABLE) || is(currentElement, PerlTypes.VALUE) || is(currentElement, PerlTypes.PREDICATE) || is(currentElement, PerlTypes.BRACES) || is(currentElement, PerlTypes.LANG_SYNTAX)) {
-                    addAllVariablesInFile(parameters, resultSet);
+                    addAllVariablesInFile(parameters, resultSet, parameters.isAutoPopup());
                 } else if (is(currentElement, PerlTypes.PACKAGE)) {
-                    addAllPackages(resultSet, currentElement);
+                    addAllPackages(resultSet, currentElement, parameters.isAutoPopup());
                 }/* else if (is(currentElement, PerlTypes.SUBROUTINE)) {
                     ModulesContainer.updateFile(virtualFile.getPath(),editor.getDocument().getText());
                 }*/
@@ -100,13 +102,13 @@ public class PerlCompletionContributor extends CompletionContributor {
                     PsiElement prevPrevElement = prevSibling(prevElement, 1);
                     if (is(prevPrevElement, PerlTypes.PACKAGE)) {
                         //get all subs of package if we are on a package's pointer
-                        addAllSubsInPackage(resultSet, prevPrevElement, true);
+                        addAllSubsInPackage(resultSet, prevPrevElement, true, parameters.isAutoPopup());
                     } else if (is(prevPrevElement, PerlTypes.VARIABLE)) {
                         //get all subs of current package if we are on an variable pointer
-                        addAllSubsInFile(parameters, resultSet);
+                        addAllSubsInFile(parameters, resultSet, parameters.isAutoPopup());
                     }
                 } else if (is(prevElement, PerlTypes.WHITESPACE)) {
-                    addAllSubsInFile(parameters, resultSet);
+                    addAllSubsInFile(parameters, resultSet, parameters.isAutoPopup());
                 }
                 //ya, i know this is crappy - temporary fix
                 if ((parameters.isAutoPopup() && updateFlipper) || parameters.getInvocationCount() == 1 || parameters.getInvocationCount() == 3) {
@@ -161,17 +163,17 @@ public class PerlCompletionContributor extends CompletionContributor {
     }
 
     public static void cacheSingleFile(Project project, VirtualFile openFile) {
-            //cache attributes
-            HashSet<String> rs = findAllVariables(PsiManager.getInstance(project).findFile(openFile).getNode().getChildren(null), PerlTypes.VARIABLE);
-            for (String str : rs) {
-                addCachedVariables(null, str);
-            }
-            //cache subs
-            ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(openFile.getPath());
-            for (int i = 0; i < packages.size(); i++) {
-                ArrayList<Sub> subs = packages.get(i).getAllSubs();
-                for (int j = 0; j < subs.size(); j++) {
-                    addCachedSub(null, subs.get(j));
+        //cache attributes
+        HashSet<String> rs = findAllVariables(PsiManager.getInstance(project).findFile(openFile).getNode().getChildren(null), PerlTypes.VARIABLE, false);
+        for (String str : rs) {
+            addCachedVariables(null, str);
+        }
+        //cache subs
+        ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(openFile.getPath());
+        for (int i = 0; i < packages.size(); i++) {
+            ArrayList<Sub> subs = packages.get(i).getAllSubs();
+            for (int j = 0; j < subs.size(); j++) {
+                addCachedSub(null, subs.get(j));
             }
         }
     }
@@ -215,23 +217,29 @@ public class PerlCompletionContributor extends CompletionContributor {
         return element != null && element.getNode().getElementType().equals(perlType);
     }
 
+    //==================
     //add cached methods
-    private void addAllPackages(CompletionResultSet resultSet, PsiElement element) {
-        ArrayList<Package> packageList = ModulesContainer.searchPackageList(element.getText());
+    //==================
+    private void addAllPackages(CompletionResultSet resultSet, PsiElement element, boolean limitResults) {
+        ArrayList<Package> packageList = ModulesContainer.searchPackageList(element.getText(), limitResults);
+
         for (int i = 0; i < packageList.size(); i++) {
             addCachedPackage(resultSet, packageList.get(i));
         }
     }
 
-    private void addAllSubsInPackage(CompletionResultSet resultSet, PsiElement packageName, boolean withArguments) {
+    private void addAllSubsInPackage(CompletionResultSet resultSet, PsiElement packageName, boolean withArguments, boolean limitResults) {
         ArrayList<Package> packageList = ModulesContainer.getPackageList(packageName.getText());
+
         if (Utils.verbose) {
             Utils.print("Detected Package:" + packageName);
         }
         for (int i = 0; i < packageList.size(); i++) {
             Package packageObj = packageList.get(i);
+
             ArrayList<Sub> subs = packageObj.getAllSubs();
-            for (int j = 0; j < subs.size(); j++) {
+            int amount = (limitResults) ? Math.min(AUTO_POPUP_SUBS_ITEMS_LIMIT, subs.size()) : subs.size();//get all results only if users press ctrl+space
+            for (int j = 0; j < amount; j++) {
                 if (withArguments) {
                     addCachedSub(resultSet, subs.get(j));
                 } else {
@@ -241,15 +249,19 @@ public class PerlCompletionContributor extends CompletionContributor {
         }
     }
 
-    private void addAllSubsInFile(CompletionParameters parameters, CompletionResultSet resultSet) {
+    private void addAllSubsInFile(CompletionParameters parameters, CompletionResultSet resultSet, boolean limitResults) {
         ArrayList<Package> packageList = ModulesContainer.getPackageListFromFile(parameters.getOriginalFile().getVirtualFile().getCanonicalPath());
+
         for (int i = 0; i < packageList.size(); i++) {
             ArrayList<Sub> subs = packageList.get(i).getAllSubs();
-            for (int j = 0; j < subs.size(); j++) {
+            int amount = (limitResults) ? Math.min(AUTO_POPUP_SUBS_ITEMS_LIMIT, subs.size()) : subs.size();//get all results only if users press ctrl+space
+            for (int j = 0; j < amount; j++) {
                 addCachedSub(resultSet, subs.get(j));
             }
             ArrayList<ImportedSub> importedSubs = packageList.get(i).getImportedSubs();
-            for (int j = 0; j < importedSubs.size(); j++) {
+            amount = (limitResults) ? Math.min(AUTO_POPUP_SUBS_ITEMS_LIMIT, importedSubs.size()) : importedSubs.size();//get all results only if users press ctrl+space
+
+            for (int j = 0; j < amount; j++) {
                 ArrayList<Package> packages = ModulesContainer.getPackageList(importedSubs.get(j).getContainingPackage());//TODO: handle more than 1 package
                 if (packages.size() > 0) {
                     Sub sub = packages.get(0).getSubByName(importedSubs.get(j).getImportSub());
@@ -261,8 +273,8 @@ public class PerlCompletionContributor extends CompletionContributor {
         }
     }
 
-    private void addAllVariablesInFile(CompletionParameters parameters, CompletionResultSet resultSet) {
-        HashSet<String> rs = findAllVariables(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.VARIABLE);
+    private void addAllVariablesInFile(CompletionParameters parameters, CompletionResultSet resultSet, boolean limitResults) {
+        HashSet<String> rs = findAllVariables(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.VARIABLE, limitResults);
         for (String str : rs) {
             addCachedVariables(resultSet, str);
         }
@@ -334,18 +346,19 @@ public class PerlCompletionContributor extends CompletionContributor {
         return LookupElementBuilder.create(text).withIcon(PerlIcons.VARIABLE).withTypeText("Variable", true);
     }
 
-    private static HashSet<String> findAllVariables(ASTNode[] children, IElementType type) {
+    private static HashSet<String> findAllVariables(ASTNode[] children, IElementType type, boolean limitResults) {
         HashSet<String> resultSet = new HashSet<String>();
-        return findAllVariables(children, resultSet, type);
+        return findAllVariables(children, resultSet, type, limitResults);
     }
 
-    private static HashSet<String> findAllVariables(ASTNode[] children, HashSet<String> resultSet, IElementType type) {
-        for (int i = 0; i < children.length; i++) {
+    private static HashSet<String> findAllVariables(ASTNode[] children, HashSet<String> resultSet, IElementType type, boolean limitResults) {
+        int amount = (limitResults) ? Math.min(AUTO_POPUP_VARS_ITEMS_LIMIT, children.length) : children.length;//get all results only if users press ctrl+space
+        for (int i = 0; i < amount; i++) {
             ASTNode astNode = children[i].findChildByType(type);
             if (astNode != null) {
                 resultSet.add(astNode.getText());
             } else if (children[i].getChildren(null) != null) {
-                findAllVariables(children[i].getChildren(null), resultSet, type);
+                findAllVariables(children[i].getChildren(null), resultSet, type, limitResults);
             }
         }
         return resultSet;

@@ -5,6 +5,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.perlplugin.bo.Package;
 import com.intellij.perlplugin.bo.PendingPackage;
 import com.intellij.perlplugin.bo.Sub;
+import com.intellij.perlplugin.extensions.PerlCompletionContributor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,11 +57,19 @@ public class ModulesContainer {
         return packageList;
     }
 
-    public static ArrayList<Package> searchPackageList(String searchStr) {
+    public static ArrayList<Package> searchPackageList(String searchStr, boolean limitResults) {
         ArrayList<Package> packageList = new ArrayList<Package>();
+        int i = PerlCompletionContributor.AUTO_POPUP_PACKAGE_ITEMS_LIMIT;
         for (String key : packageNamesToPackages.keySet()) {
             if (key.contains(searchStr)) {
                 packageList.addAll(packageNamesToPackages.get(key));
+
+                if (limitResults) {
+                    i--;
+                    if (i <= 0) {
+                        break;
+                    }
+                }
             }
         }
         return packageList;
