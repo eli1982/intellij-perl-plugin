@@ -221,7 +221,7 @@ public class PerlCompletionContributor extends CompletionContributor {
     //add cached methods
     //==================
     private void addAllPackages(CompletionResultSet resultSet, PsiElement element, boolean limitResults) {
-        ArrayList<Package> packageList = ModulesContainer.searchPackageList(element.getText(), limitResults);
+        ArrayList<Package> packageList = ModulesContainer.searchPackageList(element.getText(), false);
 
         for (int i = 0; i < packageList.size(); i++) {
             addCachedPackage(resultSet, packageList.get(i));
@@ -238,7 +238,7 @@ public class PerlCompletionContributor extends CompletionContributor {
             Package packageObj = packageList.get(i);
 
             ArrayList<Sub> subs = packageObj.getAllSubs();
-            int amount = (limitResults) ? Math.min(AUTO_POPUP_SUBS_ITEMS_LIMIT, subs.size()) : subs.size();//get all results only if users press ctrl+space
+            int amount = (false) ? Math.min(AUTO_POPUP_SUBS_ITEMS_LIMIT, subs.size()) : subs.size();//get all results only if users press ctrl+space
             for (int j = 0; j < amount; j++) {
                 if (withArguments) {
                     addCachedSub(resultSet, subs.get(j));
@@ -254,12 +254,12 @@ public class PerlCompletionContributor extends CompletionContributor {
 
         for (int i = 0; i < packageList.size(); i++) {
             ArrayList<Sub> subs = packageList.get(i).getAllSubs();
-            int amount = (limitResults) ? Math.min(AUTO_POPUP_SUBS_ITEMS_LIMIT, subs.size()) : subs.size();//get all results only if users press ctrl+space
+            int amount = (false) ? Math.min(AUTO_POPUP_SUBS_ITEMS_LIMIT, subs.size()) : subs.size();//get all results only if users press ctrl+space
             for (int j = 0; j < amount; j++) {
                 addCachedSub(resultSet, subs.get(j));
             }
             ArrayList<ImportedSub> importedSubs = packageList.get(i).getImportedSubs();
-            amount = (limitResults) ? Math.min(AUTO_POPUP_SUBS_ITEMS_LIMIT, importedSubs.size()) : importedSubs.size();//get all results only if users press ctrl+space
+            amount = (false) ? Math.min(AUTO_POPUP_SUBS_ITEMS_LIMIT, importedSubs.size()) : importedSubs.size();//get all results only if users press ctrl+space
 
             for (int j = 0; j < amount; j++) {
                 ArrayList<Package> packages = ModulesContainer.getPackageList(importedSubs.get(j).getContainingPackage());//TODO: handle more than 1 package
@@ -274,7 +274,7 @@ public class PerlCompletionContributor extends CompletionContributor {
     }
 
     private void addAllVariablesInFile(CompletionParameters parameters, CompletionResultSet resultSet, boolean limitResults) {
-        HashSet<String> rs = findAllVariables(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.VARIABLE, limitResults);
+        HashSet<String> rs = findAllVariables(parameters.getOriginalFile().getNode().getChildren(null), PerlTypes.VARIABLE, false);
         for (String str : rs) {
             addCachedVariables(resultSet, str);
         }
@@ -348,17 +348,17 @@ public class PerlCompletionContributor extends CompletionContributor {
 
     private static HashSet<String> findAllVariables(ASTNode[] children, IElementType type, boolean limitResults) {
         HashSet<String> resultSet = new HashSet<String>();
-        return findAllVariables(children, resultSet, type, limitResults);
+        return findAllVariables(children, resultSet, type, false);
     }
 
     private static HashSet<String> findAllVariables(ASTNode[] children, HashSet<String> resultSet, IElementType type, boolean limitResults) {
-        int amount = (limitResults) ? Math.min(AUTO_POPUP_VARS_ITEMS_LIMIT, children.length) : children.length;//get all results only if users press ctrl+space
+        int amount = (false) ? Math.min(AUTO_POPUP_VARS_ITEMS_LIMIT, children.length) : children.length;//get all results only if users press ctrl+space
         for (int i = 0; i < amount; i++) {
             ASTNode astNode = children[i].findChildByType(type);
             if (astNode != null) {
                 resultSet.add(astNode.getText());
             } else if (children[i].getChildren(null) != null) {
-                findAllVariables(children[i].getChildren(null), resultSet, type, limitResults);
+                findAllVariables(children[i].getChildren(null), resultSet, type, false);
             }
         }
         return resultSet;
