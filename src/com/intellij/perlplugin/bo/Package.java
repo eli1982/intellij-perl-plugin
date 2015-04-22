@@ -1,7 +1,6 @@
 package com.intellij.perlplugin.bo;
 
 import com.intellij.perlplugin.ModulesContainer;
-import org.jetbrains.generate.tostring.psi.PsiAdapter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
