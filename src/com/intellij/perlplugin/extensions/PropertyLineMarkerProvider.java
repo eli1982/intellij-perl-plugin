@@ -39,24 +39,21 @@ public class PropertyLineMarkerProvider extends RelatedItemLineMarkerProvider {
         if (element !=null && element.getNode().getElementType().equals(PerlTypes.PACKAGE)) {
             Project project = element.getProject();
             ArrayList<Package> packageList = ModulesContainer.getPackageList(element.getText().replace(";", ""));
-            PsiElement[] targets = new PsiElement[packageList.size()];
-            boolean allNull = true;
+            ArrayList<PsiElement> targets = new ArrayList();
             for (int i = 0; i < packageList.size(); i++) {
                 String file = packageList.get(i).getOriginFile();
                 VirtualFile res = ModulesContainer.getVirtualFileFromPath(project,file);//element.getProject().getBaseDir().findChild("PerlDummyProject").findChild("src").findChild("test").findChild(new File(file).getName());
                 if(res != null) {
-                    allNull = false;
-                    targets[i] = PsiManager.getInstance(project).findFile(res);
+                    targets.add(PsiManager.getInstance(project).findFile(res));
                 }
             }
-            if(allNull){
-                targets = new PsiElement[0];
-            }
-            if (packageList.size() > 0 && targets.length > 0) {
+
+            if (element != null && packageList.size() > 0 && targets.size() > 0) {
                 NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(PerlIcons.PACKAGE).
-                                setTargets(targets).
+                        setTargets(targets).
                                 setTooltipText("Navigate to package");
-                result.add(builder.createLineMarkerInfo(element));
+                RelatedItemLineMarkerInfo<PsiElement> lineMarker = builder.createLineMarkerInfo(element);
+                result.add(lineMarker);
             }
         } else if (element !=null && element.getNode().getElementType().equals(PerlTypes.SUBROUTINE)) {
             boolean isConstructor = Utils.applyRegex("sub\\s+new", element.getNode().getText()).find();
