@@ -40,17 +40,18 @@ public class PropertyLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Project project = element.getProject();
             ArrayList<Package> packageList = ModulesContainer.getPackageList(element.getText().replace(";", ""));
             PsiElement[] targets = new PsiElement[packageList.size()];
-
+            boolean allNull = true;
             for (int i = 0; i < packageList.size(); i++) {
                 String file = packageList.get(i).getOriginFile();
                 VirtualFile res = ModulesContainer.getVirtualFileFromPath(project,file);//element.getProject().getBaseDir().findChild("PerlDummyProject").findChild("src").findChild("test").findChild(new File(file).getName());
                 if(res != null) {
+                    allNull = false;
                     targets[i] = PsiManager.getInstance(project).findFile(res);
-                }else{
-                    targets = new PsiElement[0];
                 }
             }
-
+            if(allNull){
+                targets = new PsiElement[0];
+            }
             if (packageList.size() > 0 && targets.length > 0) {
                 NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(PerlIcons.PACKAGE).
                                 setTargets(targets).
