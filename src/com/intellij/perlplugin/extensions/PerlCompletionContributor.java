@@ -31,6 +31,69 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 
+class PerlElement {
+    PsiElement psiElement;
+    PerlElement previousPerlElement = null;
+    public static PerlElement fromCompletionParameter(CompletionParameters completionParameters) {
+        PsiElement originalPosition = completionParameters.getOriginalPosition();
+        if (originalPosition != null) {
+            return new PerlElement(originalPosition);
+        } else {
+            return new PerlElement(completionParameters.getPosition());
+        }
+    }
+    public PerlElement(PsiElement psiElement) {
+        this.psiElement = psiElement;
+    }
+
+    public boolean is(IElementType elementType) {
+        return is(psiElement, elementType);
+    }
+    private boolean is(PsiElement psiElement, IElementType elementType) {
+        return psiElement != null && psiElement.getNode().getElementType().equals(elementType);
+    }
+    public boolean isAny(IElementType... elementTypes) {
+        for (IElementType iElementType: elementTypes) {
+            if (is(iElementType)) return true;
+        }
+        return false;
+    }
+    public PerlElement previous() {
+        if (previousPerlElement == null) {
+            previousPerlElement = new PerlElement(getPreviousPsiElement());
+        }
+        return previousPerlElement;
+    }
+    public int getTextLength() {
+        return psiElement != null ? psiElement.getTextLength() : 0;
+    }
+    public String getText() {
+        return psiElement != null ? psiElement.getText() : null;
+    }
+    private PsiElement getPreviousPsiElement() {
+        PsiElement result = psiElement;
+        if (result != null) {
+            if (result.getPrevSibling() != null) {
+                //get sibling
+                result = result.getPrevSibling();
+                while (is(result, GeneratedParserUtilBase.DUMMY_BLOCK)) {
+                    result = result.getLastChild();
+                }
+            } else if (result.getParent() != null && result.getParent().getPrevSibling() != null) {
+                //get sibling from previous parent
+                result = result.getParent().getPrevSibling();
+                while (is(result, GeneratedParserUtilBase.DUMMY_BLOCK)) {
+                    result = result.getLastChild();
+                }
+            } else {
+                //we have no sibling - no point to continue
+                return null;
+            }
+        }
+        return result;
+    }
+}
+
 public class PerlCompletionContributor extends CompletionContributor {
     public static final int AUTO_POPUP_PACKAGE_ITEMS_LIMIT = 100;
     public static final int AUTO_POPUP_SUBS_ITEMS_LIMIT = 50;
@@ -41,8 +104,8 @@ public class PerlCompletionContributor extends CompletionContributor {
     private static HashMap<Package, LookupElement> packagesCache = new HashMap<Package, LookupElement>();
     private static boolean updateFlipper = false;
 
-    public PerlCompletionContributor() {
 
+    public PerlCompletionContributor() {
         CompletionProvider<CompletionParameters> handler = new CompletionProvider<CompletionParameters>() {
             public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
                 if (!ModulesContainer.isInitialized()) {
@@ -50,64 +113,68 @@ public class PerlCompletionContributor extends CompletionContributor {
                 }
                 Editor editor = parameters.getEditor();
                 VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
-                if (editor == null || virtualFile == null) {
+                if (virtualFile == null) {
                     return;
                 }
 
+                PerlElement currentElement = PerlElement.fromCompletionParameter(parameters);
+                PerlElement prevElement = currentElement.previous();
 
-                PsiElement currentElement = parameters.getOriginalPosition();
-                if (currentElement == null) {
-                    currentElement = parameters.getPosition();//handle case where we are auto completing in the end of file
-                }
-                PsiElement prevElement = prevSibling(currentElement, 1);
-
-                //current element based
-                if (is(currentElement, PerlTypes.PROPERTY)) {
+                //current psiElement based
+                if (currentElement.is(PerlTypes.PROPERTY)) {
                     addAllPackages(resultSet, currentElement, parameters.isAutoPopup());
                     if (currentElement.getTextLength() >= 2) {
                         addLanguageKeyword(resultSet, currentElement.getText());
                     }
-                } else if (is(currentElement, PerlTypes.WHITESPACE) && !is(prevElement, PerlTypes.POINTER) || is(currentElement, PerlTypes.BRACES)) {
-                    //qw subs auto complete
-                    if (prevElement != null) {
-                        PsiElement brace = prevSibling(currentElement, 1);
-                        while (is(brace, PerlTypes.WHITESPACE) || is(brace, PerlTypes.VARIABLE) || is(brace, PerlTypes.PROPERTY)) {
-                            brace = prevSibling(brace, 1);
+                } else {
+                    if (currentElement.is(PerlTypes.WHITESPACE) && !prevElement.is(PerlTypes.POINTER) || currentElement.is(PerlTypes.BRACES)) {
+                        //use package qw(...)
+                        PerlElement brace = prevElement;
+                        while (brace.isAny(PerlTypes.WHITESPACE, PerlTypes.VARIABLE, PerlTypes.PROPERTY)) {
+                            brace = brace.previous();
                         }
-                        if (is(brace, PerlTypes.BRACES) && (brace.getText().equals("(") || brace.getText().equals(")"))) {
-                            boolean condition = is(prevSibling(brace, 1), PerlTypes.LANG_SYNTAX) && prevSibling(brace, 1).getText().equals("qw")
-                                    && is(prevSibling(brace, 2), PerlTypes.WHITESPACE)
-                                    && is(prevSibling(brace, 3), PerlTypes.PACKAGE)
-                                    && is(prevSibling(brace, 4), PerlTypes.WHITESPACE)
-                                    && is(prevSibling(brace, 5), PerlTypes.LANG_FUNCTION) && prevSibling(brace, 5).getText().equals("use");
-                            if (condition) {
-                                addAllSubsInPackage(resultSet, prevSibling(brace, 3), false, parameters.isAutoPopup());
-                                return;
+                        if (brace.is(PerlTypes.BRACES) && (brace.getText().equals("(") || brace.getText().equals(")"))) {
+                            PerlElement tmp = brace.previous();
+                            if (tmp.is(PerlTypes.LANG_SYNTAX) && tmp.getText().equals("qw")) {
+                                tmp = tmp.previous();
+                                if (tmp.is(PerlTypes.WHITESPACE)) {
+                                    PerlElement potentialPackage = tmp.previous();
+                                    if (potentialPackage.is(PerlTypes.PACKAGE)) {
+                                        tmp = potentialPackage.previous();
+                                        if (tmp.is(PerlTypes.WHITESPACE)) {
+                                            tmp = tmp.previous();
+                                            if (tmp.is(PerlTypes.LANG_FUNCTION) && tmp.getText().equals("use")) {
+                                                addAllSubsInPackage(resultSet, potentialPackage, false, parameters.isAutoPopup());
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-                    addAllSubsInFile(parameters, resultSet, parameters.isAutoPopup());
-                    addAllVariablesInFile(parameters, resultSet, parameters.isAutoPopup());
-                } else if (is(currentElement, PerlTypes.VARIABLE) || is(currentElement, PerlTypes.VALUE) || is(currentElement, PerlTypes.PREDICATE) || is(currentElement, PerlTypes.BRACES) || is(currentElement, PerlTypes.LANG_SYNTAX)) {
-                    addAllVariablesInFile(parameters, resultSet, parameters.isAutoPopup());
-                } else if (is(currentElement, PerlTypes.PACKAGE)) {
-                    addAllPackages(resultSet, currentElement, parameters.isAutoPopup());
-                }/* else if (is(currentElement, PerlTypes.SUBROUTINE)) {
-                    ModulesContainer.updateFile(virtualFile.getPath(),editor.getDocument().getText());
-                }*/
 
+                        addAllSubsInFile(parameters, resultSet, parameters.isAutoPopup());
+                        addAllVariablesInFile(parameters, resultSet, parameters.isAutoPopup());
+                    } else if (currentElement.isAny(PerlTypes.VARIABLE, PerlTypes.VALUE, PerlTypes.PREDICATE, PerlTypes.BRACES, PerlTypes.LANG_SYNTAX)) {
+                        addAllVariablesInFile(parameters, resultSet, parameters.isAutoPopup());
+                    } else if (currentElement.is(PerlTypes.PACKAGE)) {
+                        addAllPackages(resultSet, currentElement, parameters.isAutoPopup());
+                    }/* else if (is(currentElement, PerlTypes.SUBROUTINE)) {
+                        ModulesContainer.updateFile(virtualFile.getPath(),editor.getDocument().getText());
+                    }*/
+                }
 
                 //prev element based
-                if (is(prevElement, PerlTypes.POINTER)) {
-                    PsiElement prevPrevElement = prevSibling(prevElement, 1);
-                    if (is(prevPrevElement, PerlTypes.PACKAGE)) {
+                if (prevElement.is(PerlTypes.POINTER)) {
+                    PerlElement prevPrevElement = prevElement.previous();
+                    if (prevPrevElement.is(PerlTypes.PACKAGE)) {
                         //get all subs of package if we are on a package's pointer
                         addAllSubsInPackage(resultSet, prevPrevElement, true, parameters.isAutoPopup());
-                    } else if (is(prevPrevElement, PerlTypes.VARIABLE)) {
+                    } else if (prevPrevElement.is(PerlTypes.VARIABLE)) {
                         //get all subs of current package if we are on an variable pointer
                         addAllSubsInFile(parameters, resultSet, parameters.isAutoPopup());
                     }
-                } else if (is(prevElement, PerlTypes.WHITESPACE)) {
+                } else if (prevElement.is(PerlTypes.WHITESPACE)) {
                     addAllSubsInFile(parameters, resultSet, parameters.isAutoPopup());
                 }
                 //ya, i know this is crappy - temporary fix
@@ -187,40 +254,10 @@ public class PerlCompletionContributor extends CompletionContributor {
         }
     }
 
-    //this is a temporary solution until we will have structured code blocks
-    private PsiElement prevSibling(PsiElement psiElement, int times) {
-        PsiElement result = psiElement;
-        if (result != null) {
-            for (int i = 0; i < times; i++) {
-                if (result.getPrevSibling() != null) {
-                    //get sibling
-                    result = result.getPrevSibling();
-                    while (is(result, GeneratedParserUtilBase.DUMMY_BLOCK)) {
-                        result = result.getLastChild();
-                    }
-                } else if (result.getParent() != null && result.getParent().getPrevSibling() != null) {
-                    //get sibling from previous parent
-                    result = result.getParent().getPrevSibling();
-                    while (is(result, GeneratedParserUtilBase.DUMMY_BLOCK)) {
-                        result = result.getLastChild();
-                    }
-                } else {
-                    //we have no sibling - no point to continue
-                    return null;
-                }
-            }
-        }
-        return result;
-    }
-
-    private boolean is(PsiElement element, IElementType perlType) {
-        return element != null && element.getNode().getElementType().equals(perlType);
-    }
-
     //==================
     //add cached methods
     //==================
-    private void addAllPackages(CompletionResultSet resultSet, PsiElement element, boolean limitResults) {
+    private void addAllPackages(CompletionResultSet resultSet, PerlElement element, boolean limitResults) {
         ArrayList<Package> packageList = ModulesContainer.searchPackageList(element.getText(), false);
 
         for (int i = 0; i < packageList.size(); i++) {
@@ -228,7 +265,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         }
     }
 
-    private void addAllSubsInPackage(CompletionResultSet resultSet, PsiElement packageName, boolean withArguments, boolean limitResults) {
+    private void addAllSubsInPackage(CompletionResultSet resultSet, PerlElement packageName, boolean withArguments, boolean limitResults) {
         ArrayList<Package> packageList = ModulesContainer.getPackageList(packageName.getText());
 
         if (Utils.verbose) {
