@@ -33,6 +33,9 @@ public class PerlNavigationItem implements NavigationItem{
     @Override
     public ItemPresentation getPresentation() {
         VirtualFile vFile = ModulesContainer.getVirtualFileFromPath(project, path);
+        if(vFile == null){
+            return null;
+        }
         return PsiManager.getInstance(project).findFile(vFile).getPresentation();
     }
 
