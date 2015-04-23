@@ -260,30 +260,10 @@ public class ModulesContainer {
     }
 
     public static VirtualFile getVirtualFileFromPath(Project project, String filePath) {
-        File file = new File(filePath);
-        VirtualFile vFile = project.getBaseDir();
-        VirtualFile result = vFile;
-
-        File temp = file;
-        boolean first = true;
-        while (true) {
-            if (result.findChild(temp.getName()) == null) {
-                first = false;
-                temp = temp.getParentFile();
-                if (temp == null) {
-                    //couldn't find file
-                    return null;
-                }
-            } else {
-                result = result.findChild(temp.getName());
-                if (first) {
-                    //file found
-                    return result;
-                } else {
-                    temp = file;
-                }
-                first = true;
-            }
+        String projectPath = project.getBaseDir().getPath();
+        if (filePath.startsWith(projectPath)) {
+            filePath = filePath.substring(projectPath.length() + 1);
         }
+        return project.getBaseDir().findFileByRelativePath(filePath);
     }
 }

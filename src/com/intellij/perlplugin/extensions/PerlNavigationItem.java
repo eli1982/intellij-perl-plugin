@@ -6,7 +6,6 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.perlplugin.ModulesContainer;
-import com.intellij.perlplugin.bo.Package;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +32,7 @@ public class PerlNavigationItem implements NavigationItem{
     @Override
     public ItemPresentation getPresentation() {
         VirtualFile vFile = ModulesContainer.getVirtualFileFromPath(project, path);
-        if(vFile == null){
+        if(vFile == null) {
             return null;
         }
         return PsiManager.getInstance(project).findFile(vFile).getPresentation();
