@@ -167,7 +167,7 @@ public class Package{
      */
     public String getFileName() {
         if(fileName == null){
-            String[] parts = getOriginFile().split(File.separator);
+            String[] parts = getOriginFile().split("/");
             fileName = parts[parts.length-1];
         }
         return fileName ;
