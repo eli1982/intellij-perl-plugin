@@ -6,6 +6,8 @@ import javax.swing.*;
 
 public class PerlIcons {
     public static final Icon LANGUAGE = IconLoader.getIcon("/com/intellij/perlplugin/resources/icons/icon_16x16.png");
+    public static final Icon LANGUAGE_32 = IconLoader.getIcon("/com/intellij/perlplugin/resources/icons/icon_32x32.png");
+    public static final Icon LANGUAGE_256 = IconLoader.getIcon("/com/intellij/perlplugin/resources/icons/icon_256x256.png");
     public static final Icon PACKAGE = IconLoader.getIcon("/com/intellij/perlplugin/resources/icons/package_16x16.png");
     public static final Icon SUBROUTINE = IconLoader.getIcon("/com/intellij/perlplugin/resources/icons/subroutine_16x16.png");
     public static final Icon CONSTRUCTOR = IconLoader.getIcon("/com/intellij/perlplugin/resources/icons/subroutine_16x16.png");
