@@ -1,4 +1,4 @@
-package com.intellij.perlplugin.extensions;
+package com.intellij.perlplugin.extensions.navigation;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
@@ -12,12 +12,12 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by ELI-HOME on 01-Mar-15.
  */
-public class PerlNavigationItem implements NavigationItem{
+abstract class PerlFileNavigationItem implements NavigationItem {
 
-    private final Project project;
-    private final String path;
+    protected final Project project;
+    protected final String path;
 
-    public PerlNavigationItem(Project project, String path) {
+    public PerlFileNavigationItem(Project project, String path) {
         this.project = project;
         this.path = path;
     }
@@ -26,16 +26,6 @@ public class PerlNavigationItem implements NavigationItem{
     @Override
     public String getName() {
         return path;
-    }
-
-    @Nullable
-    @Override
-    public ItemPresentation getPresentation() {
-        VirtualFile vFile = ModulesContainer.getVirtualFileFromPath(project, path);
-        if(vFile == null) {
-            return null;
-        }
-        return PsiManager.getInstance(project).findFile(vFile).getPresentation();
     }
 
     @Override

@@ -1,10 +1,11 @@
-package com.intellij.perlplugin.extensions;
+package com.intellij.perlplugin.extensions.contributors;
 
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.perlplugin.ModulesContainer;
 import com.intellij.perlplugin.bo.Package;
+import com.intellij.perlplugin.extensions.navigation.PerlGoToClassFileNavigationItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -33,12 +34,12 @@ public class PerlFileChooseByNameContributor implements ChooseByNameContributor 
 
     @NotNull
     @Override
-    public NavigationItem[] getItemsByName(String s, String s1, Project project, boolean b) {
-        ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(s);
+    public NavigationItem[] getItemsByName(String filePath, String searchTerm, Project project, boolean b) {
+        ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(filePath);
         NavigationItem[] navigationItems;
         if(packages.size() > 0){
             navigationItems = new NavigationItem[1];
-            navigationItems[0] = new PerlNavigationItem(project,packages.get(0).getOriginFile());
+            navigationItems[0] = new PerlGoToClassFileNavigationItem(project,packages.get(0).getOriginFile());
         }else{
             return new NavigationItem[0];
         }

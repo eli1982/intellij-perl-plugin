@@ -31,7 +31,8 @@
         <completion.contributor language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlCompletionContributor"/>
         <lang.commenter language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlCommenter"/>
         <lang.formatter language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlFormattingModelBuilder"/>
-        <gotoClassContributor implementation="com.intellij.perlplugin.extensions.PerlFileChooseByNameContributor"/>
+        <gotoSymbolContributor implementation="com.intellij.perlplugin.extensions.contributors.PerlFileChooseByNameContributor"/>
+        <gotoClassContributor implementation="com.intellij.perlplugin.extensions.contributors.PerlGoToClassContributor" />
     </extensions>
 
     <application-components>
