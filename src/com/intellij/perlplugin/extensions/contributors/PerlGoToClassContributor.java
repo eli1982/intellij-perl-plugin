@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 
@@ -118,7 +119,7 @@ public class PerlGoToClassContributor implements ChooseByNameContributor, GotoCl
     @Override
     public NavigationItem[] getItemsByName(String packageName, String searchTerm, Project project, boolean b) {
         ArrayList<Package> packages = ModulesContainer.getPackageList(packageName);
-        packages.sort(new PackageScoreComparator());
+        Collections.sort(packages,new PackageScoreComparator());
         NavigationItem[] navigationItems = new NavigationItem[packages.size()];
         for (int i = 0; i < packages.size(); i++) {
             navigationItems[i] = new PackageNameNavigationItem(project, packages.get(i));
