@@ -311,7 +311,7 @@ public class PerlCompletionContributor extends CompletionContributor {
 
     private static LookupElement getSubLookupElementBuilder(Sub sub, boolean withArguments) {
         String text = (withArguments) ? sub.toString2(ConfigurationHolder.isHideFirstSelfArgument) : sub.getName();
-        String containingPackage = sub.getPackageObj().getPackageName();
+        String containingPackage = sub.getPackageObj().getPackageName() + "(" + sub.getPackageObj().getFileName() + ")";
         return LookupElementBuilder.create(text).withIcon(PerlIcons.SUBROUTINE).withPresentableText(text).withTypeText(containingPackage, true);
     }
 

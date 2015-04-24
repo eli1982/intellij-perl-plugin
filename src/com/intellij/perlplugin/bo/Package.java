@@ -2,6 +2,7 @@ package com.intellij.perlplugin.bo;
 
 import com.intellij.perlplugin.ModulesContainer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -18,6 +19,7 @@ public class Package{
     private ArrayList<Sub> subs = new ArrayList<Sub>();
     private ArrayList<ImportedPackage> importedPackages = new ArrayList<ImportedPackage>();
     private ArrayList<ImportedSub> importedSubs = new ArrayList<ImportedSub>();
+    private String fileName;
 
     public Package(String originFile, String packageName) {
         this.originFile = originFile;
@@ -147,5 +149,17 @@ public class Package{
             }
         }
         return null;
+    }
+
+    /**
+     *
+     * @return only the file name and extensions without the full path
+     */
+    public String getFileName() {
+        if(fileName == null){
+            String[] parts = getOriginFile().split(File.separator);
+            fileName = parts[parts.length-1];
+        }
+        return fileName ;
     }
 }
