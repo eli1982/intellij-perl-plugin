@@ -28,10 +28,10 @@ public class ModulesContainer {
     //PACKAGES
 
     public static void addPackage(Package packageObj) {
-        if (!packageNamesToPackages.containsKey(packageObj.getPackageName())) {
-            packageNamesToPackages.put(packageObj.getPackageName(), new ArrayList<Package>());
+        if (!packageNamesToPackages.containsKey(packageObj.getQualifiedName())) {
+            packageNamesToPackages.put(packageObj.getQualifiedName(), new ArrayList<Package>());
         }
-        packageNamesToPackages.get(packageObj.getPackageName()).add(packageObj);
+        packageNamesToPackages.get(packageObj.getQualifiedName()).add(packageObj);
 
         if (!filePathsToPackages.containsKey(packageObj.getOriginFile())) {
             filePathsToPackages.put(packageObj.getOriginFile(), new ArrayList<Package>());
@@ -191,7 +191,7 @@ public class ModulesContainer {
                 HashSet<Package> children = packageObj.getChildren();
                 for (Package child : children) {
                     if (Utils.verbose) {
-                        Utils.print("removing: " + packageObj.getPackageName() + " from child:" + child.getPackageName());
+                        Utils.print("removing: " + packageObj.getQualifiedName() + " from child:" + child.getQualifiedName());
                     }
                     child.setParentPackage(null);
                 }
@@ -200,17 +200,17 @@ public class ModulesContainer {
                 //remove package from it's parent
                 if (parentPackage == null) {
                     if (Utils.verbose) {
-                        Utils.print("no parent to remove for package: " + packageObj.getPackageName());
+                        Utils.print("no parent to remove for package: " + packageObj.getQualifiedName());
                     }
                 } else {
                     if (Utils.verbose) {
-                        Utils.print("removing: " + packageObj.getPackageName() + " from parent:" + packageObj.getParentPackage().getPackageName());
+                        Utils.print("removing: " + packageObj.getQualifiedName() + " from parent:" + packageObj.getParentPackage().getQualifiedName());
                     }
                     packageObj.getParentPackage().removeChild(packageObj);
                 }
 
                 //remove package from remaining cache - make sure file path matches
-                ArrayList<Package> cachedPackages = packageNamesToPackages.get(packageObj.getPackageName());
+                ArrayList<Package> cachedPackages = packageNamesToPackages.get(packageObj.getQualifiedName());
                 for (int j = 0; j < cachedPackages.size(); j++) {
                     if (cachedPackages.get(j).getOriginFile().equals(packageObj.getOriginFile())) {
                         cachedPackages.remove(cachedPackages.get(j));
@@ -244,7 +244,7 @@ public class ModulesContainer {
                 //set parent package for all inheriting children
                 ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(path);
                 for (Package packageObj : packages) {
-                    HashSet<String> children = parentsToChildrenPackageNames.get(packageObj.getPackageName());
+                    HashSet<String> children = parentsToChildrenPackageNames.get(packageObj.getQualifiedName());
                     if (children != null) {
                         for (String child : children) {
                             ArrayList<Package> childPackages = packageNamesToPackages.get(child);

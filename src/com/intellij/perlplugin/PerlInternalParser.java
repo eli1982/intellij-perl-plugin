@@ -153,7 +153,7 @@ public class PerlInternalParser {
                 child.setParentPackage(parentPackageObj.get(0));//TODO: we don't handle case where we have several packages of the same name, maybe solve this by matching paths?
             } else {
                 if (Utils.debug) {
-                    Utils.print("warning: the package '" + pendingParentPackage.getChildPackage().getPackageName() + "' is directing to the parent package '" + pendingParentPackage.getParentPackage() + "' that doesn't exist!");
+                    Utils.print("warning: the package '" + pendingParentPackage.getChildPackage().getQualifiedName() + "' is directing to the parent package '" + pendingParentPackage.getParentPackage() + "' that doesn't exist!");
                 }
                 errorsCount++;
             }
@@ -292,7 +292,7 @@ public class PerlInternalParser {
      * @param packageParent
      */
     private static void addPendingPackageParent(Package packageObj, String packageParent) {
-        ModulesContainer.addParentChild(packageParent, packageObj.getPackageName());
+        ModulesContainer.addParentChild(packageParent, packageObj.getQualifiedName());
         if (packageParent != null) {
             ArrayList<Package> possiblePackages = ModulesContainer.getPackageList(packageParent);
             if (possiblePackages.size() > 0) {
@@ -363,7 +363,7 @@ public class PerlInternalParser {
                     Utils.print("performance[persub]:" + result);
                 }
                 if (result > PROBLEMATIC_FILE_TIME_THRESHOLD) {
-                    ModulesContainer.addProblematicFiles(packageObj.getPackageName() + ">>>>" + sub.getName() + "(" + result + ")");
+                    ModulesContainer.addProblematicFiles(packageObj.getQualifiedName() + ">>>>" + sub.getName() + "(" + result + ")");
                 }
             }
         } catch (StackOverflowError e) {

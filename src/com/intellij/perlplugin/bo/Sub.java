@@ -51,7 +51,7 @@ public class Sub {
     public String toString() {
         return "Sub{" + "\n" +
                 "   subName='" + subName + '\'' + ",\n" +
-                "   packageObj='" + packageObj.getPackageName() + '\'' + ",\n" +
+                "   packageObj='" + packageObj.getQualifiedName() + '\'' + ",\n" +
                 "   positionInFile='" + positionInFile + '\'' + ",\n" +
                 "   arguments=" + arguments + "\n" +
                 '}';

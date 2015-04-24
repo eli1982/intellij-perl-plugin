@@ -10,8 +10,9 @@ import java.util.HashSet;
  * Created by eli on 28-11-14.
  */
 public class Package{
+    public static final String PACKAGE_SEPARATOR = "::";
     private String originFile;
-    private String packageName;
+    private String qualifiedName;
     private int startPositionInFile;
     private int endPositionInFile;
     private Package parentPackage;
@@ -21,15 +22,15 @@ public class Package{
     private ArrayList<ImportedSub> importedSubs = new ArrayList<ImportedSub>();
     private String fileName;
 
-    public Package(String originFile, String packageName) {
+    public Package(String originFile, String qualifiedName) {
         this.originFile = originFile;
-        this.packageName = packageName;
+        this.qualifiedName = qualifiedName;
         ModulesContainer.addPackage(this);
 
     }
 
-    public Package(String packageName) {
-        this.packageName = packageName;
+    public Package(String qualifiedName) {
+        this.qualifiedName = qualifiedName;
     }
 
     public String getOriginFile() {
@@ -40,12 +41,21 @@ public class Package{
         this.originFile = originFile;
     }
 
-    public String getPackageName() {
-        return packageName;
+    public String getQualifiedName() {
+        return qualifiedName;
     }
 
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
+    public void setQualifiedName(String packageName) {
+        this.qualifiedName = packageName;
+    }
+
+    private String[] segments() {
+        return qualifiedName.split(PACKAGE_SEPARATOR);
+    }
+
+    public String getSimpleName() {
+        String[] segments = segments();
+        return segments[segments.length - 1];
     }
 
     public Package getParentPackage() {
@@ -123,8 +133,8 @@ public class Package{
                 "   originFile='" + originFile + '\'' + ",\n" +
                 "   startPositionInFile='" + startPositionInFile + '\'' + ",\n" +
                 "   endPositionInFile='" + endPositionInFile + '\'' + ",\n" +
-                "   packageName='" + packageName + '\'' + ",\n" +
-                "   parentPackage='" + ((parentPackage != null) ? parentPackage.getPackageName() : "''") + '\'' + ",\n" +
+                "   qualifiedName='" + qualifiedName + '\'' + ",\n" +
+                "   parentPackage='" + ((parentPackage != null) ? parentPackage.getQualifiedName() : "''") + '\'' + ",\n" +
                 "   importedPackages=" + importedPackages + "\n" +
                 "   subs=" + subs + "\n" +
                 '}';
@@ -161,5 +171,14 @@ public class Package{
             fileName = parts[parts.length-1];
         }
         return fileName ;
+    }
+
+    /* is this file potentially a main implementation of this package?
+        for now we assume that main implementation resides in a file whose name is the same as package name.
+         otherwise it is probably mixin
+     */
+    public boolean isPotentialMainImplementation() {
+        String packageName = getSimpleName();
+        return getFileName().toLowerCase().startsWith(packageName.toLowerCase() + ".");
     }
 }

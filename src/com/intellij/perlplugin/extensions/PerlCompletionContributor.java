@@ -256,7 +256,7 @@ public class PerlCompletionContributor extends CompletionContributor {
     private static void addCachedPackage(CompletionResultSet resultSet, Package packageObj) {
         if (packageObj != null && !packagesCache.containsKey(packageObj)) {
             if (Utils.verbose) {
-                Utils.print("cache package: " + packageObj.getPackageName());
+                Utils.print("cache package: " + packageObj.getQualifiedName());
             }
             packagesCache.put(packageObj, getPackageLookupElementBuilder(packageObj));
         }
@@ -268,7 +268,7 @@ public class PerlCompletionContributor extends CompletionContributor {
     private static void addCachedSub(CompletionResultSet resultSet, Sub sub) {
         if (sub != null && !subsCache.containsKey(sub)) {
             if (Utils.verbose) {
-                Utils.print("cache sub: " + sub.getName() + " , containingPackage:" + sub.getPackageObj().getPackageName());
+                Utils.print("cache sub: " + sub.getName() + " , containingPackage:" + sub.getPackageObj().getQualifiedName());
             }
             subsCache.put(sub, getSubLookupElementBuilder(sub, true));
 
@@ -281,7 +281,7 @@ public class PerlCompletionContributor extends CompletionContributor {
     private static void addCachedSubNoArgs(CompletionResultSet resultSet, Sub sub) {
         if (!subsCacheNoArgs.containsKey(sub)) {
             if (Utils.verbose) {
-                Utils.print("cache sub(no args): " + sub.getName() + " , containingPackage:" + sub.getPackageObj().getPackageName());
+                Utils.print("cache sub(no args): " + sub.getName() + " , containingPackage:" + sub.getPackageObj().getQualifiedName());
             }
             subsCacheNoArgs.put(sub, getSubLookupElementBuilder(sub, false));
         }
@@ -305,13 +305,13 @@ public class PerlCompletionContributor extends CompletionContributor {
 
     //get lookup elements methods
     private static LookupElement getPackageLookupElementBuilder(Package packageObj) {
-        String text = packageObj.getPackageName();
+        String text = packageObj.getQualifiedName();
         return LookupElementBuilder.create(text).withIcon(PerlIcons.PACKAGE).withTypeText("Package", true);
     }
 
     private static LookupElement getSubLookupElementBuilder(Sub sub, boolean withArguments) {
         String text = (withArguments) ? sub.toString2(ConfigurationHolder.isHideFirstSelfArgument) : sub.getName();
-        String containingPackage = sub.getPackageObj().getPackageName() + "(" + sub.getPackageObj().getFileName() + ")";
+        String containingPackage = sub.getPackageObj().getQualifiedName() + "(" + sub.getPackageObj().getFileName() + ")";
         return LookupElementBuilder.create(text).withIcon(PerlIcons.SUBROUTINE).withPresentableText(text).withTypeText(containingPackage, true);
     }
 
