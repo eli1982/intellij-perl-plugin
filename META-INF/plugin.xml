@@ -25,7 +25,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="com.intellij.perlplugin.extensions.PerlFileTypeFactory"/>
         <lang.parserDefinition language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlParserDefinition"/>
-        <lang.syntaxHighlighterFactory key="Simple" implementationClass="com.intellij.perlplugin.extensions.PerlSyntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory key="Simple" implementationClass="com.intellij.perlplugin.extensions.syntax.highlighting.PerlSyntaxHighlighterFactory"/>
         <codeInsight.lineMarkerProvider language="Perl" implementationClass="com.intellij.perlplugin.extensions.PropertyLineMarkerProvider"/>
         <psi.referenceContributor implementation="com.intellij.perlplugin.extensions.PropertyReferenceContributor"/>
         <completion.contributor language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlCompletionContributor"/>
@@ -33,6 +33,7 @@
         <lang.formatter language="Perl" implementationClass="com.intellij.perlplugin.extensions.PerlFormattingModelBuilder"/>
         <gotoSymbolContributor implementation="com.intellij.perlplugin.extensions.contributors.PerlFileChooseByNameContributor"/>
         <gotoClassContributor implementation="com.intellij.perlplugin.extensions.contributors.PerlGoToClassContributor" />
+        <moduleBuilder builderClass="com.intellij.perlplugin.extensions.module.builder.PerlModuleBuilder"/>
     </extensions>
 
     <application-components>
