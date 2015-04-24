@@ -1,4 +1,4 @@
-package com.intellij.perlplugin.extensions;
+package com.intellij.perlplugin.extensions.syntax.highlighting;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;

@@ -3,8 +3,8 @@ package com.intellij.perlplugin.language;
 import com.intellij.lang.Language;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory;
-import com.intellij.perlplugin.extensions.PerlSyntaxHighlighter;
-import com.intellij.perlplugin.extensions.PerlSyntaxHighlighterFactory;
+import com.intellij.perlplugin.extensions.syntax.highlighting.PerlSyntaxHighlighter;
+import com.intellij.perlplugin.extensions.syntax.highlighting.PerlSyntaxHighlighterFactory;
 import org.jetbrains.annotations.NotNull;
 
 /**
