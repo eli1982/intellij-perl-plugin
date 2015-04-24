@@ -60,11 +60,11 @@ public class PerlCompletionContributor extends CompletionContributor {
             }
 
             if (maybeBrace.is(PerlTypes.BRACES)) { //after going back check once more if it is brace already
-                PerlElement tmp = maybeBrace.previous();
+                PerlElement tmp = maybeBrace.previousIgnoringWhitespace();
                 if (tmp.is(PerlTypes.LANG_SYNTAX) && tmp.getText().equals("qw")) {
-                    PerlElement potentialPackage = tmp.previousIgnoring(PerlTypes.WHITESPACE);
+                    PerlElement potentialPackage = tmp.previousIgnoringWhitespace();
                     if (potentialPackage.is(PerlTypes.PACKAGE)) {
-                        tmp = potentialPackage.previousIgnoring(PerlTypes.WHITESPACE);
+                        tmp = potentialPackage.previousIgnoringWhitespace();
                         if (tmp.is(PerlTypes.LANG_FUNCTION) && tmp.getText().equals("use")) {
                             addAllSubsInPackage(resultSet, potentialPackage, false, parameters.isAutoPopup());
                             return true;

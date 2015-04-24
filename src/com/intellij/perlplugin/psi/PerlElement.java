@@ -43,6 +43,9 @@ public class PerlElement {
         }
         return previousPerlElement;
     }
+    public PerlElement previousIgnoringWhitespace() {
+        return previousIgnoring(PerlTypes.WHITESPACE);
+    }
     public PerlElement previousIgnoring(IElementType... ignoredElements) {
         PerlElement previous = previous();
         while (previous.isAny(ignoredElements)) {
