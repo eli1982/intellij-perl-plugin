@@ -18,7 +18,6 @@ public class MainModuleComponent implements ModuleComponent {
     }
 
     public void initComponent() {
-        PerlInternalParser.start(module.getProject());
     }
 
     public void disposeComponent() {
@@ -43,5 +42,6 @@ public class MainModuleComponent implements ModuleComponent {
     public void moduleAdded() {
         // Invoked when the module corresponding to this component instance has been completely
         // loaded and added to the project.
+        PerlInternalParser.start(module.getProject());
     }
 }

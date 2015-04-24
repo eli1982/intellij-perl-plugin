@@ -45,7 +45,7 @@ public class PerlCompletionContributor extends CompletionContributor {
         CompletionProvider<CompletionParameters> handler = new CompletionProvider<CompletionParameters>() {
             public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
                 if (!ModulesContainer.isInitialized()) {
-                    Utils.alert("warning: perl parser was not initialized");
+                    return;
                 }
                 Editor editor = parameters.getEditor();
                 VirtualFile virtualFile = parameters.getOriginalFile().getVirtualFile();
