@@ -40,11 +40,47 @@ public class PerlCompletionContributor extends CompletionContributor {
     private static HashMap<Package, LookupElement> packagesCache = new HashMap<Package, LookupElement>();
     private static boolean updateFlipper = false;
 
+    /**
+     * this will try to autocomplete subroutines from package in block like this:
+     *  use PACKAGE qw(
+     *      sub1
+     *      sub2
+     *      ...
+     *  )
+     *
+     *  returns true if contributed some results, false otherwise
+     * @return
+     */
+    public boolean tryAutocompletePackageSubImportBlock(
+            PerlElement currentElement, @NotNull CompletionParameters parameters, @NotNull CompletionResultSet resultSet) {
+        if (currentElement.isAny(PerlTypes.WHITESPACE, PerlTypes.BRACES, PerlTypes.PROPERTY)) {
+            PerlElement maybeBrace = currentElement;
+            if (!maybeBrace.is(PerlTypes.BRACES)) { //if we are not already on brace go back permitting only vars and whitespace
+                maybeBrace = maybeBrace.previousIgnoring(PerlTypes.WHITESPACE, PerlTypes.VARIABLE, PerlTypes.PROPERTY);
+            }
+
+            if (maybeBrace.is(PerlTypes.BRACES)) { //after going back check once more if it is brace already
+                PerlElement tmp = maybeBrace.previous();
+                if (tmp.is(PerlTypes.LANG_SYNTAX) && tmp.getText().equals("qw")) {
+                    PerlElement potentialPackage = tmp.previousIgnoring(PerlTypes.WHITESPACE);
+                    if (potentialPackage.is(PerlTypes.PACKAGE)) {
+                        tmp = potentialPackage.previousIgnoring(PerlTypes.WHITESPACE);
+                        if (tmp.is(PerlTypes.LANG_FUNCTION) && tmp.getText().equals("use")) {
+                            addAllSubsInPackage(resultSet, potentialPackage, false, parameters.isAutoPopup());
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     public PerlCompletionContributor() {
         CompletionProvider<CompletionParameters> handler = new CompletionProvider<CompletionParameters>() {
             public void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet resultSet) {
                 if (!ModulesContainer.isInitialized()) {
+                    Utils.alert("warning: perl parser was not initialized");
                     return;
                 }
                 Editor editor = parameters.getEditor();
@@ -57,6 +93,10 @@ public class PerlCompletionContributor extends CompletionContributor {
                 PerlElement prevElement = currentElement.previous();
 
                 //current psiElement based
+                if (tryAutocompletePackageSubImportBlock(currentElement, parameters, resultSet)) {
+                    return;
+                }
+
                 if (currentElement.is(PerlTypes.PROPERTY)) {
                     addAllPackages(resultSet, currentElement, parameters.isAutoPopup());
                     if (currentElement.getTextLength() >= 2) {
@@ -64,31 +104,6 @@ public class PerlCompletionContributor extends CompletionContributor {
                     }
                 } else {
                     if (currentElement.is(PerlTypes.WHITESPACE) && !prevElement.is(PerlTypes.POINTER) || currentElement.is(PerlTypes.BRACES)) {
-                        //use package qw(...)
-                        PerlElement brace = prevElement;
-                        while (brace.isAny(PerlTypes.WHITESPACE, PerlTypes.VARIABLE, PerlTypes.PROPERTY)) {
-                            brace = brace.previous();
-                        }
-                        if (brace.is(PerlTypes.BRACES) && (brace.getText().equals("(") || brace.getText().equals(")"))) {
-                            PerlElement tmp = brace.previous();
-                            if (tmp.is(PerlTypes.LANG_SYNTAX) && tmp.getText().equals("qw")) {
-                                tmp = tmp.previous();
-                                if (tmp.is(PerlTypes.WHITESPACE)) {
-                                    PerlElement potentialPackage = tmp.previous();
-                                    if (potentialPackage.is(PerlTypes.PACKAGE)) {
-                                        tmp = potentialPackage.previous();
-                                        if (tmp.is(PerlTypes.WHITESPACE)) {
-                                            tmp = tmp.previous();
-                                            if (tmp.is(PerlTypes.LANG_FUNCTION) && tmp.getText().equals("use")) {
-                                                addAllSubsInPackage(resultSet, potentialPackage, false, parameters.isAutoPopup());
-                                                return;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
                         addAllSubsInFile(parameters, resultSet, parameters.isAutoPopup());
                         addAllVariablesInFile(parameters, resultSet, parameters.isAutoPopup());
                     } else if (currentElement.isAny(PerlTypes.VARIABLE, PerlTypes.VALUE, PerlTypes.PREDICATE, PerlTypes.BRACES, PerlTypes.LANG_SYNTAX)) {

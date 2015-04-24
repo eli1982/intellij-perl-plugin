@@ -2,8 +2,10 @@ package com.intellij.perlplugin.psi;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
+import com.intellij.perlplugin.Utils;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 
 /**
  * Created by msakowski on 23/04/15.
@@ -41,6 +43,13 @@ public class PerlElement {
         }
         return previousPerlElement;
     }
+    public PerlElement previousIgnoring(IElementType... ignoredElements) {
+        PerlElement previous = previous();
+        while (previous.isAny(ignoredElements)) {
+            previous = previous.previous();
+        }
+        return previous;
+    }
     public int getTextLength() {
         return psiElement != null ? psiElement.getTextLength() : 0;
     }
@@ -48,25 +57,30 @@ public class PerlElement {
         return psiElement != null ? psiElement.getText() : null;
     }
     private PsiElement getPreviousPsiElement() {
-        PsiElement result = psiElement;
-        if (result != null) {
-            if (result.getPrevSibling() != null) {
+        if (psiElement != null) {
+            if (psiElement.getPrevSibling() != null) {
                 //get sibling
-                result = result.getPrevSibling();
-                while (is(result, GeneratedParserUtilBase.DUMMY_BLOCK)) {
-                    result = result.getLastChild();
-                }
-            } else if (result.getParent() != null && result.getParent().getPrevSibling() != null) {
-                //get sibling from previous parent
-                result = result.getParent().getPrevSibling();
-                while (is(result, GeneratedParserUtilBase.DUMMY_BLOCK)) {
-                    result = result.getLastChild();
-                }
+                return PsiTreeUtil.getDeepestLast(psiElement.getPrevSibling());
             } else {
-                //we have no sibling - no point to continue
-                return null;
+                PsiElement parent = psiElement.getParent();
+                while (parent != null && parent.getPrevSibling() == null) {
+                    parent = parent.getParent();
+                }
+                if (parent == null) { //we got to top of block tree and none of the block had siblings thus there is no
+                        //previous element as current is the first one
+                    return null; //no previous element
+                } else {
+                    return PsiTreeUtil.getDeepestLast(parent.getPrevSibling());
+                }
             }
+        } else {
+            Utils.alert("warning: call to getPreviousPsiElement on null element");
+            return null;
         }
-        return result;
+    }
+
+    @Override
+    public String toString() {
+        return psiElement + " -> " + psiElement.getText();
     }
 }
