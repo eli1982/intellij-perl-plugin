@@ -154,7 +154,7 @@ public class PerlModuleBuilder extends ModuleBuilder implements SourcePathsBuild
     }
 
     public ModuleType getModuleType() {
-        return ModuleType.EMPTY;
+        return PerlModuleType.getModuleType();
     }
 
     public boolean isSuitableSdkType(SdkTypeId sdkType) {
@@ -166,7 +166,7 @@ public class PerlModuleBuilder extends ModuleBuilder implements SourcePathsBuild
         if (settingsStep == null) {
             throw new IllegalArgumentException(String.format("Argument for @NotNull parameter '%s' of %s.%s must not be null", new Object[]{"settingsStep", "com/intellij/perlplugin/extensions/module/builder", "modifySettingsStep"}));
         }
-        return ModuleType.EMPTY.modifySettingsStep(settingsStep, this);
+        return PerlModuleType.getModuleType().modifySettingsStep(settingsStep, this);
     }
 
     private static String getUrlByPath(String path) {
