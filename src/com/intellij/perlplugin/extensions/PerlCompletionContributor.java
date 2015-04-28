@@ -181,17 +181,19 @@ public class PerlCompletionContributor extends CompletionContributor {
     }
 
     public static void cacheSingleFile(Project project, VirtualFile openFile) {
-        //cache attributes
-        HashSet<String> rs = findAllVariables(PsiManager.getInstance(project).findFile(openFile).getNode().getChildren(null), PerlTypes.VARIABLE, false);
-        for (String str : rs) {
-            addCachedVariables(null, str);
-        }
-        //cache subs
-        ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(openFile.getPath());
-        for (int i = 0; i < packages.size(); i++) {
-            ArrayList<Sub> subs = packages.get(i).getAllSubs();
-            for (int j = 0; j < subs.size(); j++) {
-                addCachedSub(null, subs.get(j));
+        if(openFile.exists()) {
+            //cache attributes
+            HashSet<String> rs = findAllVariables(PsiManager.getInstance(project).findFile(openFile).getNode().getChildren(null), PerlTypes.VARIABLE, false);
+            for (String str : rs) {
+                addCachedVariables(null, str);
+            }
+            //cache subs
+            ArrayList<Package> packages = ModulesContainer.getPackageListFromFile(openFile.getPath());
+            for (int i = 0; i < packages.size(); i++) {
+                ArrayList<Sub> subs = packages.get(i).getAllSubs();
+                for (int j = 0; j < subs.size(); j++) {
+                    addCachedSub(null, subs.get(j));
+                }
             }
         }
     }
