@@ -1,6 +1,7 @@
 package com.intellij.perlplugin;
 
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -11,6 +12,7 @@ import com.intellij.perlplugin.bo.*;
 import com.intellij.perlplugin.bo.Package;
 import com.intellij.perlplugin.components.FileEditorManagerListenerEX;
 import com.intellij.perlplugin.extensions.PerlCompletionContributor;
+import com.intellij.perlplugin.extensions.module.builder.PerlModuleType;
 import com.intellij.perlplugin.filters.FileFilter;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,45 +31,55 @@ public class PerlInternalParser {
     private static double totalFileCount = 0;
     private static Project project;
 
-    public static void start(Project project) {
-        PerlInternalParser.project = project;
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Caching Perl Modules",true) {
-            public void run(@NotNull ProgressIndicator progressIndicator) {
-                try {
-                    if (Utils.debug) {
-                        Utils.print("parsing started");
+    public static void start(Module module) {
+        project = module.getProject();
+
+        if (isValidModuleType(module)) {
+            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Caching Perl Modules", true) {
+                public void run(@NotNull ProgressIndicator progressIndicator) {
+                    try {
+                        if (Utils.debug) {
+                            Utils.print("parsing started");
+                        }
+                        long start = System.currentTimeMillis();
+                        PerlInternalParser.parseAllSources(progressIndicator);
+                        long end = System.currentTimeMillis();
+
+                        if (Utils.debug) {
+                            Utils.print("update completed in " + ((end - start) / 1000) + "sec");
+                        }
+                    } finally {
                     }
-                    long start = System.currentTimeMillis();
-                    PerlInternalParser.parseAllSources(progressIndicator);
-                    long end = System.currentTimeMillis();
 
+                    //attach file editor listener
+                    project.getMessageBus().connect(project).subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListenerEX(project));
+                    progressIndicator.stop();
+                }
+
+                @Override
+                public void onSuccess() {
+                    super.onSuccess();
+                    PerlCompletionContributor.initialize();
+                }
+
+                @Override
+                public void onCancel() {
                     if (Utils.debug) {
-                        Utils.print("update completed in " + ((end - start) / 1000) + "sec");
+                        Utils.print("Caching Canceled");
                     }
-                } finally {
+                    clear();
+                    super.onCancel();
                 }
-                progressIndicator.stop();
+            });
+        }
 
-                //attach file editor listener
-                PerlInternalParser.project.getMessageBus().connect(PerlInternalParser.project).subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListenerEX(PerlInternalParser.project));
-            }
+    }
 
-            @Override
-            public void onSuccess() {
-                super.onSuccess();
-                PerlCompletionContributor.initialize();
-            }
-
-            @Override
-            public void onCancel() {
-                if(Utils.debug){
-                    Utils.print("Caching Canceled");
-                }
-                clear();
-                super.onCancel();
-            }
-        });
-
+    private static boolean isValidModuleType(Module module) {
+        if (module != null && module.getOptionValue("type").equals(PerlModuleType.MODULE_TYPE)) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -103,7 +115,7 @@ public class PerlInternalParser {
     //==========================
 
     private static void firstPass(ProgressIndicator progressIndicator) {
-        VirtualFile[] sourceFolders = ProjectRootManager.getInstance(PerlInternalParser.project).getContentSourceRoots();
+        VirtualFile[] sourceFolders = ProjectRootManager.getInstance(project).getContentSourceRoots();
         if (sourceFolders.length == 0) {
             Utils.alert("No source folders found. please go to > Project Structure > Modules > Sources and add your source folders");
         }
@@ -203,8 +215,8 @@ public class PerlInternalParser {
         if (fileContent == null) {
             fileContent = Utils.readFile(filePath);
             int eof = fileContent.indexOf("__END__");
-            if(eof != -1){
-                fileContent = fileContent.substring(0,eof);
+            if (eof != -1) {
+                fileContent = fileContent.substring(0, eof);
             }
         }
 

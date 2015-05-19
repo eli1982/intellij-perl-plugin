@@ -5,7 +5,6 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.JavaSdkType;
 import com.intellij.openapi.projectRoots.SdkTypeId;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ContentEntry;
@@ -116,7 +115,7 @@ public class PerlModuleBuilder extends ModuleBuilder implements SourcePathsBuild
 
     @Nullable
     public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
-        PerlIntroWizardStep step = new PerlIntroWizardStep();
+        PerlProjectWizardStep step = new PerlProjectWizardStep(context);
         Disposer.register(parentDisposable, step);
         return step;
     }
@@ -158,7 +157,7 @@ public class PerlModuleBuilder extends ModuleBuilder implements SourcePathsBuild
     }
 
     public boolean isSuitableSdkType(SdkTypeId sdkType) {
-        return sdkType instanceof JavaSdkType;//TODO: create sdk type - based on SimpleJavaSdkType.class
+        return sdkType instanceof PerlSdkType;
     }
 
     @Nullable

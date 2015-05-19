@@ -32,6 +32,7 @@
         <gotoSymbolContributor implementation="com.intellij.perlplugin.extensions.contributors.PerlFileChooseByNameContributor"/>
         <gotoClassContributor implementation="com.intellij.perlplugin.extensions.contributors.PerlGoToClassContributor" />
         <moduleBuilder builderClass="com.intellij.perlplugin.extensions.module.builder.PerlModuleBuilder"/>
+        <sdkType implementation="com.intellij.perlplugin.extensions.module.builder.PerlSdkType"/>
     </extensions>
 
     <application-components>

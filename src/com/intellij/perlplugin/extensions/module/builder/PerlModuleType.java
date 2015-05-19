@@ -25,7 +25,7 @@ public class PerlModuleType extends ModuleType<PerlModuleBuilder> {
     public static final String PERL_GROUP = "Perl";
     public static final String BUILD_TOOLS_GROUP = "Build Tools";
     public static final String MOBILE_GROUP = "Mobile Perl";
-    private static final String MODULE_TYPE = "JAVA_MODULE";
+    public static final String MODULE_TYPE = "PERL_MODULE";
 
     public static ModuleType getModuleType() {
         return ModuleTypeManager.getInstance().findByID(MODULE_TYPE);
@@ -72,7 +72,7 @@ public class PerlModuleType extends ModuleType<PerlModuleBuilder> {
         return ProjectWizardStepFactory.getInstance().createJavaSettingsStep(settingsStep, moduleBuilder, new Condition() {
             @Override
             public boolean value(Object o) {
-                return false;
+                return true;
             }
 
             public boolean value(SdkTypeId sdkType) {
@@ -81,15 +81,11 @@ public class PerlModuleType extends ModuleType<PerlModuleBuilder> {
         });
     }
 
-    private static Icon getJavaModuleNodeIconClosed() {
-        return Nodes.Module;
-    }
-
     public boolean isValidSdk(@NotNull Module module, Sdk projectSdk) {
-        return isValidJavaSdk(module);//TODO::handle perl sdk
+        return true;//isValidJavaSdk(module);//TODO::handle perl sdk
     }
 
     public static boolean isValidJavaSdk(@NotNull Module module) {
-        return ModuleRootManager.getInstance(module).getSourceRoots(JavaModuleSourceRootTypes.SOURCES).isEmpty()?true:JavaPsiFacade.getInstance(module.getProject()).findClass("java.lang.Object", module.getModuleWithLibrariesScope()) != null;//TODO::handle as perl
+        return true;// ModuleRootManager.getInstance(module).getSourceRoots(JavaModuleSourceRootTypes.SOURCES).isEmpty()?true:JavaPsiFacade.getInstance(module.getProject()).findClass("java.lang.Object", module.getModuleWithLibrariesScope()) != null;//TODO::handle as perl
     }
 }
