@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.FileASTNode;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -20,6 +21,7 @@ import com.intellij.perlplugin.language.PerlIcons;
 import com.intellij.perlplugin.language.PerlLanguage;
 import com.intellij.perlplugin.psi.PerlElement;
 import com.intellij.perlplugin.psi.PerlTypes;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.ProcessingContext;
@@ -183,7 +185,14 @@ public class PerlCompletionContributor extends CompletionContributor {
     public static void cacheSingleFile(Project project, VirtualFile openFile) {
         if(openFile.exists()) {
             //cache attributes
-            HashSet<String> rs = findAllVariables(PsiManager.getInstance(project).findFile(openFile).getNode().getChildren(null), PerlTypes.VARIABLE, false);
+            PsiManager psiManager = PsiManager.getInstance(project);
+            if(psiManager == null) return;
+            PsiFile psiFile = psiManager.findFile(openFile);
+            if(psiFile == null) return;
+            FileASTNode astNode = psiFile.getNode();
+            if(astNode == null) return;
+            HashSet<String> rs = findAllVariables(astNode.getChildren(null), PerlTypes.VARIABLE, false);
+            if(rs == null) return;
             for (String str : rs) {
                 addCachedVariables(null, str);
             }
