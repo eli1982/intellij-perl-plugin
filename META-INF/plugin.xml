@@ -33,6 +33,7 @@
         <gotoClassContributor implementation="com.intellij.perlplugin.extensions.contributors.PerlGoToClassContributor" />
         <moduleBuilder builderClass="com.intellij.perlplugin.extensions.module.builder.PerlModuleBuilder"/>
         <sdkType implementation="com.intellij.perlplugin.extensions.module.builder.PerlSdkType"/>
+        <configurationType implementation="com.intellij.perlplugin.extensions.run.configuration.PerlConfigurationType"/>
     </extensions>
 
     <application-components>
@@ -51,6 +52,9 @@
         </action>
         <action id="newFileAction" class="com.intellij.perlplugin.actions.NewFileAction" text="Perl Script/Module" icon="/com/intellij/perlplugin/resources/icons/icon_16x16.png">
             <add-to-group group-id="NewGroup" anchor="first"/>
+        </action>
+        <action id="RunPerl" class="com.intellij.perlplugin.extensions.run.configuration.RunPerlAction" text="Run" icon="/com/intellij/perlplugin/resources/icons/icon_16x16.png">
+            <add-to-group group-id="RunContextGroup" anchor="first"/>
         </action>
     </actions>
 

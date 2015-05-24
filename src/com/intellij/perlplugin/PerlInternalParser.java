@@ -75,7 +75,7 @@ public class PerlInternalParser {
 
     }
 
-    private static boolean isValidModuleType(Module module) {
+    public static boolean isValidModuleType(Module module) {
         if (module != null && module.getOptionValue("type").equals(PerlModuleType.MODULE_TYPE)) {
             return true;
         }
