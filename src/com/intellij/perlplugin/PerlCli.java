@@ -15,14 +15,13 @@ import java.io.InputStreamReader;
 public class PerlCli {
 
     public static String runFile(final Project project, String filePath) {
-
         String result = "";
         try {
             String path = new File(filePath).getPath().replaceFirst("file:\\\\", "");
-            if(Utils.debug) {
+            if (Utils.debug) {
                 Utils.print("running: perl " + "\"" + path + "\"");
             }
-            String cmd = ((project == null) ? System.getenv("PERL_HOME") : getSdkHome(project)) + "\\bin\\perl";
+            String cmd = getPerlPath(project);
             String[] params = {cmd, "\"" + path + "\""};
 
             Process p = Runtime.getRuntime().exec(params);
@@ -44,8 +43,12 @@ public class PerlCli {
 
     private static String executeCode(Project project, String code) {
         String result = "";
+        if (project == null) {
+            Utils.alert("Missing project, cannot execute code");
+            return null;
+        }
         try {
-            String cmd = ((project == null) ? System.getenv("PERL_HOME") : getSdkHome(project)) + "\\bin\\perl";
+            String cmd = getPerlPath(project);
             String[] params = {cmd, "-e", code};
 
             Process p = Runtime.getRuntime().exec(params);
@@ -76,9 +79,45 @@ public class PerlCli {
 
     private static String getSdkHome(Project project) {
         Sdk sdk = ProjectRootManagerImpl.getInstance(project).getProjectSdk();
-        if(sdk == null){
-            return System.getenv("PERL_HOME");
+        if (sdk == null) {
+            return null;
         }
         return sdk.getHomePath();
+    }
+
+    /**
+     * @param project
+     * @return perl's executable file full path
+     */
+    public static String getPerlPath(Project project) {
+        String path = null;
+        if (project != null) {
+            Sdk sdk = ProjectRootManagerImpl.getInstance(project).getProjectSdk();
+            if (sdk != null) {
+                return getPerlPath(sdk.getHomePath());
+            }
+        }
+        return path;
+    }
+
+    public static String getPerlPath(String sdkHome) {
+        String path = null;
+        Utils.OSType os = Utils.getOperatingSystemType();
+        if (sdkHome == null) {
+            switch (os) {
+                case Linux:
+                    path = "/usr/";
+                case Windows:
+                case MacOS:
+                case Other:
+                    path = System.getenv("PERL_HOME");
+            }
+        } else {
+            path = sdkHome;
+        }
+        if (!path.endsWith("/") && !path.endsWith("\\")) {
+            path += "/";
+        }
+        return path + "/bin/perl";
     }
 }

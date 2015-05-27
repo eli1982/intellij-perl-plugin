@@ -8,6 +8,7 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.newvfs.impl.VirtualFileImpl;
 import com.intellij.perlplugin.PerlCli;
 import com.intellij.perlplugin.Utils;
@@ -20,10 +21,12 @@ import java.io.InputStreamReader;
  * Created by ELI-HOME on 22-May-15.
  */
 public class PerlRunProfileState implements RunProfileState {
+    private final Project project;
     private ExecutionEnvironment executionEnvironment;
 
     public PerlRunProfileState(ExecutionEnvironment executionEnvironment) {
         this.executionEnvironment = executionEnvironment;
+        this.project = executionEnvironment.getProject();
         String file = "";
         Object vFile = executionEnvironment.getDataContext().getData("virtualFile");
         if(vFile != null && vFile instanceof VirtualFileImpl && ((VirtualFileImpl) vFile).getExtension().equals("pl")) {
@@ -43,7 +46,7 @@ public class PerlRunProfileState implements RunProfileState {
     public ExecutionResult execute(Executor executor, ProgramRunner programRunner) throws ExecutionException {
         try {
 //            System.out.println("executor.getActionName():" + executor.getActionName());
-            String cmd =  System.getenv("PERL_HOME") + "\\bin\\perl";
+            String cmd =  PerlCli.getPerlPath(project);
             String[] params = {cmd ,"-e","'print 1;'"};
 
             Process p = Runtime.getRuntime().exec(params);

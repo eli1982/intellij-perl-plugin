@@ -1,6 +1,7 @@
 package com.intellij.perlplugin.extensions.module.builder;
 
 import com.intellij.openapi.projectRoots.*;
+import com.intellij.perlplugin.PerlCli;
 import com.intellij.perlplugin.Utils;
 import com.intellij.perlplugin.language.PerlIcons;
 import org.jdom.Element;
@@ -56,6 +57,9 @@ public class PerlSdkType extends SimpleJavaSdkType {
 
     @Override
     public String suggestHomePath() {
+        if(Utils.getOperatingSystemType().equals(Utils.OSType.Linux)){
+            return "/usr/bin/";
+        }
         return System.getenv("PERL_HOME");
     }
 
@@ -74,8 +78,7 @@ public class PerlSdkType extends SimpleJavaSdkType {
 
     public static String getVersionNumber(String sdkHome) {
         try {
-            String cmd = sdkHome + "\\bin\\" + PERL_EXE_NAME;
-            String[] params = {cmd, PERL_FLAG, PERL_CODE};
+            String[] params = {PerlCli.getPerlPath(sdkHome), PERL_FLAG, PERL_CODE};
 
             Process p = Runtime.getRuntime().exec(params);
             BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
