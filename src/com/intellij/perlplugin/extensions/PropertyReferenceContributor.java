@@ -2,6 +2,7 @@ package com.intellij.perlplugin.extensions;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
+import com.intellij.perlplugin.Utils;
 import com.intellij.perlplugin.psi.impl.PerlPropertyImpl;
 import com.intellij.perlplugin.psi.impl.PerlPropertyReference;
 import com.intellij.psi.*;
@@ -28,7 +29,7 @@ public class PropertyReferenceContributor extends PsiReferenceContributor {
                     @NotNull
                     @Override
                     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-                        System.out.println("registerReferenceProviders");
+                        Utils.print("registerReferenceProviders");
                         PsiLiteralExpression literalExpression = (PsiLiteralExpression) element;
                         String text = (String) literalExpression.getValue();
                         if (text != null) {

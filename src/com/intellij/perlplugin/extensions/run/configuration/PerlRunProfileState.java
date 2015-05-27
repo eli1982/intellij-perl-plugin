@@ -45,7 +45,6 @@ public class PerlRunProfileState implements RunProfileState {
     @Override
     public ExecutionResult execute(Executor executor, ProgramRunner programRunner) throws ExecutionException {
         try {
-//            System.out.println("executor.getActionName():" + executor.getActionName());
             String cmd =  PerlCli.getPerlPath(project);
             String[] params = {cmd ,"-e","'print 1;'"};
 
