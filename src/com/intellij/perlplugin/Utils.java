@@ -17,7 +17,7 @@ public class Utils {
     public static boolean debug = verbose || false;
 
     public static void alert(String str) {
-        throw new RuntimeException(str);
+        System.out.println(str);//TODO:: Log an exception properly
     }
 
     public static void print(Object obj) {
@@ -28,7 +28,7 @@ public class Utils {
         try {
             return new String(Files.readAllBytes(Paths.get(filePath)));
         } catch (Exception e) {
-            e.printStackTrace();
+            Utils.alert(e.getMessage());
         }
         return "";
     }
