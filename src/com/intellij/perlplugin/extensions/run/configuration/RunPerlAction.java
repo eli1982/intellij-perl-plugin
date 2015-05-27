@@ -33,28 +33,31 @@ public class RunPerlAction extends AnAction {
 
     @Override
     public void update(AnActionEvent e) {
-        super.update(e);
-        VirtualFile[] files = (VirtualFile[]) e.getDataContext().getData(DataConstants.VIRTUAL_FILE_ARRAY);
-        if (isInvalid(e.getProject(), files)) return;
+        try {
+            super.update(e);
+            VirtualFile[] files = (VirtualFile[]) e.getDataContext().getData(DataConstants.VIRTUAL_FILE_ARRAY);
+            if (isInvalid(e.getProject(), files)) return;
 
-        //check pl file in order to update display
-        boolean visible = false;
-        String perlScriptName = "";
-        for (int i = 0; i < files.length; i++) {
-            VirtualFile file = files[i];
-            if (file.getExtension().equals("pl")) {
-                visible = true;
-                if (perlScriptName.isEmpty()) {
-                    perlScriptName = file.getName();
-                } else {
-                    perlScriptName += ", " + file.getName();
+            //check pl file in order to update display
+            boolean visible = false;
+            String perlScriptName = "";
+            for (int i = 0; i < files.length; i++) {
+                VirtualFile file = files[i];
+                if (file.getExtension().equals("pl")) {
+                    visible = true;
+                    if (perlScriptName.isEmpty()) {
+                        perlScriptName = file.getName();
+                    } else {
+                        perlScriptName += ", " + file.getName();
+                    }
                 }
             }
-        }
 
-        e.getPresentation().setVisible(true);// Visibility
-        e.getPresentation().setEnabled(visible);// Enable or disable
-        e.getPresentation().setText("Run '" + ((perlScriptName.isEmpty()) ? "..." : perlScriptName) + "'");// Update text
+            e.getPresentation().setVisible(true);// Visibility
+            e.getPresentation().setEnabled(visible);// Enable or disable
+            e.getPresentation().setText("Run '" + ((perlScriptName.isEmpty()) ? "..." : perlScriptName) + "'");// Update text
+        }finally {
+        }
     }
 
 }
