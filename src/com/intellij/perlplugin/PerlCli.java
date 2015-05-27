@@ -6,6 +6,7 @@ import com.intellij.openapi.roots.impl.ProjectRootManagerImpl;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
@@ -26,11 +27,9 @@ public class PerlCli {
 
             Process p = Runtime.getRuntime().exec(params);
             BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            while ((line = input.readLine()) != null) {
-                Utils.print(result += line);
-            }
-            input.close();
+            BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            result = printStream(result, input);
+            result = printStream(result, err);
             int resultCode = p.waitFor();
             if (resultCode != 0) {
                 throw new Exception("Failed to run perl - Code (" + resultCode + ")");
@@ -43,21 +42,16 @@ public class PerlCli {
 
     private static String executeCode(Project project, String code) {
         String result = "";
-        if (project == null) {
-            Utils.alert("Missing project, cannot execute code");
-            return null;
-        }
         try {
-            String cmd = getPerlPath(project);
+            String cmd = ((project == null) ? getPerlPath("") : getPerlPath(project));
             String[] params = {cmd, "-e", code};
 
             Process p = Runtime.getRuntime().exec(params);
             BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            while ((line = input.readLine()) != null) {
-                Utils.print(result += line);
-            }
-            input.close();
+            BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+            result = printStream(result, input);
+            result = printStream(result, err);
             int resultCode = p.waitFor();
             if (resultCode != 0) {
                 throw new Exception("Failed to run perl - Code (" + resultCode + ")");
@@ -68,7 +62,15 @@ public class PerlCli {
         return result;
     }
 
-    //"perl version \"" + getVersionNumber(homePath) + "\""
+    private static String printStream(String result, BufferedReader input) throws IOException {
+        String line;
+        while ((line = input.readLine()) != null) {
+            Utils.print(result += line);
+        }
+        input.close();
+        return result;
+    }
+
     public static String getVersionString(Project project) {
         return executeCode(project, "\"use Config;print $Config{version}\"");
     }
@@ -95,6 +97,8 @@ public class PerlCli {
             Sdk sdk = ProjectRootManagerImpl.getInstance(project).getProjectSdk();
             if (sdk != null) {
                 return getPerlPath(sdk.getHomePath());
+            }else{
+                getPerlPath("");
             }
         }
         return path;
@@ -103,7 +107,7 @@ public class PerlCli {
     public static String getPerlPath(String sdkHome) {
         String path = null;
         Utils.OSType os = Utils.getOperatingSystemType();
-        if (sdkHome == null) {
+        if (sdkHome == null || sdkHome.isEmpty()) {
             switch (os) {
                 case Linux:
                     path = "/usr/";
@@ -118,6 +122,6 @@ public class PerlCli {
         if (!path.endsWith("/") && !path.endsWith("\\")) {
             path += "/";
         }
-        return path + "/bin/perl";
+        return path + "bin/perl";
     }
 }
