@@ -43,7 +43,7 @@ public class RunPerlAction extends AnAction {
             String perlScriptName = "";
             for (int i = 0; i < files.length; i++) {
                 VirtualFile file = files[i];
-                if (file.getExtension().equals("pl")) {
+                if (file != null && file.getExtension().equals("pl")) {
                     visible = true;
                     if (perlScriptName.isEmpty()) {
                         perlScriptName = file.getName();

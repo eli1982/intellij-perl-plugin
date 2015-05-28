@@ -1,8 +1,10 @@
 package com.intellij.perlplugin;
 
+import com.intellij.execution.console.ConsoleExecuteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.impl.ProjectRootManagerImpl;
+import org.jetbrains.builtInWebServer.ConsoleManager;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -113,6 +115,7 @@ public class PerlCli {
                 getPerlPath("");
             }
         }
+
         return path;
     }
 
