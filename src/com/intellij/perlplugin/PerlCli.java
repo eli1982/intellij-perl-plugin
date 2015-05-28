@@ -45,7 +45,9 @@ public class PerlCli {
         try {
             String cmd = ((project == null) ? getPerlPath("") : getPerlPath(project));
             String[] params = {cmd, "-e", code};
-
+            if(cmd == null){
+                throw new Exception("can't find perl");
+            }
             Process p = Runtime.getRuntime().exec(params);
             BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -57,7 +59,7 @@ public class PerlCli {
                 throw new Exception("Failed to run perl - Code (" + resultCode + ")");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Utils.alert(e.getMessage());
         }
         return result;
     }
@@ -111,6 +113,7 @@ public class PerlCli {
             switch (os) {
                 case Linux:
                     path = "/usr/";
+                    break;
                 case Windows:
                 case MacOS:
                 case Other:
@@ -118,6 +121,9 @@ public class PerlCli {
             }
         } else {
             path = sdkHome;
+        }
+        if(path == null){
+            return "";//TODO::Handle Exception
         }
         if (!path.endsWith("/") && !path.endsWith("\\")) {
             path += "/";
