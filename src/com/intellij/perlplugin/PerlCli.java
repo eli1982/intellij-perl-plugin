@@ -14,6 +14,12 @@ import java.io.InputStreamReader;
  * Perl CLI Util - please put all CLI controls here
  */
 public class PerlCli {
+    public static final String CODE_FLAG = "-e";
+
+    private static Utils.OSType os = null;
+    static {
+        os = Utils.getOperatingSystemType();
+    }
 
     public static String runFile(final Project project, String filePath) {
         String result = "";
@@ -22,14 +28,14 @@ public class PerlCli {
             if (Utils.debug) {
                 Utils.print("running: perl " + "\"" + path + "\"");
             }
-            String cmd = getPerlPath(project);
-            String[] params = {cmd, "\"" + path + "\""};
+            String cmd = ((project == null) ? getPerlPath("") : getPerlPath(project));;
+            String[] params = {cmd, ((os.equals(os.Windows))? "\"" + path + "\"" : path)};
 
             Process p = Runtime.getRuntime().exec(params);
             BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-            result = printStream(result, input);
-            result = printStream(result, err);
+            result = printStream( input);
+            printStream( err);
             int resultCode = p.waitFor();
             if (resultCode != 0) {
                 throw new Exception("Failed to run perl - Code (" + resultCode + ")");
@@ -44,16 +50,16 @@ public class PerlCli {
         String result = "";
         try {
             String cmd = ((project == null) ? getPerlPath("") : getPerlPath(project));
-            String[] params = {cmd, "-e", code};
+            String[] params = {cmd, CODE_FLAG, code};
+
             if(cmd == null){
                 throw new Exception("can't find perl");
             }
             Process p = Runtime.getRuntime().exec(params);
             BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-
-            result = printStream(result, input);
-            result = printStream(result, err);
+            result = printStream(input);
+            printStream(err);
             int resultCode = p.waitFor();
             if (resultCode != 0) {
                 throw new Exception("Failed to run perl - Code (" + resultCode + ")");
@@ -64,7 +70,8 @@ public class PerlCli {
         return result;
     }
 
-    private static String printStream(String result, BufferedReader input) throws IOException {
+    private static String printStream(BufferedReader input) throws IOException {
+        String result = "";
         String line;
         while ((line = input.readLine()) != null) {
             Utils.print(result += line);
@@ -74,7 +81,10 @@ public class PerlCli {
     }
 
     public static String getVersionString(Project project) {
-        return executeCode(project, "\"use Config;print $Config{version}\"");
+        if(os.equals(os.Windows)) {
+            return executeCode(project, "\"use Config;print Config{version};\"");
+        }
+        return executeCode(project, "use Config;print $Config{version};");
     }
 
     public static void main(String[] args) {
@@ -108,7 +118,6 @@ public class PerlCli {
 
     public static String getPerlPath(String sdkHome) {
         String path = null;
-        Utils.OSType os = Utils.getOperatingSystemType();
         if (sdkHome == null || sdkHome.isEmpty()) {
             switch (os) {
                 case Linux:
