@@ -84,7 +84,7 @@ public class PerlCli {
 
     public static String getVersionString(Project project) {
         if(os.equals(os.Windows)) {
-            return executeCode(project, "\"use Config;print Config{version};\"");
+            return executeCode(project, "\"use Config;print $Config{version};\"");
         }
         return executeCode(project, "use Config;print $Config{version};");
     }
