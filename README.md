@@ -6,3 +6,5 @@ https://github.com/eli1982/intellij-perl-plugin/wiki
 
 If you want to contribute, please contact me!
 Any help will be appreciated!
+
+![alt tag](https://raw.githubusercontent.com/eli1982/intellij-perl-plugin/master/perlplugin_github.jpg)
