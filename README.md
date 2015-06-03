@@ -4,7 +4,7 @@ This is a plugin that adds support for perl language in intellij (Based on Intel
 Read all about it in our wiki:
 https://github.com/eli1982/intellij-perl-plugin/wiki
 
-If you want to contribute, please contact me!
-Any help will be appreciated!
+# Amazing News - Hurricup and I have decided to collaborate and therefore will migrate parts of my project to his.
+# Make sure to follow us and code with us at: https://github.com/hurricup/Perl5-IDEA
 
 ![alt tag](https://raw.githubusercontent.com/eli1982/intellij-perl-plugin/master/perlplugin_github.jpg)
