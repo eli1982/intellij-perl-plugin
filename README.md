@@ -6,5 +6,3 @@ https://github.com/eli1982/intellij-perl-plugin/wiki
 
 # Amazing News - Hurricup and I have decided to collaborate and therefore will migrate parts of my project to his.
 # Make sure to follow us and code with us at: https://github.com/hurricup/Perl5-IDEA
-
-![alt tag](https://raw.githubusercontent.com/eli1982/intellij-perl-plugin/master/perlplugin_github.jpg)
